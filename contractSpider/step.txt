@@ -1,0 +1,2 @@
+1. 先用scrapy爬取代币合约的地址
+2. 再用etherscan的API爬取合约的源代码

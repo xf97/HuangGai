@@ -1,0 +1,5 @@
+{
+	"apiOrder": "https://api-cn.etherscan.com/api?module=contract&action=getabi", //&address=0xBB9bc244D798123fDe783fCc1C72d3Bb8C189413&apikey=YourApiKeyToken
+	"apikey": "FKA9S2UPX4DCTFA59VHBKVMPE4RRPP2RNX",
+	"scrapyTargetUrl": "https://cn.etherscan.com/tokens", //get contract'address url
+}
