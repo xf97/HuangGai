@@ -9,5 +9,13 @@ from itemadapter import ItemAdapter
 
 
 class ContractcodegetterPipeline:
+	def __init__(self):
+		pass
+
     def process_item(self, item, spider):
+    	#这个item一定要返回给引擎
         return item
+
+    #在爬虫关闭时执行
+    def close_spider(self, spider):
+    	pass
