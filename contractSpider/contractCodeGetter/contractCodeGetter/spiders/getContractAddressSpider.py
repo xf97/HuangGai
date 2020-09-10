@@ -4,7 +4,7 @@ import re
 import json
 
 #默认数据保存位置
-DATA_PATH = "../../data/tokenAndItsAddr.json"
+DATA_PATH = "./../data/tokenAndItsAddr.json"
 
 class GetcontractaddressspiderSpider(scrapy.Spider):
     name = 'getContractAddressSpider'
@@ -14,10 +14,12 @@ class GetcontractaddressspiderSpider(scrapy.Spider):
     #首批处理的url，可以是多个
 
     def __init__(self):
-    	self.num = 0
+    	self.num = self.initNum(DATA_PATH)
 
     def initNum(self, _dataPath):
-        pass
+        with open(_dataPath, "r", encoding = "utf-8") as f:
+            data = json.load(f)
+        print(data)
 
 
     #如果有多个请求(eg., 在start_urls中)，则每个parse方法都对应一个请求，并发执行

@@ -14,6 +14,7 @@ class ContractcodegetterPipeline:
 		#使用该文件保存爬取结果
 		self.file = open("tokenAndItsAddr.json", "ab+")
 
+	#spider参数传入当前的爬虫，根据spider.name区分爬虫
 	def process_item(self, item, spider):
 		#print(item)
 		aInfo = json.dumps(dict(item)) + ",\n"
@@ -24,3 +25,7 @@ class ContractcodegetterPipeline:
 	def close_spider(self, spider):
 		#关闭文件
 		self.file.close()
+
+	#爬虫开启时执行
+	def open_spider(self, spider):
+		pass
