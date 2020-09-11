@@ -18,6 +18,7 @@ NEWSPIDER_MODULE = 'contractCodeGetter.spiders'
 
 # Obey robots.txt rules
 #ROBOTSTXT_OBEY = True
+#不遵守robots协议
 ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
@@ -27,7 +28,8 @@ ROBOTSTXT_OBEY = False
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
 # unit: second
-#DOWNLOAD_DELAY = 3
+# 为防止被封ip，设置下载间隙
+DOWNLOAD_DELAY = 3
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
 #CONCURRENT_REQUESTS_PER_IP = 16
