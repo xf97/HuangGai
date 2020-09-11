@@ -10,10 +10,12 @@ class GetcontractaddressspiderSpider(scrapy.Spider):
     name = 'getContractAddressSpider'
     #允许爬取的网页的根域名
     allowed_domains = ["cn.etherscan.com"]
-    baseUrl = "https://cn.etherscan.com/tokens?p=" #基础url
+    #baseUrl = "https://cn.etherscan.com/tokens?p=" #拼接url时使用的基础url
+    baseUrl = "https://cn.etherscan.com/" #通过查找网页"下一页"来构造下一页url时使用的url
     offset = 1 #偏移量，用于翻页
     #首批处理的url，可以是多个
-    start_urls = [baseUrl + str(offset)]
+    #start_urls = [baseUrl + str(offset)] #使用拼接时使用的起始url
+    start_urls = ["https://cn.etherscan.com/tokens?p=1"]
     #num = 0 
 
     def __init__(self):
@@ -38,6 +40,7 @@ class GetcontractaddressspiderSpider(scrapy.Spider):
     #如果有多个请求(eg., 在start_urls中)，则每个parse方法都对应一个请求，并发执行
     #解析爬取结果，response是返回对象
     def parse(self, response):
+        #print(response.xpath("//a[@class = 'page-link' and @aria-label='Next']/@href").extract()[0]) #我学会一点xpath啦
         '''
         另有，response内置了re方法
         '''
@@ -66,8 +69,15 @@ class GetcontractaddressspiderSpider(scrapy.Spider):
             yield item
         #处理完一页信息后，翻页
         #由于cn.etherscan.com的限制，最多只展示20页
+        #通过拼接产生下一页的url
+        '''
         if self.offset < 20:
             self.offset += 1
             nowUrl = self.baseUrl + str(self.offset) #拼接出下一个要拼接的url
             #以下请求将会发送给调度器
             yield scrapy.Request(nowUrl, callback = self.parse) #指定parse为响应本次调用的回调函数并发送请求
+        '''
+        #或者，通过查找网页中的下一页连接来翻页
+        if len(response.xpath("//a[@class = 'page-link' and @aria-label='Next']/@href").extract()) > 0:
+            nowUrl = response.xpath("//a[@class = 'page-link' and @aria-label='Next']/@href").extract()[0]
+            yield scrapy.Request(self.baseUrl + nowUrl, callback = self.parse)
