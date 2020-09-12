@@ -78,6 +78,8 @@ class GetcontractaddressspiderSpider(scrapy.Spider):
             yield scrapy.Request(nowUrl, callback = self.parse) #指定parse为响应本次调用的回调函数并发送请求
         '''
         #或者，通过查找网页中的下一页连接来翻页
+        '''
         if len(response.xpath("//a[@class = 'page-link' and @aria-label='Next']/@href").extract()) > 0:
             nowUrl = response.xpath("//a[@class = 'page-link' and @aria-label='Next']/@href").extract()[0]
             yield scrapy.Request(self.baseUrl + nowUrl, callback = self.parse)
+        '''

@@ -78,7 +78,7 @@ DEFAULT_REQUEST_HEADERS = {
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'contractCodeGetter.pipelines.ContractcodegetterPipeline': 300,
+   'contractCodeGetter.pipelines.ContractcodegetterPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
