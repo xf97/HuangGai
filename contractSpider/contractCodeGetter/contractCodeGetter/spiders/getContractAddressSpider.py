@@ -8,6 +8,10 @@ ADDRESS_DATA_PATH = "tokenAndItsAddr.json"
 
 class GetcontractaddressspiderSpider(scrapy.Spider):
     name = 'getContractAddressSpider'
+    #指定本spider使用的管道
+    custom_settings = {
+        'ITEM_PIPELINES' : {'contractCodeGetter.pipelines.ContractcodegetterPipeline': 300}
+    }
     #允许爬取的网页的根域名
     allowed_domains = ["cn.etherscan.com"]
     #baseUrl = "https://cn.etherscan.com/tokens?p=" #拼接url时使用的基础url
@@ -20,22 +24,6 @@ class GetcontractaddressspiderSpider(scrapy.Spider):
 
     def __init__(self):
         pass
-    	#self.num = self.initNum(ADDRESS_DATA_PATH)
-
-    '''
-    #初始化序号，接上上次爬取时的最新数据
-    def initNum(self, _dataPath):
-        maxNum = 0
-        try:
-            with open(_dataPath, "r", encoding = "utf-8") as f:
-                for oneInfo in f.readlines():
-                    data = json.loads(oneInfo[:-2]) #dict(eval(oneInfo[:-2]))， 去除每条字符串最后的",\n"
-                    maxNum = max(maxNum, data["number"])
-        except:
-            maxNum = 0
-        return maxNum
-    '''
-
 
     #如果有多个请求(eg., 在start_urls中)，则每个parse方法都对应一个请求，并发执行
     #解析爬取结果，response是返回对象
@@ -78,8 +66,6 @@ class GetcontractaddressspiderSpider(scrapy.Spider):
             yield scrapy.Request(nowUrl, callback = self.parse) #指定parse为响应本次调用的回调函数并发送请求
         '''
         #或者，通过查找网页中的下一页连接来翻页
-        '''
         if len(response.xpath("//a[@class = 'page-link' and @aria-label='Next']/@href").extract()) > 0:
             nowUrl = response.xpath("//a[@class = 'page-link' and @aria-label='Next']/@href").extract()[0]
             yield scrapy.Request(self.baseUrl + nowUrl, callback = self.parse)
-        '''

@@ -7,9 +7,12 @@
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
 import json
+import os
 
 #合约及其地址信息存储位置
 ADDRESS_DATA_PATH = "contractAndItsAddr.json"
+#源代码写入位置
+CONTRACT_SOURCE_CODE_PATH = "../sourceCode/"
 
 
 class ContractcodegetterPipeline:
@@ -23,7 +26,6 @@ class ContractcodegetterPipeline:
 		try:
 			with open(_dataPath, "r", encoding = "utf-8") as f:
 				preResult = json.loads(f.read())
-				
 		except:
 			preResult = dict()
 		return preResult
@@ -46,6 +48,17 @@ class ContractcodegetterPipeline:
 	def close_spider(self, spider):
 		#关闭文件
 		#在爬虫结束时，将数据写入存储
-		self.writeResult(open(ADDRESS_DATA_PATH, "w+"), self.preResult) #将dict写入为json
-		self.file.close()
+		file = open(ADDRESS_DATA_PATH, "w+")
+		self.writeResult(file, self.preResult) #将dict写入为json
+		file.close()
+
+class SourceCodeGetterPipeline:
+	def process_item(self, item, spider):
+		filePath = os.path.join(CONTRACT_SOURCE_CODE_PATH, item["filename"] + ".sol") 
+		#若文件不存在，则写入文件
+		if not os.path.exists(filePath):
+			with open(filePath, "w+", encoding = "utf-8") as f:
+				f.write(item["sourceCode"])
+		return item
+
 

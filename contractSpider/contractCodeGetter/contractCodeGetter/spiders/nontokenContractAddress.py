@@ -8,6 +8,10 @@ NOTOKEN_ADDRESS_DATA_PATH = "nontokenAndItsAddr.json"
 class NontokencontractaddressSpider(scrapy.Spider):
     name = 'nontokenContractAddress'
     #allowed_domains = ['cn.etherscan.com/contractsVerified'] #爬取根域名，为防止出错，将其注释
+    #指定本spider使用的管道
+    custom_settings = {
+        'ITEM_PIPELINES' : {'contractCodeGetter.pipelines.ContractcodegetterPipeline': 300}
+    }
     baseUrl = "https://cn.etherscan.com" #基础url
     offset = "/contractsVerified/1?filter=opensourcelicense" #初始偏移值，选取开源的合约进行爬取
     start_urls = [baseUrl + offset] #爬取的起始域名
@@ -34,8 +38,6 @@ class NontokencontractaddressSpider(scrapy.Spider):
     		#返回给管道
     		yield item
     	#抓取页面中的”下一页“链接来进行换页
-    	'''
     	if len(response.xpath("//a[@class = 'page-link' and @aria-label='Next']/@href").extract()) > 0:
     		self.offset = response.xpath("//a[@class = 'page-link' and @aria-label='Next']/@href").extract()[0]
     		yield scrapy.Request(self.baseUrl + self.offset, callback = self.parse)
-    	'''

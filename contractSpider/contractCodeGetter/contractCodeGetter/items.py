@@ -15,3 +15,9 @@ class ContractcodegetterItem(scrapy.Item):
     #代币市值，可选
     #marketCap = scrapy.Field()
     #pass
+
+class SourceCodeGetterItem(scrapy.Item):
+	#命名文件名
+	filename = scrapy.Field()
+	#合约源代码
+	sourceCode = scrapy.Field()

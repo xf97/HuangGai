@@ -78,7 +78,8 @@ DEFAULT_REQUEST_HEADERS = {
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'contractCodeGetter.pipelines.ContractcodegetterPipeline': 300,
+   'contractCodeGetter.pipelines.ContractcodegetterPipeline': 300,	#两个管道，300的给爬取地址用
+   'contractCodeGetter.pipelines.SourceCodeGetterPipeline': 500,	#500的给源代码用 
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
