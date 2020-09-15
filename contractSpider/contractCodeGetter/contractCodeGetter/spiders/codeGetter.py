@@ -40,22 +40,32 @@ class CodegetterSpider(scrapy.Spider):
                 #当所有合约都被爬取完时，数组将越界，引发异常，结束爬取
                 return
         else:
-            #获取源码
-            pageText = response.body.decode("utf-8")
-            #通过xpath拿出源代码
-            sourceCode = response.xpath("//pre[@id='editor']/text()").extract()[0]
-            #print(sourceCode)
-            #存储信息
-            item = infoItem()
-            item["filename"] = self.contractAddress
-            item["sourceCode"] = sourceCode
-            #返回item给管道
-            yield item
-            #构造下一个请求
+            #捕获异常，持续爬取
             try:
-                self.contractAddress = self.getContractAddress(self.index)
-                self.index += 1
-                yield scrapy.Request(self.baseUrlPrefix + self.contractAddress + self.baseUrlSuffix, callback = self.parse)
-            except IndexError:
-                #当所有合约都被爬取完时，数组将越界，引发异常，结束爬取
-                return
+                #获取源码
+                pageText = response.body.decode("utf-8")
+                #通过xpath拿出源代码
+                sourceCode = response.xpath("//pre[@id='editor']/text()").extract()[0]
+                #print(sourceCode)
+                #存储信息
+                item = infoItem()
+                item["filename"] = self.contractAddress
+                item["sourceCode"] = sourceCode
+                #返回item给管道
+                yield item
+                #构造下一个请求
+                try:
+                    self.contractAddress = self.getContractAddress(self.index)
+                    self.index += 1
+                    yield scrapy.Request(self.baseUrlPrefix + self.contractAddress + self.baseUrlSuffix, callback = self.parse)
+                except IndexError:
+                    #当所有合约都被爬取完时，数组将越界，引发异常，结束爬取
+                    return
+            except:
+                try:
+                    self.contractAddress = self.getContractAddress(self.index)
+                    self.index += 1
+                    yield scrapy.Request(self.baseUrlPrefix + self.contractAddress + self.baseUrlSuffix, callback = self.parse)
+                except IndexError:
+                    #当所有合约都被爬取完时，数组将越界，引发异常，结束爬取
+                    return

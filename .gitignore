@@ -1,2 +1,3 @@
 contractSpider/spiderConfig.json
 contractSpider/data/*.json
+contractExtractor/reentrancyExtractor/*.txt
