@@ -7,6 +7,7 @@ from random import randint
 import re
 import subprocess	#使用subprocess的popen，该popen是同步IO的
 from colorPrint import *	#该头文件中定义了色彩显示的信息
+from judgeAst import judgeAst #该头文件用于判断合约的ast中是否存在三个较为简单的特征
 
 #源代码数据存储位置
 SOURCE_CODE_PATH = "../../contractSpider/contractCodeGetter/sourceCode"
@@ -142,7 +143,11 @@ class reentrancyExtractor:
 			raise Exception("Failed to compile the contract.")
 
 	def judgeContract(self, _sourceCode, _jsonAst):
-		#关键函数，待实现
+		simpleJudge = judgeAst(_jsonAst)
+		if not simpleJudge.run():
+			#如果不符合标准（简单标准），则返回False
+			return False
+		#关键函数，正在实现
 		return True
 
 	def storeResult(self, _filename):
