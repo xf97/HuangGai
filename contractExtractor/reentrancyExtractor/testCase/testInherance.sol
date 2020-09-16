@@ -16,9 +16,24 @@ contract baseContract2{
 }
 
 contract baseContract3 is baseContract1{
-	function withdraw() external{
+	function withdraw1() external{
 		require(balance[msg.sender] > 0);
 		msg.sender.transfer(balance[msg.sender]);
+	}
+
+	function withdraw2() external{
+		require(balance[msg.sender] > 0);
+		msg.sender.send(balance[msg.sender]);
+	}
+
+	function withdraw3() external{
+		require(balance[msg.sender] > 0);
+		msg.sender.call.value(balance[msg.sender])("");
+	}
+
+	function noWithdraw() external{
+		require(balance[msg.sender] > 0);
+		msg.sender.call("");
 	}
 }
 

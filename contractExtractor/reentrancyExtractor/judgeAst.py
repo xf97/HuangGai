@@ -42,6 +42,28 @@ class judgeAst:
 		self.payableFlag = False
 		self.mapping = False
 
+	#该函数还暂时欠考虑，需要考虑较近基类合约的复写函数、函数修改器
 	def run(self):
+		for contractAst in self.inherGraph.astList():
+			if self.callTransferSendFlag and self.payableFunc and self.mapping:
+				break
+			else:
+				if self.etherOutStatement(contractAst):
+					self.callTransferSendFlag = True
+				if self.payableFunc(contractAst):
+					self.payableFunc = True
+				if self.mappingState(contractAst):
+					self.mapping = True
+		return self.callTransferSendFlag and self.payableFunc and self.mapping
+
+
+	def etherOutStatement(self, _ast):
+		pass
+
+	def payableFunc(self, _ast):
+		pass
+
+	def mappingState(self, _ast):
+		pass
 		
 
