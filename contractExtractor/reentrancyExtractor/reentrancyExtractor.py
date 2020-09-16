@@ -5,6 +5,8 @@ import sys
 import os
 from random import randint
 import re
+import subprocess	#使用subprocess的popen，该popen是同步IO的
+from colorPrint import *	#该头文件中定义了色彩显示的信息
 
 #源代码数据存储位置
 SOURCE_CODE_PATH = "../../contractSpider/contractCodeGetter/sourceCode"
@@ -13,7 +15,7 @@ SOURCE_CODE_PREFIX_PATH = "../../contractSpider/contractCodeGetter/sourceCode"
 RESULT_PATH = "./result/"
 
 '''
-本机支持的
+本机支持的solc范围从: 0.4.0-0.7.1
 '''
 
 
@@ -23,31 +25,36 @@ class reentrancyExtractor:
 		self.needs = _needsNum
 		self.nowNum = 0
 		self.cacheContractPath = "./cache/temp.sol" 
-		self.cacheJsonAstPath = "./cache/temp.sol_json.ast"
+		self.cacheJsonAstPath = "./cache/"	#默认json_ast存储名: json_ast
+		self.cacheJsonAstName = "temp.sol_json.ast"
 		self.defaultSolc = "0.6.0"	#默认使用的solc编译版本
 		self.maxSolc = "0.7.1" #最高被支持的solc版本，合约使用的solc版本高于此版本时，引发异常
-		self.minSolc = "0.4.21"	#最低被支持的solc版本
+		self.minSolc = "0.4.0"	#最低被支持的solc版本
 
 	def extractContracts(self):
 		#当符合条件的合约数量不满足需求时，继续抽取
-		while self.nowNum < needs:
-			#拿到一个合约及其源代码
-			(sourceCode, prevFileName) = self.getSourceCode()
-			#将当前合约暂存
-			self.cacheContract(sourceCode)
-			#调整本地编译器版本
-			self.changeSolcVersion(sourceCode)
-			#编译生成当前合约的抽象语法树(以json_ast形式给出)
-			jsonAst = self.compile2Json()
-			#根据合约文件本身、源代码、抽象语法树来判断该合约是否符合标准
-			if self.judgeContract(sourceCode, jsonAst) == True:
-				#符合标准，加１，写入数据文件
-				self.nowNum += 1 
-				#将暂存文件及其JsonAst文件转移到结果保存文件中
-				self.storeResult(prevFileName)
-				#显示进度　
-				print("\r当前抽取进度: %.2f" % (self.nowNum / self.needs) )
-			else:
+		while self.nowNum < self.needs:
+			try:
+				#拿到一个合约及其源代码
+				(sourceCode, prevFileName) = self.getSourceCode()
+				#将当前合约暂存
+				self.cacheContract(sourceCode)
+				#调整本地编译器版本
+				self.changeSolcVersion(sourceCode)
+				#编译生成当前合约的抽象语法树(以json_ast形式给出)
+				jsonAst = self.compile2Json()
+				#根据合约文件本身、源代码、抽象语法树来判断该合约是否符合标准
+				if self.judgeContract(sourceCode, jsonAst) == True:
+					#符合标准，加１，写入数据文件
+					self.nowNum += 1 
+					#将暂存文件及其JsonAst文件转移到结果保存文件中
+					self.storeResult(prevFileName)
+					#显示进度　
+					print("\r%s当前抽取进度: %.2f%s" % (blue, self.nowNum / self.needs, end) )
+				else:
+					continue
+			except Exception as e:
+				print("%s %s %s" % (bad, e, end))
 				continue
 
 	def getSourceCode(self):
@@ -65,16 +72,20 @@ class reentrancyExtractor:
 				continue
 		#读取文件内容
 		index = randint(0, len(solList))
+		#print(index, solList[index])
+		#index = 2
 		try:
 			#拼接绝对路径
 			sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
+			return sourceCode, solList[index]
 		except:
-			#无法获取源代码，则终止运行
-			sys.exit(0)
-		return sourceCode, solList[index]
+			#无法获取源代码，则引发异常　
+			#sys.exit(0)
+			raise Exception("Unable to obtain source code " + solList[index])
+		
 
 	def changeSolcVersion(self, _sourceCode):
-		#首先明确－如果合约内存在多个solc版本语句，则只考虑第一个声明语句
+		#首先明确－如果合约内存在多个solc版本语句，则只不处理该合约
 		#要考虑多种情况，1-pragma solidity 0.5.0
 		#2-pragma solidity ^0.5.0
 		#3-pragma solidity >=0.5.0 <0.6.0
@@ -82,56 +93,72 @@ class reentrancyExtractor:
 		#然后再取第一个的数字
 		pragmaPattern = re.compile(r"(\b)pragma(\s)+(solidity)(.)+?(;)")
 		lowVersionPattern = re.compile(r"(\b)(\d)(\.)(\d)(.)(\d)+(\b)")
+		#print("2.1")
 		#再考虑，万一没有声明呢？则默认，考虑使用0.6.0作为默认值吧
+		if len(pragmaPattern.findall(_sourceCode)) > 1:
+			raise Exception("Multiple pragma solidity statements.")
+		#print(2.2)
 		pragmaStatement = pragmaPattern.search(_sourceCode, re.S)	#允许匹配多行
+		#print(2.3)
+		#print("pragmaStatement", pragmaStatement)
 		#如果存在声明
 		if pragmaStatement:
 			#抽取出最低版本
 			solcVersion = lowVersionPattern.search(pragmaStatement.group())
+			#print("solcVersion", solcVersion)
 			if solcVersion:
 				self.defaultSolc = solcVersion.group()
 		#否则使用默认声明
+		#print(self.defaultSolc)
 		try:
 			if self.defaultSolc >= self.minSolc and self.defaultSolc <= self.maxSolc:
+				#print("xixixix")
 				#在本机支持的solc版本范围内
-				print(_sourceCode)
-				compileResult = os.popen("solc use " + self.defaultSolc)	#切换版本
-				print(compileResult.read())
+				compileResult = subprocess.run("solc use " + self.defaultSolc, check = True, shell = True)	#切换版本
+				#print("lalala")
+				#print(compileResult.read())
 			else:
 				#如果超出本机支持的solc范围，则引发异常
+				#print("Use unsupported solc version.")
 				raise Exception("Use unsupported solc version.")
-		except:
+		except Exception as e:
 			#切换编译器失败，则终止运行
-			sys.exit(0)
+			print(e)
+			return
+			#sys.exit(0)
 
 	def cacheContract(self, _sourceCode):
-		with open(self.cacheContractPath, "w+", encoding = "utf-8") as f:
-			f.write(_sourceCode)
-		return
+		try:
+			with open(self.cacheContractPath, "w+", encoding = "utf-8") as f:
+				f.write(_sourceCode)
+			return
+		except:
+			raise Exception("Failed to cache contract.")
 
 	def compile2Json(self):
-		compileResult = os.popen("solc --ast-json --pretty-json --overwrite " + self.cacheContractPath + " -o .")
-		print(compileResult.read())
+		try:
+			compileResult = subprocess.run("solc --ast-json --overwrite " + self.cacheContractPath + " -o " + self.cacheJsonAstPath, check = True, shell = True)
+		except:
+			raise Exception("Failed to compile the contract.")
 
 	def judgeContract(self, _sourceCode, _jsonAst):
 		#关键函数，待实现
 		return True
 
 	def storeResult(self, _filename):
-		#使用cp命令拷贝两份问卷
-		desCode = os.path.join(RESULT_PATH, _filename)
-		desJsonAst = os.path.join(RESULT_PATH, _filename + "_json.ast")
-		#执行拷贝，显示详细信息
-		codeExecuteResult = os.popen("cp -v " + self.cacheContractPath + " " + desCode)
-		astExecuteResult = os.popen("cp -v " + self.cacheJsonAstPath + " " +desJsonAst)
-		return
+		try:
+			#使用cp命令拷贝两份结果
+			desCode = os.path.join(RESULT_PATH, _filename)
+			desJsonAst = os.path.join(RESULT_PATH, _filename + "_json.ast")
+			#执行拷贝，显示详细信息
+			codeExecuteResult = subprocess.run("cp -v " + self.cacheContractPath + " " + desCode, check = True, shell = True)
+			astExecuteResult = subprocess.run("cp -v " + self.cacheJsonAstPath + self.cacheJsonAstName + " " + desJsonAst, check = True, shell = True)
+			return
+		except:
+			raise Exception("Failed to store the result.")
 
 
 #单元测试
 if __name__ == "__main__":
-	ree = reentrancyExtractor()
-	filename, sourceCode = ree.getSourceCode()
-	ree.cacheContract(sourceCode)
-	ree.changeSolcVersion(sourceCode)
-	#re.compile2Json()
-		
+	ree = reentrancyExtractor(10)
+	ree.extractContracts()

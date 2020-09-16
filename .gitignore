@@ -1,3 +1,5 @@
 contractExtractor/reentrancyExtractor/*.txt
 contractSpider/contractCodeGetter/data/*.json
 contractSpider/contractCodeGetter/sourceCode/*.sol
+contractExtractor/reentrancyExtractor/result/*.sol
+contractExtractor/reentrancyExtractor/result/*.ast
