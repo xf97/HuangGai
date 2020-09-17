@@ -18,20 +18,30 @@
 
 '''
 哪些东西会被继承？或者说，可以被子类使用的基类资源是哪些？
-non-private资源，那么我们仅考虑搜查以下三类资源：
+non-private资源，那么我们仅考虑搜查以下两类资源：
 1.　状态变量
 2.　函数定义(FunctionDefinition)
-3.	修改器
 '''
 
 '''
-哪些东西可能被重写？
-根据Solidity 0.7.1 文档
-函数、函数修改器
+如果在一群继承合约中，存在一个“孤立”的合约（即，不参与继承的合约）；或在一个文件中存在多路互相独立的继承流，如何处理？
+将继承基类合约最多的子类合约作为主合约
 '''
+
+'''
+如何区分多态函数？
+使用函数签名－即FunctionSelector区分函数
+但后返回的合约中的同FunctionSelector函数中没有需求语句，但先返回的合约中的同FunctionSelector函数中有时
+不计入统计
+'''
+
+CALL_FLAG = 1
+PAYABLE_FLAG = 2
+MAPPING_FLAG = 3
 
 import json
-from inherGraph import inherGraph #该库接收jsonAst，按继承顺序，从最底层子类到最上层基类的顺序返回每个"ContractDefinition"的jsonAst
+from inherGraph import inherGraph #该库接收jsonAst，按线性继承顺序，从最上层基类到最底层子类的顺序返回每个"ContractDefinition"的jsonAst
+import 
 
 
 class judgeAst:
@@ -41,29 +51,128 @@ class judgeAst:
 		self.callTransferSendFlag = False
 		self.payableFlag = False
 		self.mapping = False
+		#该列表每个元素的存储结构是(函数签名，包含的语句类型)
+		self.funcHashAndItsStatement = list()
 
-	#该函数还暂时欠考虑，需要考虑较近基类合约的复写函数、函数修改器
 	def run(self):
 		for contractAst in self.inherGraph.astList():
+			#如果有在上层捕获的函数，那么就应该在本层删除同函数签名的函数
+			if len(self.funcHashAndItsStatement) > 0:
+				self.polymorphism(contractAst, self.funcHashAndItsStatement)
+			if self.etherOutStatement(contractAst)[0]:
+				self.funcHashAndItsStatement.extend(self.etherOutStatement(contractAst)[1])
+			if self.payableFunc(contractAst)[0]:
+				self.funcHashAndItsStatement.extend(self.payableFunc(contractAst)[1])
+			if self.mappingState(contractAst)[0]:
+				self.funcHashAndItsStatement.extend(self.mappingState(contractAst)[1])
+		if len(self.funcHashAndItsStatement) <= 3:
+			return False
+		#遍历结束，检查结果
+		for item in self.funcHashAndItsStatement:
 			if self.callTransferSendFlag and self.payableFunc and self.mapping:
-				break
-			else:
-				if self.etherOutStatement(contractAst):
-					self.callTransferSendFlag = True
-				if self.payableFunc(contractAst):
-					self.payableFunc = True
-				if self.mappingState(contractAst):
-					self.mapping = True
+				return True
+			if item[1] == MAPPING_FLAG:
+				self.mapping = True
+			elif item[1] == CALL_FLAG:
+				self.callTransferSendFlag = True
+			elif item[1] == PAYABLE_FLAG:
+				self.payableFunc = True
 		return self.callTransferSendFlag and self.payableFunc and self.mapping
+
+	def polymorphism(self, _ast, _list):
+		funcList = self.findASTNode(_ast, "name", "FunctionDefinition")
+		signatureList = [item[0] for item im _list]	#构建上层已有的函数签名列表
+		for func in funcList:
+			signature  = func["attributes"]["functionSelector"]
+			if signature in signatureList:
+				#找到下层的复写了上层的函数，就从上层的列表中删除这一项
+				for i in range(0, len(_list)):
+					if i[0] == signature:
+						_list.pop(i)	#按索引删除元素
+						break
+			else:
+				continue
 
 
 	def etherOutStatement(self, _ast):
-		pass
+		result = list()
+		memberList = self.findASTNode(_ast, "name", "MemberAccess")
+		funcList = self.findASTNode(_ast, "name", "FunctionDefinition")
+		for item in memberList:
+			if item["attributes"]["member_name"] == "transfer" and item["attributes"]["type"] == "function (uint256)":
+				#找到使用transfer
+				#现在去找外层的FunctionDefinition
+				signature = self.getMemberTypeSig(item, funcList)
+				result.append((signature, CALL_FLAG))
+			if item["attributes"]["member_name"] == "send" and item["attributes"]["type"] == "function (uint256) returns (bool)":
+				#找到使用send
+				signature = self.getMemberTypeSig(item, funcList)
+				result.append((signature, CALL_FLAG))
+			if item["attributes"]["member_name"] == "value" and item["attributes"]["type"] == "function (uint256) pure returns (function (bytes memory) payable returns (bool,bytes memory))":
+				if item["children"][0]["attributes"]["member_name"] == "call" and item["children"][0]["attributes"]["type"] == "function (bytes memory) payable returns (bool,bytes memory)":
+					signature = self.getMemberTypeSig(item, funcList)
+					result.append((signature, CALL_FLAG))
+		if len(result) > 0:
+			return True, result
+		else:
+			return False, list()
+
+	def getMemberTypeSig(self, _item, _list):
+		#根据源代码的包含关系来判断语句属于哪个函数
+		startPos, endPos = self.srcToPos(item["src"])
+		for func in _list:
+			funcSPos, funcEPos = self.srcToPos(func["src"])
+			if startPos > funcSPos and endPos < funcEPos:
+				return func["attributes"]["functionSelector"]
+
+
+	#传入：657:17:0
+	#传出：657, 674
+	def srcToPos(self, _src):
+		temp = _src.split(":")
+		return int(temp[0]), int(temp[0]) + int(temp[1])
 
 	def payableFunc(self, _ast):
-		pass
+		result = list()
+		payableList = self.findASTNode(_ast, "name", "FunctionDefinition")
+		funcList = payableList[:]
+		for item in payableList:
+			if item["attributes"]["stateMutability"] == "payable":
+				signature = item["attributes"]["functionSelector"]
+				result.append((signature, PAYABLE_FLAG))
+		if len(result) > 0:
+			return True, result
+		else:
+			return False, list()
 
 	def mappingState(self, _ast):
-		pass
+		result = list()
+		varList = self.findASTNode(_ast, "name", "VariableDeclaration")
+		for item in varList:
+			if item["attributes"]["stateVariable"] == True and item["attributes"]["type"] == "mapping(address => uint256)":
+				result.append((-1, MAPPING_FLAG))
+		if len(result) > 0:
+			return True, result
+		else:
+			return False, result
+
+
+	#在给定的ast中返回包含键值对"_name": "_value"的字典列表
+	def findASTNode(self, _ast, _name, _value):
+		queue = [_ast]
+		result = list()
+		literalList = list()
+		while len(queue) > 0:
+			data = queue.pop()
+			for key in data:
+				if key == _key and  data[key] == _value:
+					result.append(data)
+				elif type(data[key]) == dict:
+					queue.append(data[key])
+				elif type(data[key]) == list:
+					for item in data[key]:
+						if type(item) == dict:
+							queue.append(item)
+		return result
 		
 

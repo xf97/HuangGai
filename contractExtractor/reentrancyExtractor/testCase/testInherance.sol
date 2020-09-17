@@ -6,6 +6,11 @@ contract baseContract1{
 	function getMoney() external payable{
 		balance[msg.sender] += msg.value;
 	}
+
+	modifier deductBalance() virtual {
+		balance[msg.sender] -= 1;
+		_;
+	}
 }
 
 contract baseContract2{
@@ -13,30 +18,43 @@ contract baseContract2{
 	constructor() public{
 		owner = msg.sender;
 	}
+
+	modifier onlyOwner(){
+		require(msg.sender == owner);
+		_;
+	}
 }
 
 contract baseContract3 is baseContract1{
 	function withdraw1() external{
 		require(balance[msg.sender] > 0);
 		msg.sender.transfer(balance[msg.sender]);
+		balance[msg.sender] = 0;
 	}
 
 	function withdraw2() external{
 		require(balance[msg.sender] > 0);
 		msg.sender.send(balance[msg.sender]);
+		balance[msg.sender] = 0;
 	}
 
 	function withdraw3() external{
 		require(balance[msg.sender] > 0);
 		msg.sender.call.value(balance[msg.sender])("");
+		balance[msg.sender] = 0;
 	}
 
 	function noWithdraw() external{
 		require(balance[msg.sender] > 0);
 		msg.sender.call("");
+		balance[msg.sender] = 0;
 	}
 }
 
 contract myContract is baseContract2, baseContract3{
-	
+	function withdraw1(uint256 _amount) onlyOwner external{
+		require(balance[msg.sender] > _amount);
+		msg.sender.transfer(_amount);
+		balance[msg.sender] -= _amount;
+	}
 }
