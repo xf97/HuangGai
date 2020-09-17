@@ -22,6 +22,10 @@ RESULT_PATH = "./result/"
 本机支持的solc范围从: 0.4.0-0.7.1
 '''
 
+'''
+新问题-导入合约如何编译？
+'''
+
 
 class reentrancyExtractor:
 	#默认每次的抽取输出是100
@@ -38,42 +42,50 @@ class reentrancyExtractor:
 	def extractContracts(self):
 		#当符合条件的合约数量不满足需求时，继续抽取
 		while self.nowNum < self.needs:
-			try:
-				#拿到一个合约及其源代码
-				(sourceCode, prevFileName) = self.getSourceCode()
-				print(1)
-				#将当前合约暂存
-				self.cacheContract(sourceCode)
-				print(2)
-				#调整本地编译器版本
-				self.changeSolcVersion(sourceCode)
-				print(3)
-				#编译生成当前合约的抽象语法树(以json_ast形式给出)
-				jsonAst = self.compile2Json()
-				print(4)
-				#根据合约文件本身、源代码、抽象语法树来判断该合约是否符合标准
-				if self.judgeContract(sourceCode, jsonAst) == True:
-					print(5)
-					#符合标准，加１，写入数据文件
-					self.nowNum += 1 
-					#将暂存文件及其JsonAst文件转移到结果保存文件中
-					self.storeResult(prevFileName)
-					print(6)
-					#显示进度　
-					print("\r%s当前抽取进度: %.2f%s" % (blue, self.nowNum / self.needs, end) )
-				else:
-					continue
+			#try:
+			#拿到一个合约及其源代码
+			(sourceCode, prevFileName) = self.getSourceCode()
+			print(prevFileName)
+			#print(1)
+			#将当前合约暂存
+			self.cacheContract(sourceCode)
+			#print(2)
+			#调整本地编译器版本
+			self.changeSolcVersion(sourceCode)
+			#print(3)
+			#编译生成当前合约的抽象语法树(以json_ast形式给出)
+			jsonAst = self.compile2Json()
+			#print(4)
+			#根据合约文件本身、源代码、抽象语法树来判断该合约是否符合标准
+			if self.judgeContract(sourceCode, jsonAst) == True:
+				#print(5)
+				#符合标准，加１，写入数据文件
+				self.nowNum += 1 
+				#将暂存文件及其JsonAst文件转移到结果保存文件中
+				self.storeResult(prevFileName)
+				#print(6)
+				#显示进度　
+				print("\r%s当前抽取进度: %.2f%s" % (blue, self.nowNum / self.needs, end) )
+			else:
+				#self.nowNum += 1
+				continue
+			'''
+			每次操作后要清空cache文件夹
+			'''
+			'''
 			except Exception as e:
+				#self.nowNum += 1
 				print("%s %s %s" % (bad, e, end))
 				continue
+			'''
 
 	def getSourceCode(self):
 		'''
 		该函数从源代码数据存储位置提取
 		合约的名称和源代码
 		'''
-		#fileList = os.listdir(SOURCE_CODE_PATH)
-		fileList = os.listdir(TESTCASE_PATH)
+		fileList = os.listdir(SOURCE_CODE_PATH)
+		#fileList = os.listdir(TESTCASE_PATH)
 		solList = list()
 		#根据文件后缀判断文件类型
 		for i in fileList:
@@ -84,12 +96,12 @@ class reentrancyExtractor:
 		#读取文件内容
 		index = randint(0, len(solList))
 		#print(index, solList[index])
-		#index = 2
+		#index = 0
 		try:
 			#拼接绝对路径
 			#sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
-			sourceCode = open(os.path.join(TESTCASE_PATH, solList[index]), "r", encoding = "utf-8").read()
-			return sourceCode, solList[index]
+			sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, "0x9ec022f82c5004a2fd71ce354ea2e57baf6b81ab.sol"), "r", encoding = "utf-8").read()
+			return sourceCode, "0x9ec022f82c5004a2fd71ce354ea2e57baf6b81ab.sol"#solList[index]
 		except:
 			#无法获取源代码，则引发异常　
 			#sys.exit(0)

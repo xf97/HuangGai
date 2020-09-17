@@ -3,8 +3,8 @@ pragma solidity 0.6.0;
 contract baseContract1{
 	mapping(address=>uint256) public balance;
 
-	function getMoney() external payable{
-		balance[msg.sender] += msg.value;
+	
+	function getMoney() external payable virtual{
 	}
 
 	modifier deductBalance() virtual {
@@ -56,5 +56,10 @@ contract myContract is baseContract2, baseContract3{
 		require(balance[msg.sender] > _amount);
 		msg.sender.transfer(_amount);
 		balance[msg.sender] -= _amount;
+	}
+
+	function getMoney() override external payable{
+		balance[msg.sender] += msg.value;
+		balance[msg.sender] += 10;
 	}
 }

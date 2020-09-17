@@ -9,7 +9,7 @@ class inherGraph:
 
 	def astList(self):
 		#获取所有合约的定义
-		contractList = self.findAstNode(self.json, "name", "ContractDefinition")
+		contractList = self.findASTNode(self.json, "name", "ContractDefinition")
 		idList = list()
 		maxNum, mainId = (0, 0)
 		#判断哪个合约将作为“主合约”
@@ -26,7 +26,7 @@ class inherGraph:
 		idList.append(mainId)
 		#根据调用，逐个返回contract
 		for _id in idList:
-			yield self.findAstNode(self.json, "id", _id)[0]
+			yield self.findASTNode(self.json, "id", _id)[0]
 
 	def findASTNode(self, _ast, _name, _value):
 		queue = [_ast]
@@ -35,7 +35,7 @@ class inherGraph:
 		while len(queue) > 0:
 			data = queue.pop()
 			for key in data:
-				if key == _key and  data[key] == _value:
+				if key == _name and  data[key] == _value:
 					result.append(data)
 				elif type(data[key]) == dict:
 					queue.append(data[key])

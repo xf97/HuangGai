@@ -35,17 +35,26 @@ non-private资源，那么我们仅考虑搜查以下两类资源：
 不计入统计
 '''
 
+#WARNING
+'''
+部分函数有“函数选择器”值，但部分函数没有，这些函数之间并没有明显地差异，这令人费解?
+稳妥的解决方法，用命令"solc --hashes myContract.sol -o ."
+'''
+
 CALL_FLAG = 1
 PAYABLE_FLAG = 2
 MAPPING_FLAG = 3
 
 import json
 from inherGraph import inherGraph #该库接收jsonAst，按线性继承顺序，从最上层基类到最底层子类的顺序返回每个"ContractDefinition"的jsonAst
-import 
+import subprocess
+import os
 
 
 class judgeAst:
 	def __init__(self, _json):
+		self.cacheContractPath = "./cache/temp.sol"
+		self.cacheFolder = "./cache/"
 		self.json =  _json
 		self.inherGraph = inherGraph(_json)
 		self.callTransferSendFlag = False
@@ -53,6 +62,19 @@ class judgeAst:
 		self.mapping = False
 		#该列表每个元素的存储结构是(函数签名，包含的语句类型)
 		self.funcHashAndItsStatement = list()
+		self.contractAndItsHashes = dict()
+
+	#该函数用于生成每个合约中每个函数的函数选择器值
+	def getFuncHash(self):
+		try:
+			#生成哈希签名
+			compileResult = subprocess.run("solc --hashes " + self.cacheContractPath + " -o .", check = True, shell = True)
+			#获取保存哈希值的文件名
+			hashFileName = [filename for filename in os.listdir(self.cacheFolder) if filename.split(".")[1] == "signatures"]
+			#打开每个文件，读取每个函数的哈希值，保存为字典
+			#key为合约名，元素[0]是函数名，元素[1]是函数选择器值
+			#最后与要清空cache文件夹
+
 
 	def run(self):
 		for contractAst in self.inherGraph.astList():
@@ -65,31 +87,39 @@ class judgeAst:
 				self.funcHashAndItsStatement.extend(self.payableFunc(contractAst)[1])
 			if self.mappingState(contractAst)[0]:
 				self.funcHashAndItsStatement.extend(self.mappingState(contractAst)[1])
-		if len(self.funcHashAndItsStatement) <= 3:
+		'''
+		if len(self.funcHashAndItsStatement) < 3:
 			return False
+		'''
 		#遍历结束，检查结果
 		for item in self.funcHashAndItsStatement:
-			if self.callTransferSendFlag and self.payableFunc and self.mapping:
+			if self.callTransferSendFlag and self.payableFlag and self.mapping:
 				return True
 			if item[1] == MAPPING_FLAG:
 				self.mapping = True
 			elif item[1] == CALL_FLAG:
 				self.callTransferSendFlag = True
 			elif item[1] == PAYABLE_FLAG:
-				self.payableFunc = True
-		return self.callTransferSendFlag and self.payableFunc and self.mapping
+				self.payableFlag = True
+		#print(self.callTransferSendFlag, self.payableFlag, self.mapping)
+		return self.callTransferSendFlag and self.payableFlag and self.mapping
 
 	def polymorphism(self, _ast, _list):
 		funcList = self.findASTNode(_ast, "name", "FunctionDefinition")
-		signatureList = [item[0] for item im _list]	#构建上层已有的函数签名列表
+		signatureList = [item[0] for item in _list]	#构建上层已有的函数签名列表
 		for func in funcList:
-			signature  = func["attributes"]["functionSelector"]
-			if signature in signatureList:
-				#找到下层的复写了上层的函数，就从上层的列表中删除这一项
-				for i in range(0, len(_list)):
-					if i[0] == signature:
-						_list.pop(i)	#按索引删除元素
-						break
+			#构造函数没有FunctionSelector
+			if func["attributes"]["kind"] == "function":
+				#很奇怪
+				signature  = func["attributes"]["functionSelector"]
+				if signature in signatureList:
+					#找到下层的复写了上层的函数，就从上层的列表中删除这一项
+					for i in range(0, len(_list)):
+						if i[0] == signature:
+							_list.pop(i)	#按索引删除元素
+							break
+				else:
+					continue
 			else:
 				continue
 
@@ -119,7 +149,7 @@ class judgeAst:
 
 	def getMemberTypeSig(self, _item, _list):
 		#根据源代码的包含关系来判断语句属于哪个函数
-		startPos, endPos = self.srcToPos(item["src"])
+		startPos, endPos = self.srcToPos(_item["src"])
 		for func in _list:
 			funcSPos, funcEPos = self.srcToPos(func["src"])
 			if startPos > funcSPos and endPos < funcEPos:
@@ -138,7 +168,11 @@ class judgeAst:
 		funcList = payableList[:]
 		for item in payableList:
 			if item["attributes"]["stateMutability"] == "payable":
-				signature = item["attributes"]["functionSelector"]
+				#如果是payable函数，特殊处理
+				if item["attributes"]["kind"] == "fallback":
+					signature = "fallback"
+				else:
+					signature = item["attributes"]["functionSelector"]
 				result.append((signature, PAYABLE_FLAG))
 		if len(result) > 0:
 			return True, result
@@ -165,7 +199,7 @@ class judgeAst:
 		while len(queue) > 0:
 			data = queue.pop()
 			for key in data:
-				if key == _key and  data[key] == _value:
+				if key == _name and  data[key] == _value:
 					result.append(data)
 				elif type(data[key]) == dict:
 					queue.append(data[key])
