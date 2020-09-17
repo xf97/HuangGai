@@ -8,10 +8,13 @@ import re
 import subprocess	#使用subprocess的popen，该popen是同步IO的
 from colorPrint import *	#该头文件中定义了色彩显示的信息
 from judgeAst import judgeAst #该头文件用于判断合约的ast中是否存在三个较为简单的特征
+import json
 
 #源代码数据存储位置
 SOURCE_CODE_PATH = "../../contractSpider/contractCodeGetter/sourceCode"
 SOURCE_CODE_PREFIX_PATH = "../../contractSpider/contractCodeGetter/sourceCode"
+#测试时源代码存储位置
+TESTCASE_PATH = "./testCase/"
 #结果存储位置
 RESULT_PATH = "./result/"
 
@@ -38,18 +41,24 @@ class reentrancyExtractor:
 			try:
 				#拿到一个合约及其源代码
 				(sourceCode, prevFileName) = self.getSourceCode()
+				print(1)
 				#将当前合约暂存
 				self.cacheContract(sourceCode)
+				print(2)
 				#调整本地编译器版本
 				self.changeSolcVersion(sourceCode)
+				print(3)
 				#编译生成当前合约的抽象语法树(以json_ast形式给出)
 				jsonAst = self.compile2Json()
+				print(4)
 				#根据合约文件本身、源代码、抽象语法树来判断该合约是否符合标准
 				if self.judgeContract(sourceCode, jsonAst) == True:
+					print(5)
 					#符合标准，加１，写入数据文件
 					self.nowNum += 1 
 					#将暂存文件及其JsonAst文件转移到结果保存文件中
 					self.storeResult(prevFileName)
+					print(6)
 					#显示进度　
 					print("\r%s当前抽取进度: %.2f%s" % (blue, self.nowNum / self.needs, end) )
 				else:
@@ -63,7 +72,8 @@ class reentrancyExtractor:
 		该函数从源代码数据存储位置提取
 		合约的名称和源代码
 		'''
-		fileList = os.listdir(SOURCE_CODE_PATH)
+		#fileList = os.listdir(SOURCE_CODE_PATH)
+		fileList = os.listdir(TESTCASE_PATH)
 		solList = list()
 		#根据文件后缀判断文件类型
 		for i in fileList:
@@ -77,7 +87,8 @@ class reentrancyExtractor:
 		#index = 2
 		try:
 			#拼接绝对路径
-			sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
+			#sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
+			sourceCode = open(os.path.join(TESTCASE_PATH, solList[index]), "r", encoding = "utf-8").read()
 			return sourceCode, solList[index]
 		except:
 			#无法获取源代码，则引发异常　
@@ -138,7 +149,10 @@ class reentrancyExtractor:
 
 	def compile2Json(self):
 		try:
-			compileResult = subprocess.run("solc --ast-json --overwrite " + self.cacheContractPath + " -o " + self.cacheJsonAstPath, check = True, shell = True)
+			subprocess.run("solc --ast-json --overwrite " + self.cacheContractPath + " -o " + self.cacheJsonAstPath, check = True, shell = True)
+			with open(self.cacheJsonAstPath + self.cacheJsonAstName, "r", encoding = "utf-8") as f:
+				compileResult = f.read()
+			return json.loads(compileResult)
 		except:
 			raise Exception("Failed to compile the contract.")
 
@@ -147,7 +161,7 @@ class reentrancyExtractor:
 		if not simpleJudge.run():
 			#如果不符合标准（简单标准），则返回False
 			return False
-		#关键函数，正在实现
+		#关键函数，已部分实现
 		return True
 
 	def storeResult(self, _filename):
@@ -165,5 +179,5 @@ class reentrancyExtractor:
 
 #单元测试
 if __name__ == "__main__":
-	ree = reentrancyExtractor(10)
+	ree = reentrancyExtractor(1)
 	ree.extractContracts()
