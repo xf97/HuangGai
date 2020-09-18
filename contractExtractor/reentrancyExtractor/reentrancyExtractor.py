@@ -8,6 +8,7 @@ import re
 import subprocess	#使用subprocess的popen，该popen是同步IO的
 from colorPrint import *	#该头文件中定义了色彩显示的信息
 from judgeAst import judgeAst #该头文件用于判断合约的ast中是否存在三个较为简单的特征
+from judgePath import judgePath #该头文件用于判断合约中是否存在目标路径
 import json
 from shutil import rmtree
 
@@ -54,7 +55,7 @@ class reentrancyExtractor:
 			try:
 				#拿到一个合约及其源代码
 				(sourceCode, prevFileName) = self.getSourceCode()
-				print(prevFileName)
+				#print(prevFileName)
 				#print(1)
 				#将当前合约暂存
 				self.cacheContract(sourceCode)
@@ -65,8 +66,8 @@ class reentrancyExtractor:
 				#编译生成当前合约的抽象语法树(以json_ast形式给出)
 				jsonAst = self.compile2Json()
 				#print(4)
-				#根据合约文件本身、源代码、抽象语法树来判断该合约是否符合标准
-				if self.judgeContract(sourceCode, jsonAst) == True:
+				#根据合约文件本身、抽象语法树来判断该合约是否符合标准
+				if self.judgeContract(os.path.join(self.cacheContractPath), jsonAst) == True:
 					#print(5)
 					#符合标准，加１，写入数据文件
 					self.nowNum += 1 
@@ -176,13 +177,15 @@ class reentrancyExtractor:
 		except:
 			raise Exception("Failed to compile the contract.")
 
-	def judgeContract(self, _sourceCode, _jsonAst):
-		simpleJudge = judgeAst(_jsonAst)
+	def judgeContract(self, _contractPath, _jsonAst):
 		simpleJudge = judgeAst(_jsonAst)
 		if not simpleJudge.run():
 			#如果不符合标准（简单标准），则返回False
 			return False
-		#关键函数，已部分实现
+		#关键函数，待实现
+		pathJudge  = judgePath(_contractPath)
+		if not pathJudge.run():
+			return False
 		return True
 
 	def storeResult(self, _filename):

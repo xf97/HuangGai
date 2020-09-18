@@ -7,10 +7,6 @@ contract baseContract1{
 	function getMoney() external payable virtual{
 	}
 
-	modifier deductBalance() virtual {
-		balance[msg.sender] -= 1;
-		_;
-	}
 }
 
 contract baseContract2{

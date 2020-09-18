@@ -1,7 +1,0 @@
-e3d670d7: balance(address)
-98e1b410: getMoney()
-8fa94d79: noWithdraw()
-0079efb0: withdraw1()
-0f87a044: withdraw1(uint256)
-ea98847b: withdraw2()
-4fa3eeff: withdraw3()
