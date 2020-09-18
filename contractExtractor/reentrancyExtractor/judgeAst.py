@@ -45,6 +45,9 @@ CALL_FLAG = 1
 PAYABLE_FLAG = 2
 MAPPING_FLAG = 3
 
+#缓存路径
+CACHE_PATH = "./cache/"
+
 import json
 from inherGraph import inherGraph #该库接收jsonAst，按线性继承顺序，从最上层基类到最底层子类的顺序返回每个"ContractDefinition"的jsonAst
 import subprocess
@@ -68,29 +71,36 @@ class judgeAst:
 	def getFuncHash(self):
 		try:
 			#生成哈希签名
-			compileResult = subprocess.run("solc --hashes " + self.cacheContractPath + " -o .", check = True, shell = True)
+			compileResult = subprocess.run("solc --hashes --overwrite " + self.cacheContractPath + " -o " + CACHE_PATH, check = True, shell = True)
 			#获取保存哈希值的文件名
 			hashFileName = [filename for filename in os.listdir(self.cacheFolder) if filename.split(".")[1] == "signatures"]
 			#打开每个文件，读取每个函数的哈希值，保存为字典
-			#key为合约名，元素[0]是函数名，元素[1]是函数选择器值
-			#最后与要清空cache文件夹
-
+			for file in hashFileName:
+				resultList = list()
+				with open(os.path.join(CACHE_PATH, file), "r", encoding = "utf-8") as f:
+					for i in f.readlines():
+						funcName = i.split(": ")[1][:-1]	#最后[:-1]是为了去除最后的\n
+						signature = i.split(": ")[0]
+						resultList.append([funcName, signature])
+				self.contractAndItsHashes[file.split(".")[0]] = resultList
+		except:
+			raise Exception("Failed to generate function selector.")
+		#for i in self.contractAndItsHashes:
+		#	print(self.contractAndItsHashes[i])
+		#key为合约名，元素[0]是函数名，元素[1]是函数选择器值
+		#最后与要清空cache文件夹
 
 	def run(self):
 		for contractAst in self.inherGraph.astList():
 			#如果有在上层捕获的函数，那么就应该在本层删除同函数签名的函数
 			if len(self.funcHashAndItsStatement) > 0:
-				self.polymorphism(contractAst, self.funcHashAndItsStatement)
+				self.polymorphism(contractAst, self.funcHashAndItsStatement, self.getContractName(contractAst))
 			if self.etherOutStatement(contractAst)[0]:
 				self.funcHashAndItsStatement.extend(self.etherOutStatement(contractAst)[1])
 			if self.payableFunc(contractAst)[0]:
 				self.funcHashAndItsStatement.extend(self.payableFunc(contractAst)[1])
 			if self.mappingState(contractAst)[0]:
 				self.funcHashAndItsStatement.extend(self.mappingState(contractAst)[1])
-		'''
-		if len(self.funcHashAndItsStatement) < 3:
-			return False
-		'''
 		#遍历结束，检查结果
 		for item in self.funcHashAndItsStatement:
 			if self.callTransferSendFlag and self.payableFlag and self.mapping:
@@ -104,13 +114,18 @@ class judgeAst:
 		#print(self.callTransferSendFlag, self.payableFlag, self.mapping)
 		return self.callTransferSendFlag and self.payableFlag and self.mapping
 
+	#传入：合约ast
+	#传出：合约名
+	def getContractName(self, _ast):
+		return _ast["attributes"]["name"]
+
+	#*待修改*#
 	def polymorphism(self, _ast, _list):
 		funcList = self.findASTNode(_ast, "name", "FunctionDefinition")
 		signatureList = [item[0] for item in _list]	#构建上层已有的函数签名列表
 		for func in funcList:
 			#构造函数没有FunctionSelector
 			if func["attributes"]["kind"] == "function":
-				#很奇怪
 				signature  = func["attributes"]["functionSelector"]
 				if signature in signatureList:
 					#找到下层的复写了上层的函数，就从上层的列表中删除这一项
@@ -147,6 +162,7 @@ class judgeAst:
 		else:
 			return False, list()
 
+	#*待修改*#
 	def getMemberTypeSig(self, _item, _list):
 		#根据源代码的包含关系来判断语句属于哪个函数
 		startPos, endPos = self.srcToPos(_item["src"])
@@ -162,6 +178,7 @@ class judgeAst:
 		temp = _src.split(":")
 		return int(temp[0]), int(temp[0]) + int(temp[1])
 
+	#*待修改*#
 	def payableFunc(self, _ast):
 		result = list()
 		payableList = self.findASTNode(_ast, "name", "FunctionDefinition")
@@ -179,6 +196,7 @@ class judgeAst:
 		else:
 			return False, list()
 
+	#*待修改*#
 	def mappingState(self, _ast):
 		result = list()
 		varList = self.findASTNode(_ast, "name", "VariableDeclaration")

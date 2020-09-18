@@ -9,6 +9,7 @@ import subprocess	#使用subprocess的popen，该popen是同步IO的
 from colorPrint import *	#该头文件中定义了色彩显示的信息
 from judgeAst import judgeAst #该头文件用于判断合约的ast中是否存在三个较为简单的特征
 import json
+from shutil import rmtree
 
 #源代码数据存储位置
 SOURCE_CODE_PATH = "../../contractSpider/contractCodeGetter/sourceCode"
@@ -17,6 +18,9 @@ SOURCE_CODE_PREFIX_PATH = "../../contractSpider/contractCodeGetter/sourceCode"
 TESTCASE_PATH = "./testCase/"
 #结果存储位置
 RESULT_PATH = "./result/"
+
+#缓存路径
+CACHE_PATH = "./cache/"
 
 '''
 本机支持的solc范围从: 0.4.0-0.7.1
@@ -38,6 +42,7 @@ class reentrancyExtractor:
 		self.defaultSolc = "0.6.0"	#默认使用的solc编译版本
 		self.maxSolc = "0.7.1" #最高被支持的solc版本，合约使用的solc版本高于此版本时，引发异常
 		self.minSolc = "0.4.0"	#最低被支持的solc版本
+		os.mkdir(CACHE_PATH)	#建立缓存文件夹
 
 	def extractContracts(self):
 		#当符合条件的合约数量不满足需求时，继续抽取
@@ -65,13 +70,14 @@ class reentrancyExtractor:
 				self.storeResult(prevFileName)
 				#print(6)
 				#显示进度　
-				print("\r%s当前抽取进度: %.2f%s" % (blue, self.nowNum / self.needs, end) )
+				print("\r%s当前抽取进度: %.2f%s" % (blue, self.nowNum / self.needs, end))
+				#清空缓存数据
+				rmtree(CACHE_PATH)
+				#重新建立文件夹
+				os.mkdir(CACHE_PATH)
 			else:
 				#self.nowNum += 1
 				continue
-			'''
-			每次操作后要清空cache文件夹
-			'''
 			'''
 			except Exception as e:
 				#self.nowNum += 1
@@ -170,11 +176,16 @@ class reentrancyExtractor:
 
 	def judgeContract(self, _sourceCode, _jsonAst):
 		simpleJudge = judgeAst(_jsonAst)
+		simpleJudge.getFuncHash()
+		return True
+		'''
+		simpleJudge = judgeAst(_jsonAst)
 		if not simpleJudge.run():
 			#如果不符合标准（简单标准），则返回False
 			return False
 		#关键函数，已部分实现
 		return True
+		'''
 
 	def storeResult(self, _filename):
 		try:
