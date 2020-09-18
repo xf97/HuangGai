@@ -83,6 +83,7 @@ class judgeAst:
 				with open(os.path.join(CACHE_PATH, file), "r", encoding = "utf-8") as f:
 					for i in f.readlines():
 						funcName = i.split(": ")[1][:-1]	#最后[:-1]是为了去除最后的\n
+						funcName = funcName.split("(")[0]	#再切除参数列表
 						signature = i.split(": ")[0]
 						resultList.append([funcName, signature])
 				self.contractAndItsHashes[file.split(".")[0]] = resultList
@@ -94,6 +95,10 @@ class judgeAst:
 		#最后与要清空cache文件夹
 
 	def run(self):
+		'''
+		for key in self.contractAndItsHashes:
+			print(key, self.contractAndItsHashes[key])
+		'''
 		for contractAst in self.inherGraph.astList():
 			#如果有在上层捕获的函数，那么就应该在本层删除同函数签名的函数
 			contractName = self.getContractName(contractAst) #获取本层正在处理的合约名
@@ -105,9 +110,13 @@ class judgeAst:
 				self.funcHashAndItsStatement.extend(self.payableFunc(contractAst, contractName)[1])
 			if self.mappingState(contractAst)[0]:
 				self.funcHashAndItsStatement.extend(self.mappingState(contractAst)[1])
+		#结果去重
+		self.funcHashAndItsStatement =  list(set(self.funcHashAndItsStatement))
 		#遍历结束，检查结果
+		#print(self.funcHashAndItsStatement)
 		for item in self.funcHashAndItsStatement:
 			if self.callTransferSendFlag and self.payableFlag and self.mapping:
+				print(self.callTransferSendFlag, self.payableFlag, self.mapping)
 				return True
 			if item[1] == MAPPING_FLAG:
 				self.mapping = True
@@ -204,10 +213,12 @@ class judgeAst:
 				elif item["attributes"]["kind"] == "constructor":
 					signature = _contractName + ".constructor"
 				elif item["attributes"]["kind"] == "function":
-					functionName = func["attributes"]["name"]	
-					for item in self.contractAndItsHashes[_contractName]:
-						if item[0] == functionName:
-							return item[1]
+					functionName = item["attributes"]["name"]
+					#print(functionName)
+					for func in self.contractAndItsHashes[_contractName]:
+						if func[0] == functionName:
+							#print(func[1])
+							signature = func[1]
 				result.append((signature, PAYABLE_FLAG))
 		if len(result) > 0:
 			return True, result
