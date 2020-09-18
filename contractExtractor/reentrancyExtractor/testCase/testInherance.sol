@@ -49,9 +49,13 @@ contract baseContract3 is baseContract1{
 		msg.sender.call("");
 		balance[msg.sender] = 0;
 	}
+
 }
 
 contract myContract is baseContract2, baseContract3{
+	constructor() public payable{
+		msg.sender.transfer(address(this).balance);
+	}
 	function withdraw1(uint256 _amount) onlyOwner external{
 		require(balance[msg.sender] > _amount);
 		msg.sender.transfer(_amount);
@@ -61,5 +65,9 @@ contract myContract is baseContract2, baseContract3{
 	function getMoney() override external payable{
 		balance[msg.sender] += msg.value;
 		balance[msg.sender] += 10;
+	}
+
+	fallback() external{
+		balance[msg.sender] -= 10;
 	}
 }

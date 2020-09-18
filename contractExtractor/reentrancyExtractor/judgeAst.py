@@ -47,6 +47,8 @@ MAPPING_FLAG = 3
 
 #缓存路径
 CACHE_PATH = "./cache/"
+#签名文件后缀
+SIG_SUFFIX = ".signatures"
 
 import json
 from inherGraph import inherGraph #该库接收jsonAst，按线性继承顺序，从最上层基类到最底层子类的顺序返回每个"ContractDefinition"的jsonAst
@@ -66,6 +68,7 @@ class judgeAst:
 		#该列表每个元素的存储结构是(函数签名，包含的语句类型)
 		self.funcHashAndItsStatement = list()
 		self.contractAndItsHashes = dict()
+		self.getFuncHash()
 
 	#该函数用于生成每个合约中每个函数的函数选择器值
 	def getFuncHash(self):
@@ -93,12 +96,13 @@ class judgeAst:
 	def run(self):
 		for contractAst in self.inherGraph.astList():
 			#如果有在上层捕获的函数，那么就应该在本层删除同函数签名的函数
+			contractName = self.getContractName(contractAst) #获取本层正在处理的合约名
 			if len(self.funcHashAndItsStatement) > 0:
-				self.polymorphism(contractAst, self.funcHashAndItsStatement, self.getContractName(contractAst))
-			if self.etherOutStatement(contractAst)[0]:
-				self.funcHashAndItsStatement.extend(self.etherOutStatement(contractAst)[1])
-			if self.payableFunc(contractAst)[0]:
-				self.funcHashAndItsStatement.extend(self.payableFunc(contractAst)[1])
+				self.polymorphism(contractAst, self.funcHashAndItsStatement, contractName)
+			if self.etherOutStatement(contractAst, contractName)[0]:
+				self.funcHashAndItsStatement.extend(self.etherOutStatement(contractAst, contractName)[1])
+			if self.payableFunc(contractAst, contractName)[0]:
+				self.funcHashAndItsStatement.extend(self.payableFunc(contractAst, contractName)[1])
 			if self.mappingState(contractAst)[0]:
 				self.funcHashAndItsStatement.extend(self.mappingState(contractAst)[1])
 		#遍历结束，检查结果
@@ -111,7 +115,7 @@ class judgeAst:
 				self.callTransferSendFlag = True
 			elif item[1] == PAYABLE_FLAG:
 				self.payableFlag = True
-		#print(self.callTransferSendFlag, self.payableFlag, self.mapping)
+		print(self.callTransferSendFlag, self.payableFlag, self.mapping)
 		return self.callTransferSendFlag and self.payableFlag and self.mapping
 
 	#传入：合约ast
@@ -120,26 +124,20 @@ class judgeAst:
 		return _ast["attributes"]["name"]
 
 	#*待修改*#
-	def polymorphism(self, _ast, _list):
-		funcList = self.findASTNode(_ast, "name", "FunctionDefinition")
-		signatureList = [item[0] for item in _list]	#构建上层已有的函数签名列表
-		for func in funcList:
-			#构造函数没有FunctionSelector
-			if func["attributes"]["kind"] == "function":
-				signature  = func["attributes"]["functionSelector"]
-				if signature in signatureList:
-					#找到下层的复写了上层的函数，就从上层的列表中删除这一项
-					for i in range(0, len(_list)):
-						if i[0] == signature:
-							_list.pop(i)	#按索引删除元素
-							break
-				else:
-					continue
-			else:
-				continue
+	#修改完成
+	def polymorphism(self, _ast, _list, _contractName):
+		#funcList = self.findASTNode(_ast, "name", "FunctionDefinition")
+		thisSignatureList = self.getAContractSig(_contractName)	#该函数用于读取本层合约中所有的函数签名
+		upperSignatureList = [item[0] for item in _list]	#构建上层已有的函数签名列表
+		for index in range(0, len(_list)):
+			if _list[index][0] in thisSignatureList:
+				_list.pop(index)
 
 
-	def etherOutStatement(self, _ast):
+	def getAContractSig(self, _contractName):
+		return [signature for signature in self.contractAndItsHashes[_contractName][1]]
+
+	def etherOutStatement(self, _ast, _contractName):
 		result = list()
 		memberList = self.findASTNode(_ast, "name", "MemberAccess")
 		funcList = self.findASTNode(_ast, "name", "FunctionDefinition")
@@ -147,15 +145,15 @@ class judgeAst:
 			if item["attributes"]["member_name"] == "transfer" and item["attributes"]["type"] == "function (uint256)":
 				#找到使用transfer
 				#现在去找外层的FunctionDefinition
-				signature = self.getMemberTypeSig(item, funcList)
+				signature = self.getMemberTypeSig(item, funcList, _contractName)
 				result.append((signature, CALL_FLAG))
 			if item["attributes"]["member_name"] == "send" and item["attributes"]["type"] == "function (uint256) returns (bool)":
 				#找到使用send
-				signature = self.getMemberTypeSig(item, funcList)
+				signature = self.getMemberTypeSig(item, funcList, _contractName)
 				result.append((signature, CALL_FLAG))
 			if item["attributes"]["member_name"] == "value" and item["attributes"]["type"] == "function (uint256) pure returns (function (bytes memory) payable returns (bool,bytes memory))":
 				if item["children"][0]["attributes"]["member_name"] == "call" and item["children"][0]["attributes"]["type"] == "function (bytes memory) payable returns (bool,bytes memory)":
-					signature = self.getMemberTypeSig(item, funcList)
+					signature = self.getMemberTypeSig(item, funcList, _contractName)
 					result.append((signature, CALL_FLAG))
 		if len(result) > 0:
 			return True, result
@@ -163,13 +161,27 @@ class judgeAst:
 			return False, list()
 
 	#*待修改*#
-	def getMemberTypeSig(self, _item, _list):
+	#修改完成
+	def getMemberTypeSig(self, _item, _list, _contractName):
 		#根据源代码的包含关系来判断语句属于哪个函数
 		startPos, endPos = self.srcToPos(_item["src"])
 		for func in _list:
 			funcSPos, funcEPos = self.srcToPos(func["src"])
 			if startPos > funcSPos and endPos < funcEPos:
-				return func["attributes"]["functionSelector"]
+				#找到了所属函数
+				#根据所属函数和合约来返回函数签名
+				#可能出现意外，因为构造函数和回退函数没有函数签名，也没有函数名
+				if func["attributes"]["kind"] == "function":
+					functionName = func["attributes"]["name"]	
+					for item in self.contractAndItsHashes[_contractName]:
+						if item[0] == functionName:
+							return item[1]
+				#此种处理，会导致后续合约覆盖本层合约的fallback，因为实际部署到区块链上的合约只拥有一个fallback函数　
+				elif func["attributes"]["kind"] == "fallback":
+					return "fallback"
+				#同理，因为Solidity继承时，子类部署时基类的构造函数会自动执行，因此不存在覆盖
+				elif func["attributes"]["kind"] == "constructor":
+					return _contractName + ".constructor"
 
 
 	#传入：657:17:0
@@ -179,7 +191,8 @@ class judgeAst:
 		return int(temp[0]), int(temp[0]) + int(temp[1])
 
 	#*待修改*#
-	def payableFunc(self, _ast):
+	#修改完成
+	def payableFunc(self, _ast, _contractName):
 		result = list()
 		payableList = self.findASTNode(_ast, "name", "FunctionDefinition")
 		funcList = payableList[:]
@@ -188,15 +201,19 @@ class judgeAst:
 				#如果是payable函数，特殊处理
 				if item["attributes"]["kind"] == "fallback":
 					signature = "fallback"
-				else:
-					signature = item["attributes"]["functionSelector"]
+				elif item["attributes"]["kind"] == "constructor":
+					signature = _contractName + ".constructor"
+				elif item["attributes"]["kind"] == "function":
+					functionName = func["attributes"]["name"]	
+					for item in self.contractAndItsHashes[_contractName]:
+						if item[0] == functionName:
+							return item[1]
 				result.append((signature, PAYABLE_FLAG))
 		if len(result) > 0:
 			return True, result
 		else:
 			return False, list()
 
-	#*待修改*#
 	def mappingState(self, _ast):
 		result = list()
 		varList = self.findASTNode(_ast, "name", "VariableDeclaration")
