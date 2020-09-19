@@ -1,6 +1,11 @@
 #!/usr/bin/python
 #-*- coding: utf-8 -*-
 
+'''
+2020/9/19
+可能需要为了配合judgePath而修改　
+'''
+
 
 class inherGraph:
 	def __init__(self, _json):

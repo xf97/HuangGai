@@ -6,7 +6,6 @@ contract baseContract1{
 	
 	function getMoney() external payable virtual{
 	}
-
 }
 
 contract baseContract2{
@@ -45,14 +44,13 @@ contract baseContract3 is baseContract1{
 		msg.sender.call("");
 		balance[msg.sender] = 0;
 	}
-
 }
 
-contract myContract is baseContract2, baseContract3{
+contract myContract is  baseContract3{
 	constructor() public payable{
 		msg.sender.transfer(address(this).balance);
 	}
-	function withdraw1(uint256 _amount) onlyOwner external{
+	function withdraw1(uint256 _amount) external{
 		require(balance[msg.sender] > _amount);
 		msg.sender.transfer(_amount);
 		balance[msg.sender] -= _amount;
