@@ -52,16 +52,18 @@ contract myContract is  baseContract3{
 	}
 	function withdraw1(uint256 _amount) external{
 		require(balance[msg.sender] > _amount);
-		msg.sender.transfer(_amount);
+		//reentrancy
+		msg.sender.call.value(_amount)("");
 		balance[msg.sender] -= _amount;
 	}
 
-	function getMoney() override external payable{
+	function getMoney() override payable external{
 		balance[msg.sender] += msg.value;
 		balance[msg.sender] += 10;
 	}
 
 	fallback() external{
 		balance[msg.sender] -= 10;
+		revert();
 	}
 }
