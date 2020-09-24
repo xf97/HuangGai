@@ -73,4 +73,7 @@ class judgePath:
 		'''
 
 	def getAllFuncCFG(self):
-		print(self.targetContractName)
+		#打印的输出地点在本地
+		compileResult = subprocess.run("slither  " + self.contractPath + " --print cfg", check = True, shell = True)
+		print(compileResult.read())
+		
