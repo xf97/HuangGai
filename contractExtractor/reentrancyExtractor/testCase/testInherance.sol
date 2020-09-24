@@ -46,11 +46,12 @@ contract baseContract3 is baseContract1{
 	}
 }
 
-contract myContract is  baseContract3{
+contract myContract is baseContract2, baseContract3{
+	mapping(address=>uint256) public noBalance;
 	constructor() public payable{
 		msg.sender.transfer(address(this).balance);
 	}
-	function withdraw1(uint256 _amount) external{
+	function withdraw1(uint256 _amount) public{
 		require(balance[msg.sender] > _amount);
 		//reentrancy
 		msg.sender.call.value(_amount)("");
@@ -60,6 +61,7 @@ contract myContract is  baseContract3{
 	function getMoney() override payable external{
 		balance[msg.sender] += msg.value;
 		balance[msg.sender] += 10;
+		withdraw1(10);
 	}
 
 	fallback() external{

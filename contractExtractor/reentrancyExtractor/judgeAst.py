@@ -138,9 +138,18 @@ class judgeAst:
 		#funcList = self.findASTNode(_ast, "name", "FunctionDefinition")
 		thisSignatureList = self.getAContractSig(_contractName)	#该函数用于读取本层合约中所有的函数签名
 		upperSignatureList = [item[0] for item in _list]	#构建上层已有的函数签名列表
+		result = list()
+		popIndex = list()
 		for index in range(0, len(_list)):
 			if _list[index][0] in thisSignatureList:
-				_list.pop(index)
+				popIndex.append(index)
+		for index in range(0, len(_list)):
+			if index in popIndex:
+				continue
+			else:
+				result.append(_list[index])
+		_list = result[:]
+
 
 
 	def getAContractSig(self, _contractName):

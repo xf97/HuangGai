@@ -69,10 +69,10 @@ class judgePath:
 		#第二步，产生函数间的调用图（可能跨合约）
 		self.getAllFuncCallGraph()
 		#第三步，根据合约的CFG和函数调用图，尝试组合出所有路径
-		#3.1 读取主合约的dot文件
+		#3.1 构造函数调用关系图
 		self.getCallGraphDot()
-		#3.2 构造函数调用关系，输出为哪个函数调用了哪个函数
-		self.buildCallPath()
+		#3.2 寻找以payable函数为起点的函数调用路径，寻找其中增值的mapping变量
+		ledgerName = self.findLedger()
 		return True
 		'''
 		不可用，slither的contract-summary并不准确
@@ -115,16 +115,31 @@ class judgePath:
 					edgeList.append(edgeInfo)
 			#根据边集，拼接路径
 			#我的起点是你的终点
+			temp = edgeList[:]	#为防止出现问题，准备一个副本
 			for edge in edgeList:
-				#两个
-			'''
-			self.funcCallGraph
-			with open(dotFileName, "r", encoding = "utf-8") as f:
-				self.funcCallGraph = f.read()
-			'''
-			print(edgeList)
+				result = edge[:]
+				#两个工作，我的终点是你的起点吗，我的起点是你的终点吗
+				startPos = edge[0]
+				endPos = edge[1]
+				for line in temp:
+					if line[1] == startPos:
+						#它的终点是我的起点，加入
+						result.insert(0, line[0])
+						#更新起点　
+						startPos = line[0]
+					if line[0] == endPos:
+						#它的起点是我的终点，加入
+						result.append(line[1])
+						#更新终点
+						endPos = line[1]
+				#跨合约的函数调用拼接完毕
+				self.funcCallGraph.append(result)
 		except:
 			print("Failed to read functions call-graph.")
+
+	#待实现
+	def findLedger(self):
+		return str()
 
 
 		
