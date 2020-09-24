@@ -1,0 +1,28 @@
+strict digraph {
+subgraph cluster_248_myContract {
+label = "myContract"
+"248_withdraw1" [label="withdraw1"]
+"248_getMoney" [label="getMoney"]
+"248_constructor" [label="constructor"]
+"248_fallback" [label="fallback"]
+}subgraph cluster_161_baseContract3 {
+label = "baseContract3"
+"161_withdraw3" [label="withdraw3"]
+"161_withdraw2" [label="withdraw2"]
+"161_withdraw1" [label="withdraw1"]
+"161_noWithdraw" [label="noWithdraw"]
+}subgraph cluster_10_baseContract1 {
+label = "baseContract1"
+"10_getMoney" [label="getMoney"]
+}subgraph cluster_solidity {
+label = "[Solidity]"
+"require(bool)" 
+"revert()" 
+"161_withdraw3" -> "require(bool)"
+"248_fallback" -> "revert()"
+"161_withdraw1" -> "require(bool)"
+"161_noWithdraw" -> "require(bool)"
+"248_withdraw1" -> "require(bool)"
+"161_withdraw2" -> "require(bool)"
+}
+}

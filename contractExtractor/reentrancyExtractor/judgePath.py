@@ -21,12 +21,19 @@ require显示出每个合约的每个函数中用到的require和assert
 import subprocess
 import os
 from inherGraph import inherGraph #该库用于返回主合约的合约名
+from colorPrint import *	#该头文件中定义了色彩显示的信息
+from pydot import io 	#该头文件用来读取.dot文件
 
 #缓存路径
 #进行抽取时，合约仍然存于cache文件夹中
 CACHE_PATH = "./cache/"
 #终端输出记录文件
 TERMINAL_FILE = "log.txt"
+
+#图文件后缀
+DOT_SUFFIX = ".dot"
+#有向边标志　
+EDGE_FLAG = " -> "
 
 #未使用　
 #发送以太币标志字符串
@@ -55,14 +62,17 @@ class judgePath:
 	def getMainContract(self):
 		return self.inherGraph.getMainContractName()
 
-
-
 	def run(self):
 		#第一步，应该是生成合约所有函数的CFG
-		self.getAllFuncCFG()
+		#因为slither的此功能故障，因此暂时失效此功能
+		#self.getAllFuncCFG()
 		#第二步，产生函数间的调用图（可能跨合约）
-		#self.getAllFuncCallGraph()
+		self.getAllFuncCallGraph()
 		#第三步，根据合约的CFG和函数调用图，尝试组合出所有路径
+		#3.1 读取主合约的dot文件
+		self.getCallGraphDot()
+		#3.2 构造函数调用关系，输出为哪个函数调用了哪个函数
+		self.buildCallPath()
 		return True
 		'''
 		不可用，slither的contract-summary并不准确
@@ -74,6 +84,47 @@ class judgePath:
 
 	def getAllFuncCFG(self):
 		#打印的输出地点在本地
-		compileResult = subprocess.run("slither  " + self.contractPath + " --print cfg", check = True, shell = True)
-		print(compileResult.read())
+		try:
+			compileResult = subprocess.run("slither  " + self.contractPath + " --print cfg", check = True, shell = True)
+			print(compileResult.read())
+		except:
+			print("Failed to generate control flow graph.")
+
+	def getAllFuncCallGraph(self):
+		#打印的输出地点在本地
+		try:
+			compileResult = subprocess.run("slither " + self.contractPath + " --print call-graph", check = True, shell = True)
+			print(compileResult.read())
+		except:
+			print("Failed to generate functions call-graph.")
+
+	def getCallGraphDot(self):
+		dotFileName = self.targetContractName + DOT_SUFFIX
+		try:
+			f =  io.open(dotFileName)
+			edgeList =  list()
+			self.funcCallGraph = list()
+			#逐行遍历dot文件，找到所有有向边
+			for line in f.readlines():
+				if line.find(EDGE_FLAG) != -1:
+					#找到有向边，分裂起点和终点
+					edgeInfo = list()
+					edgeInfo.append(line.split(EDGE_FLAG)[0])
+					edgeInfo.append(line.split(EDGE_FLAG)[1][:-1]) #去掉结尾换行符
+					#加入边集
+					edgeList.append(edgeInfo)
+			#根据边集，拼接路径
+			#我的起点是你的终点
+			for edge in edgeList:
+				#两个
+			'''
+			self.funcCallGraph
+			with open(dotFileName, "r", encoding = "utf-8") as f:
+				self.funcCallGraph = f.read()
+			'''
+			print(edgeList)
+		except:
+			print("Failed to read functions call-graph.")
+
+
 		
