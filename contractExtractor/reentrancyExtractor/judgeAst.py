@@ -153,7 +153,17 @@ class judgeAst:
 
 
 	def getAContractSig(self, _contractName):
-		return [signature for signature in self.contractAndItsHashes[_contractName][1]]
+		'''
+		print(self.contractAndItsHashes[_contractName])
+		print("*" * 30)
+		for i in self.contractAndItsHashes[_contractName]:
+			print(i[1])
+		'''
+		signatureList = list()
+		for record in self.contractAndItsHashes[_contractName]:
+			signatureList.append(record[1])
+		return signatureList
+		#return [signature for signature in self.contractAndItsHashes[_contractName][1]]
 
 	def etherOutStatement(self, _ast, _contractName):
 		result = list()
