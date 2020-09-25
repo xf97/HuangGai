@@ -34,12 +34,24 @@ TERMINAL_FILE = "log.txt"
 DOT_SUFFIX = ".dot"
 #有向边标志　
 EDGE_FLAG = " -> "
+#payable函数标志
+PAYABLE_FLAG = "payable"
+#构造函数标志
+CONSTRUCTOR_FLAG = "constructor"
+#回退函数标志
+FALLBACK_FLAG = "fallback"
+#账本类型标志
+MAPPING_FLAG = "mapping(address => uint256)"
+#dot中cluster标志
+CLUSTER_FLAG = "cluster_"
+
 
 #未使用　
 #发送以太币标志字符串
 SEND_ETH_FLAG = "Send ETH"
 #收取以太币标志字符串
-RECEIVE_ETH_FLAG =  "Receive ETH"
+RECEIVE_ETH_FLAG =  "Receive ETH""stateMutability"
+
 
 '''
 考虑使用slither和script
@@ -50,14 +62,17 @@ class judgePath:
 		self.contractPath = _contractPath
 		self.inherGraph = inherGraph(_json)
 		self.targetContractName = self.getMainContract()
+		self.json = _json
 		try:
 			#如果存在log.txt，则删除已存在的log.txt
 			if os.path.exists(os.path.join(CACHE_PATH, TERMINAL_FILE)):
 				os.remove(os.path.join(CACHE_PATH, TERMINAL_FILE))
-		except:
-			#不存在的话，启动脚本，记录终端输出　
-			compileResult = subprocess.run("script -f " + TERMINAL_FILE, check = True, shell = True)
+			#启动脚本，记录终端输出　
+			#compileResult = subprocess.run("script -f " + TERMINAL_FILE, check = True, shell = True)
 			print(compileResult.read())
+		except:
+			print("Failed to record terminal output.")
+
 
 	def getMainContract(self):
 		return self.inherGraph.getMainContractName()
@@ -72,7 +87,9 @@ class judgePath:
 		#3.1 构造函数调用关系图
 		self.getCallGraphDot()
 		#3.2 寻找以payable函数为起点的函数调用路径，寻找其中增值的mapping变量
-		ledgerName = self.findLedger()
+		ledgerName = self.findLedger(self.funcCallGraph)
+		#清除生成的缓存资料
+		self.deleteDot()
 		return True
 		'''
 		不可用，slither的contract-summary并不准确
@@ -82,19 +99,21 @@ class judgePath:
 		return self.findTargetFeatures(self.contractName)
 		'''
 
+	def deleteDot(self):
+		pass
+
+
 	def getAllFuncCFG(self):
 		#打印的输出地点在本地
 		try:
-			compileResult = subprocess.run("slither  " + self.contractPath + " --print cfg", check = True, shell = True)
-			print(compileResult.read())
+			subprocess.run("slither  " + self.contractPath + " --print cfg", check = True, shell = True)
 		except:
 			print("Failed to generate control flow graph.")
 
 	def getAllFuncCallGraph(self):
 		#打印的输出地点在本地
 		try:
-			compileResult = subprocess.run("slither " + self.contractPath + " --print call-graph", check = True, shell = True)
-			print(compileResult.read())
+			subprocess.run("slither " + self.contractPath + " --print call-graph", check = True, shell = True)
 		except:
 			print("Failed to generate functions call-graph.")
 
@@ -138,8 +157,196 @@ class judgePath:
 			print("Failed to read functions call-graph.")
 
 	#待实现
-	def findLedger(self):
+	#部分实现 
+	def findLedger(self, _callGraph):
+		#print(_callGraph)
+		#find each payable function and its contract
+		#dict
+		payableList = self.getPayableFunc(self.json)
+		print(payableList)
+		#contractName to num
+		newCallGraph = self.contractNameToNum(_callGraph)
+		#mapping
+		mappingList = self.getMapping(self.json)
+		#给定调用图、payable函数列表、mapping，寻找在以payable函数开头的路劲中，其中使用过（加过钱）的mappingAList
+		#print(payableList)
+		print("zzzzzzz")
+		increaseMapping = self.findIncreaseMapping(payableList, newCallGraph, mappingList)
+		print("lalala")
 		return str()
+
+	def findIncreaseMapping(self, _payableList, _funcPath, _mappingList):
+		result = list()
+		for payableFunc in _payableList:
+			for onePath in _funcPath:
+				if onePath[0] == payableFunc:
+					#找到一条路径
+					result.extend(self.findOnePathMapping(onePath, _mappingList))
+				else:
+					continue
+		return result
+
+	def findOnePathMapping(self, _path, _mappingList):
+		contractList = self.findASTNode(self.json, "name", "ContractDefinition")
+		for func in _path:
+			#拆分出函数名和合约名
+			funcName = func.split(".")[1]
+			contractName = func.split(".")[0]
+			#print(contractName)
+			#找到合约的AST
+			for contract in contractList:
+				if contract["attributes"]["name"] == contractName:
+					functionList = self.findASTNode(contract, "name", "FunctionDefinition")
+					for oneFunc in functionList:
+						print("xixix", funcName)
+						if oneFunc["attributes"]["kind"] == CONSTRUCTOR_FLAG and funcName == CONSTRUCTOR_FLAG:
+							#找到函数的ast
+							print("hahaha")
+							statementList = self.findASTNode(oneFunc, "name", "ExpressionStatement")
+							for i in statementList:
+								print(i["src"])
+						elif oneFunc["attributes"]["kind"] == FALLBACK_FLAG and funcName == FALLBACK_FLAG:
+							#找到函数的ast
+							print("hahaha")
+							statementList = self.findASTNode(oneFunc, "name", "ExpressionStatement")
+							for i in statementList:
+								print(i["src"])
+						elif oneFunc["attributes"]["name"] == funcName:
+							#找到函数的ast
+							print("hahaha")
+							statementList = self.findASTNode(oneFunc, "name", "ExpressionStatement")
+							for i in statementList:
+								print(i["src"])
+		return _mappingList
+							
+
+
+	def contractNameToNum(self,_callGraph):
+		dotFileName = self.targetContractName + DOT_SUFFIX
+		#try:
+		result = list()
+		f = io.open(dotFileName)
+		contractNameDict = dict()
+		for line in f.readlines():
+			if line.find(CLUSTER_FLAG) != -1:
+				#找到集群声明标志，拆分出编号和合约名
+				try:
+					temp = line.split(" ")[1]
+					num = temp.split("_")[1]
+					contractName = temp.split("_")[2]
+					contractNameDict[contractName] = num
+				except:
+					continue
+			else:
+				continue
+		for _list in _callGraph:
+			aList = list()
+			for func in _list:
+				try:
+					num = func.split("_")[0][1:] #1为了去掉开头的双引号
+					funcName = func.split("_")[1][:-1]  #去掉尾部双引号
+					for item in contractNameDict.items():
+						if item[1] == num:
+							temp = item[0] + "." + funcName
+							aList.append(temp)
+						else:
+							continue
+				except:
+					continue
+			result.append(aList)
+		#print(contractNameDict)
+		#print(result)
+		return result
+
+	def getMapping(self, _json):
+		#variable声明
+		mappingDict = dict()
+		for ast in self.findASTNode(_json, "name", "VariableDeclaration"):
+			#print(ast)
+			if ast["attributes"]["type"] == MAPPING_FLAG:
+				mappingName = ast["attributes"]["name"]
+				startPos, endPos = self.srcToPos(ast["src"])
+				mappingDict[mappingName] = [startPos, endPos]
+				contractDict = dict()
+		contractDict = dict()
+		#dict: {合约名，[起始位置，终止位置]}
+		for ast in self.findASTNode(self.json, "name", "ContractDefinition"):
+			contractName = ast["attributes"]["name"]
+			startPos, endPos = self.srcToPos(ast["src"])
+			contractDict[contractName] = [startPos, endPos]
+		#根据从属关系，拼接返回结果
+		result = list()
+		for mappingName in mappingDict:
+			startPos, endPos = mappingDict[mappingName]
+			for item in contractDict.items():
+				if startPos >= item[1][0] and endPos <= item[1][1]:
+					#找到合约和函数的对应关系
+					temp = item[0] + "." + mappingName
+					result.append(temp)
+					break
+				else:
+					continue
+		return result
+
+	def getPayableFunc(self, _json):
+		contractDict = dict()
+		#dict: {合约名，[起始位置，终止位置]}
+		for ast in self.findASTNode(self.json, "name", "ContractDefinition"):
+			contractName = ast["attributes"]["name"]
+			startPos, endPos = self.srcToPos(ast["src"])
+			contractDict[contractName] = [startPos, endPos]
+		#payable func
+		funcDict = dict()
+		for ast in self.findASTNode(self.json, "name", "FunctionDefinition"):
+			if ast["attributes"]["stateMutability"] == PAYABLE_FLAG:
+				if ast["attributes"]["kind"] == CONSTRUCTOR_FLAG:
+					functionName = CONSTRUCTOR_FLAG
+				elif ast["attributes"]["kind"] == FALLBACK_FLAG:
+					functionName = FALLBACK_FLAG
+				else:
+					functionName = ast["attributes"]["name"]
+				startPos, endPos = self.srcToPos(ast["src"])
+				#bug修复，重名!
+				funcDict[functionName] = [startPos, endPos]
+		print(funcDict)
+		print("xuanxuanpi")
+		#根据从属关系，拼接返回结果
+		result = list()
+		for funcName in funcDict:
+			startPos, endPos = funcDict[funcName]
+			for item in contractDict.items():
+				if startPos >= item[1][0] and endPos <= item[1][1]:
+					#找到合约和函数的对应关系
+					temp = item[0] + "." + funcName
+					result.append(temp)
+					break
+				else:
+					continue
+		return result #返回payable函数
+
+	#在给定的ast中返回包含键值对"_name": "_value"的字典列表
+	def findASTNode(self, _ast, _name, _value):
+		queue = [_ast]
+		result = list()
+		literalList = list()
+		while len(queue) > 0:
+			data = queue.pop()
+			for key in data:
+				if key == _name and  data[key] == _value:
+					result.append(data)
+				elif type(data[key]) == dict:
+					queue.append(data[key])
+				elif type(data[key]) == list:
+					for item in data[key]:
+						if type(item) == dict:
+							queue.append(item)
+		return result
+
+	#传入：657:17:0
+	#传出：657, 674
+	def srcToPos(self, _src):
+		temp = _src.split(":")
+		return int(temp[0]), int(temp[0]) + int(temp[1])
 
 
 		

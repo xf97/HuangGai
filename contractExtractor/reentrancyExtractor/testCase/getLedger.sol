@@ -2,10 +2,10 @@ pragma solidity 0.6.0;
 
 contract baseContract1{
 	mapping(address=>uint256) balance;
-	mapping(address=>uint256) noBalance;
 }
 
 contract baseContract2 is baseContract1{
+	mapping(address=>uint256) noBalance;
 	function getMoney() external payable{
 		require(balance[msg.sender] + msg.value >= balance[msg.sender]);
 		addMoney(msg.value);
