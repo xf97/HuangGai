@@ -47,6 +47,14 @@ MAPPING_FLAG = "mapping(address => uint256)"
 CLUSTER_FLAG = "cluster_"
 #dot中label标志
 LABEL_FLAG = "[label="
+#UINT256标志
+UINT256_FLAG = "uint256"
+#加等于标志
+ADD_EQU_FLAG = "+="
+#等于标志
+EQU_FLAG = "="
+#加标志
+ADD_FLAG = "+"
 
 
 #未使用　
@@ -170,7 +178,7 @@ class judgePath:
 			print("Failed to read functions call-graph.")
 
 	#待实现
-	#部分实现 
+	#部分实现
 	def findLedger(self, _callGraph):
 		#find each payable function and its contract
 		#dict
@@ -182,6 +190,7 @@ class judgePath:
 		#给定调用图、payable函数列表、mapping，寻找在以payable函数开头的路劲中，其中使用过（加过钱）的mappingAList
 		#print(payableList)
 		increaseMapping = self.findIncreaseMapping(payableList, newCallGraph, mappingList)
+		#print(increaseMapping)
 		return str()
 
 	def findIncreaseMapping(self, _payableList, _funcPath, _mappingList):
@@ -196,6 +205,7 @@ class judgePath:
 		return result
 
 	def findOnePathMapping(self, _path, _mappingList):
+		result = list()
 		contractList = self.findASTNode(self.json, "name", "ContractDefinition")
 		for func in _path:
 			#拆分出函数名和合约名
@@ -209,24 +219,65 @@ class judgePath:
 					for oneFunc in functionList:
 						if oneFunc["attributes"]["kind"] == CONSTRUCTOR_FLAG and funcName == CONSTRUCTOR_FLAG:
 							#找到函数的ast
-							print(contractName, CONSTRUCTOR_FLAG)
-							statementList = self.findASTNode(oneFunc, "name", "Assignment")
-							for i in statementList:
-								print(i["src"])						
+							statementList = self.findASTNode(oneFunc, "name", "Assignment")		
+							result.extend(self.getMapping_addEqu(statementList, _mappingList))	
+							result.extend(self.getMapping_add(statementList, _mappingList))
 						elif oneFunc["attributes"]["kind"] == FALLBACK_FLAG and funcName == FALLBACK_FLAG:
-							print(contractName, FALLBACK_FLAG)
 							statementList = self.findASTNode(oneFunc, "name", "Assignment")
-							for i in statementList:
-								print(i["src"])		
+							result.extend(self.getMapping_addEqu(statementList, _mappingList))	
+							result.extend(self.getMapping_add(statementList, _mappingList))
 						elif oneFunc["attributes"]["name"] == funcName:
-							print(contractName, funcName)
-							#找到函数的ast
-							statementList = self.findASTNode(oneFunc, "name", "Assignment")
-							for i in statementList:
-								print(i["src"])		
-		return _mappingList
-							
+							statementList = self.findASTNode(oneFunc, "name", "Assignment")	
+							result.extend(self.getMapping_addEqu(statementList, _mappingList))
+							result.extend(self.getMapping_add(statementList, _mappingList))
+		#最后记得去重
+		result = list(set(result))
+		#print(result)
+		return result
 
+	#如果该赋值语句中存在对mapping的+=操作，则返回mappingList
+	def getMapping_addEqu(self, _astList, _mappingList):
+		result = list()
+		for _ast in _astList:
+			if _ast["attributes"]["type"] == UINT256_FLAG and _ast["attributes"]["operator"] == ADD_EQU_FLAG:
+				if _ast["children"][0]["attributes"]["type"] == UINT256_FLAG:
+					#print("hahahah")
+					#寻找id
+					for ledger in _mappingList:
+						_id = ledger.split(".")[1]
+						if str(_id) == str(_ast["children"][0]["children"][0]["attributes"]["referencedDeclaration"]):
+							#在payable起始的函数的调用序列的该赋值语句中，有对mapping(address=>uint256)的+=操作
+							result.append(ledger)
+						else:
+							continue
+				else:
+					continue
+			else:
+				continue
+		return result
+
+	#如果该赋值语句中存在对mapping的+操作，则返回mappingList
+	def getMapping_add(self, _astList, _mappingList):
+		result = list()
+		for _ast in _astList:
+			try:
+				if _ast["attributes"]["type"] == UINT256_FLAG and _ast["attributes"]["operator"] == EQU_FLAG:
+					print(_ast["attributes"])
+					num = _ast["children"][0]
+					operator = _ast["children"][1]
+					if num["attributes"]["type"] == UINT256_FLAG and operator["attributes"]["operator"] == ADD_FLAG:
+						for ledger in _mappingList:
+							_id = ledger.split(".")[1]
+							if str(_id) == str(num["children"][0]["attributes"]["referencedDeclaration"]):
+								#在payable起始的函数的调用序列的该赋值语句中，有对mapping(address=>uint256)的+=操作
+								result.append(ledger)
+			except:
+				continue
+		return result
+
+	#待实现
+	def getMapping_SafeMathAdd(self, _astList, _mappingList):
+		pass
 
 	def contractNameToNum(self,_callGraph):
 		dotFileName = self.targetContractName + DOT_SUFFIX

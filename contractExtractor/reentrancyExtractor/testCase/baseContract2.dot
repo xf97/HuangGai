@@ -1,8 +1,0 @@
-strict digraph {
-subgraph cluster_33_baseContract2 {
-label = "baseContract2"
-"33_constructor" [label="constructor"]
-}subgraph cluster_solidity {
-label = "[Solidity]"
-}
-}
