@@ -23,6 +23,7 @@ import os
 from inherGraph import inherGraph #该库用于返回主合约的合约名
 from colorPrint import *	#该头文件中定义了色彩显示的信息
 from pydot import io 	#该头文件用来读取.dot文件
+import re
 
 #缓存路径
 #进行抽取时，合约仍然存于cache文件夹中
@@ -44,6 +45,8 @@ FALLBACK_FLAG = "fallback"
 MAPPING_FLAG = "mapping(address => uint256)"
 #dot中cluster标志
 CLUSTER_FLAG = "cluster_"
+#dot中label标志
+LABEL_FLAG = "[label="
 
 
 #未使用　
@@ -153,26 +156,32 @@ class judgePath:
 						endPos = line[1]
 				#跨合约的函数调用拼接完毕
 				self.funcCallGraph.append(result)
+			#接下来拼接“独立”函数
+			f.seek(0,0)	#回到文件开头
+			startFuncList = [funcName[0]for funcName in self.funcCallGraph]
+			for line in f.readlines():
+				if line.find(LABEL_FLAG) != -1:
+					funcName = line.split(" ")[0]
+					if funcName not in startFuncList:
+						self.funcCallGraph.append([funcName])
+					else:
+						continue
 		except:
 			print("Failed to read functions call-graph.")
 
 	#待实现
 	#部分实现 
 	def findLedger(self, _callGraph):
-		#print(_callGraph)
 		#find each payable function and its contract
 		#dict
 		payableList = self.getPayableFunc(self.json)
-		print(payableList)
 		#contractName to num
 		newCallGraph = self.contractNameToNum(_callGraph)
 		#mapping
 		mappingList = self.getMapping(self.json)
 		#给定调用图、payable函数列表、mapping，寻找在以payable函数开头的路劲中，其中使用过（加过钱）的mappingAList
 		#print(payableList)
-		print("zzzzzzz")
 		increaseMapping = self.findIncreaseMapping(payableList, newCallGraph, mappingList)
-		print("lalala")
 		return str()
 
 	def findIncreaseMapping(self, _payableList, _funcPath, _mappingList):
@@ -198,25 +207,23 @@ class judgePath:
 				if contract["attributes"]["name"] == contractName:
 					functionList = self.findASTNode(contract, "name", "FunctionDefinition")
 					for oneFunc in functionList:
-						print("xixix", funcName)
 						if oneFunc["attributes"]["kind"] == CONSTRUCTOR_FLAG and funcName == CONSTRUCTOR_FLAG:
 							#找到函数的ast
-							print("hahaha")
-							statementList = self.findASTNode(oneFunc, "name", "ExpressionStatement")
+							print(contractName, CONSTRUCTOR_FLAG)
+							statementList = self.findASTNode(oneFunc, "name", "Assignment")
 							for i in statementList:
-								print(i["src"])
+								print(i["src"])						
 						elif oneFunc["attributes"]["kind"] == FALLBACK_FLAG and funcName == FALLBACK_FLAG:
-							#找到函数的ast
-							print("hahaha")
-							statementList = self.findASTNode(oneFunc, "name", "ExpressionStatement")
+							print(contractName, FALLBACK_FLAG)
+							statementList = self.findASTNode(oneFunc, "name", "Assignment")
 							for i in statementList:
-								print(i["src"])
+								print(i["src"])		
 						elif oneFunc["attributes"]["name"] == funcName:
+							print(contractName, funcName)
 							#找到函数的ast
-							print("hahaha")
-							statementList = self.findASTNode(oneFunc, "name", "ExpressionStatement")
+							statementList = self.findASTNode(oneFunc, "name", "Assignment")
 							for i in statementList:
-								print(i["src"])
+								print(i["src"])		
 		return _mappingList
 							
 
@@ -227,13 +234,14 @@ class judgePath:
 		result = list()
 		f = io.open(dotFileName)
 		contractNameDict = dict()
+		alnumPattern = re.compile("")
 		for line in f.readlines():
 			if line.find(CLUSTER_FLAG) != -1:
 				#找到集群声明标志，拆分出编号和合约名
 				try:
 					temp = line.split(" ")[1]
-					num = temp.split("_")[1]
-					contractName = temp.split("_")[2]
+					#下述方法不能应对合约名以下划线开头的情况，使用土办法
+					num, contractName = self.splitTemp(temp)
 					contractNameDict[contractName] = num
 				except:
 					continue
@@ -258,16 +266,35 @@ class judgePath:
 		#print(result)
 		return result
 
+	def splitTemp(self, _str):
+		result = list()
+		flag = 0
+		temp = str()
+		for char in _str:
+			if char != "_":
+				temp += char
+			elif char == "_" and flag < 1:
+				temp = str()
+				flag += 1
+			elif char == "_" and flag == 1:
+				result.append(temp)
+				temp = str()
+				flag += 1
+			elif flag >= 2:
+				temp += char
+		result.append(temp)
+		return result[0], result[1]
+
+
 	def getMapping(self, _json):
 		#variable声明
 		mappingDict = dict()
 		for ast in self.findASTNode(_json, "name", "VariableDeclaration"):
 			#print(ast)
 			if ast["attributes"]["type"] == MAPPING_FLAG:
-				mappingName = ast["attributes"]["name"]
+				mappingName = ast["id"]
 				startPos, endPos = self.srcToPos(ast["src"])
 				mappingDict[mappingName] = [startPos, endPos]
-				contractDict = dict()
 		contractDict = dict()
 		#dict: {合约名，[起始位置，终止位置]}
 		for ast in self.findASTNode(self.json, "name", "ContractDefinition"):
@@ -281,7 +308,7 @@ class judgePath:
 			for item in contractDict.items():
 				if startPos >= item[1][0] and endPos <= item[1][1]:
 					#找到合约和函数的对应关系
-					temp = item[0] + "." + mappingName
+					temp = item[0] + "." + str(mappingName)
 					result.append(temp)
 					break
 				else:
@@ -296,7 +323,7 @@ class judgePath:
 			startPos, endPos = self.srcToPos(ast["src"])
 			contractDict[contractName] = [startPos, endPos]
 		#payable func
-		funcDict = dict()
+		funcList = list()
 		for ast in self.findASTNode(self.json, "name", "FunctionDefinition"):
 			if ast["attributes"]["stateMutability"] == PAYABLE_FLAG:
 				if ast["attributes"]["kind"] == CONSTRUCTOR_FLAG:
@@ -306,18 +333,17 @@ class judgePath:
 				else:
 					functionName = ast["attributes"]["name"]
 				startPos, endPos = self.srcToPos(ast["src"])
-				#bug修复，重名!
-				funcDict[functionName] = [startPos, endPos]
-		print(funcDict)
-		print("xuanxuanpi")
+				#bug修复，不同合约可能有重名函数
+				funcList.append([functionName, startPos, endPos])
 		#根据从属关系，拼接返回结果
 		result = list()
-		for funcName in funcDict:
-			startPos, endPos = funcDict[funcName]
+		for func in funcList:
+			startPos = func[1]
+			endPos = func[2]
 			for item in contractDict.items():
 				if startPos >= item[1][0] and endPos <= item[1][1]:
 					#找到合约和函数的对应关系
-					temp = item[0] + "." + funcName
+					temp = item[0] + "." + func[0]
 					result.append(temp)
 					break
 				else:

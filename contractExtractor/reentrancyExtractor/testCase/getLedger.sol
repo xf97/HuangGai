@@ -13,7 +13,9 @@ contract baseContract2 is baseContract1{
 
 	function addMoney(uint256 _money) internal{
 		balance[msg.sender] += msg.value;
-		noBalance[msg.sender] = 0;
+		balance[msg.sender] = balance[msg.sender] + 10;
+		noBalance[msg.sender] = 10;
+		noBalance[msg.sender] -= 10;
 	}
 }
 
