@@ -32,6 +32,8 @@ contract myContract is baseContract2{
 	function sendMoney(uint256 _amount) external{
 		require(balance[msg.sender] >= _amount);
 		msg.sender.transfer(_amount);
+		msg.sender.send(10);
+		msg.sender.call.value(10)("");
 		balance[msg.sender] -= _amount;
 		noBalance[msg.sender] += 10;
 	}
