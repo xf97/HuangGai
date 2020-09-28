@@ -111,8 +111,8 @@ class reentrancyExtractor:
 		try:
 			#拼接绝对路径
 			#sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
-			sourceCode = open(os.path.join(TESTCASE_PATH, "0x9ec022f82c5004a2fd71ce354ea2e57baf6b81ab.sol"), "r", encoding = "utf-8").read()
-			return sourceCode, "0x9ec022f82c5004a2fd71ce354ea2e57baf6b81ab.sol"#solList[index]
+			sourceCode = open(os.path.join(TESTCASE_PATH, "getLedger.sol"), "r", encoding = "utf-8").read()
+			return sourceCode, "getLedger.sol"#solList[index]
 		except:
 			#无法获取源代码，则引发异常　
 			#sys.exit(0)

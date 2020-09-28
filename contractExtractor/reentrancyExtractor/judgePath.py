@@ -55,13 +55,19 @@ ADD_EQU_FLAG = "+="
 EQU_FLAG = "="
 #加标志
 ADD_FLAG = "+"
+#SafeMath标志
+SAFEMATH_FLAG = "SAFEMATH"
+#库类型标志
+LIBRARY_FLAG = "library"
+#add函数名标志
+ADD_STR_FLAG = "add"
 
 
 #未使用　
 #发送以太币标志字符串
 SEND_ETH_FLAG = "Send ETH"
 #收取以太币标志字符串
-RECEIVE_ETH_FLAG =  "Receive ETH""stateMutability"
+RECEIVE_ETH_FLAG =  "Receive ETH"
 
 
 '''
@@ -71,9 +77,12 @@ RECEIVE_ETH_FLAG =  "Receive ETH""stateMutability"
 class judgePath:
 	def __init__(self, _contractPath, _json):
 		self.contractPath = _contractPath
+		#print(self.contractPath)
 		self.inherGraph = inherGraph(_json)
 		self.targetContractName = self.getMainContract()
 		self.json = _json
+		self.receiveEthPath = list()
+		self.sendEthPath = list()
 		try:
 			#如果存在log.txt，则删除已存在的log.txt
 			if os.path.exists(os.path.join(CACHE_PATH, TERMINAL_FILE)):
@@ -98,9 +107,14 @@ class judgePath:
 		#3.1 构造函数调用关系图
 		self.getCallGraphDot()
 		#3.2 寻找以payable函数为起点的函数调用路径，寻找其中增值的mapping变量
-		ledgerName = self.findLedger(self.funcCallGraph)
+		increaseLedger = self.findLedger(self.funcCallGraph)
+		#3.3 寻找路径 ，其中存在对增值mapping变量减值的操作，并且有.transfer/.send/.call.value语句
+		#最好能够保存减值操作和传输语句的相对位置（或许能够以调用链中的偏移量来记录），结果记录在出钱语句中
+		decreseLedger = self.outOfEther(self.funcCallGraph, increaseLedger)
 		#清除生成的缓存资料
 		self.deleteDot()
+		if len(ledgerName) == 0:
+			return False
 		return True
 		'''
 		不可用，slither的contract-summary并不准确
@@ -109,6 +123,24 @@ class judgePath:
 		#2. 读取log.txt，判断主合约是否具有收取以太币、发送以太币的功能，有的话返回True
 		return self.findTargetFeatures(self.contractName)
 		'''
+
+	#待实现
+	def outOfEther(self, _callGraph, _ledger):
+		ledgerId = [int(name.split(".")[1]) for name in _ledger]	#获取账本的id
+		decreaseLedger = list()
+		for path in _callGraph:
+			#检查每条路径
+			(ledger, ledgerIndex) = self.findDecreseLedger(path, ledgerId)
+			(sendEth, sendEthIndex) = self.findsendEth(path)
+			if ledgerIndex == -1 or sendEthIndex == -1:
+				continue
+			else:
+				#找到目标路径
+				self.sendEthPath.append(path)
+				decreaseLedger.append(ledger)
+				print(ledgerIndex, sendEthIndex)
+		decreaseLedger = list(set(result))
+		return decreaseLedger
 
 	def deleteDot(self):
 		pass
@@ -142,7 +174,7 @@ class judgePath:
 					edgeInfo.append(line.split(EDGE_FLAG)[0])
 					edgeInfo.append(line.split(EDGE_FLAG)[1][:-1]) #去掉结尾换行符
 					#加入边集
-					edgeList.append(edgeInfo)
+					edgeList.append(edgeInfo) 
 			#根据边集，拼接路径
 			#我的起点是你的终点
 			temp = edgeList[:]	#为防止出现问题，准备一个副本
@@ -178,7 +210,7 @@ class judgePath:
 			print("Failed to read functions call-graph.")
 
 	#待实现
-	#部分实现
+	#已经实现
 	def findLedger(self, _callGraph):
 		#find each payable function and its contract
 		#dict
@@ -188,10 +220,8 @@ class judgePath:
 		#mapping
 		mappingList = self.getMapping(self.json)
 		#给定调用图、payable函数列表、mapping，寻找在以payable函数开头的路劲中，其中使用过（加过钱）的mappingAList
-		#print(payableList)
 		increaseMapping = self.findIncreaseMapping(payableList, newCallGraph, mappingList)
-		#print(increaseMapping)
-		return str()
+		return increaseMapping
 
 	def findIncreaseMapping(self, _payableList, _funcPath, _mappingList):
 		result = list()
@@ -199,9 +229,12 @@ class judgePath:
 			for onePath in _funcPath:
 				if onePath[0] == payableFunc:
 					#找到一条路径
-					result.extend(self.findOnePathMapping(onePath, _mappingList))
+					if len(self.findOnePathMapping(onePath, _mappingList)):
+						self.receiveEthPath.append(onePath)	#找到一条收钱路径
+						result.extend(self.findOnePathMapping(onePath, _mappingList))
 				else:
 					continue
+		result = list(set(result))
 		return result
 
 	def findOnePathMapping(self, _path, _mappingList):
@@ -211,7 +244,6 @@ class judgePath:
 			#拆分出函数名和合约名
 			funcName = func.split(".")[1]
 			contractName = func.split(".")[0]
-			#print(contractName)
 			#找到合约的AST
 			for contract in contractList:
 				if contract["attributes"]["name"] == contractName:
@@ -222,17 +254,19 @@ class judgePath:
 							statementList = self.findASTNode(oneFunc, "name", "Assignment")		
 							result.extend(self.getMapping_addEqu(statementList, _mappingList))	
 							result.extend(self.getMapping_add(statementList, _mappingList))
+							result.extend(self.getMapping_SafeMathAdd(statementList, _mappingList))
 						elif oneFunc["attributes"]["kind"] == FALLBACK_FLAG and funcName == FALLBACK_FLAG:
 							statementList = self.findASTNode(oneFunc, "name", "Assignment")
 							result.extend(self.getMapping_addEqu(statementList, _mappingList))	
 							result.extend(self.getMapping_add(statementList, _mappingList))
+							result.extend(self.getMapping_SafeMathAdd(statementList, _mappingList))
 						elif oneFunc["attributes"]["name"] == funcName:
 							statementList = self.findASTNode(oneFunc, "name", "Assignment")	
 							result.extend(self.getMapping_addEqu(statementList, _mappingList))
 							result.extend(self.getMapping_add(statementList, _mappingList))
+							result.extend(self.getMapping_SafeMathAdd(statementList, _mappingList))
 		#最后记得去重
 		result = list(set(result))
-		#print(result)
 		return result
 
 	#如果该赋值语句中存在对mapping的+=操作，则返回mappingList
@@ -262,7 +296,7 @@ class judgePath:
 		for _ast in _astList:
 			try:
 				if _ast["attributes"]["type"] == UINT256_FLAG and _ast["attributes"]["operator"] == EQU_FLAG:
-					print(_ast["attributes"])
+					#print(_ast["attributes"])
 					num = _ast["children"][0]
 					operator = _ast["children"][1]
 					if num["attributes"]["type"] == UINT256_FLAG and operator["attributes"]["operator"] == ADD_FLAG:
@@ -277,7 +311,44 @@ class judgePath:
 
 	#待实现
 	def getMapping_SafeMathAdd(self, _astList, _mappingList):
-		pass
+		safeMathAst = dict()
+		for ast in self.findASTNode(self.json, "name", "ContractDefinition"):
+			if ast["attributes"]["name"].upper() == SAFEMATH_FLAG and ast["attributes"]["contractKind"] == LIBRARY_FLAG:
+				safeMathAst = ast
+				#找到safeMath的AST
+				break
+			else:
+				continue
+		addId = int()
+		#用id来指明函数调用
+		for func in self.findASTNode(self.json, "name", "FunctionDefinition"):
+			if func["attributes"]["name"].lower() == ADD_STR_FLAG:
+				addId = func["id"]
+				break
+			else:
+				continue
+		#下一步，来找调用
+		result = list()
+		#赋值语句的ast
+		for _ast in _astList:
+			try:
+				if _ast["attributes"]["type"] == UINT256_FLAG and _ast["attributes"]["operator"] == EQU_FLAG:
+					#print(_ast["attributes"])
+					num = _ast["children"][0]
+					operator = _ast["children"][1]
+					if num["attributes"]["type"] == UINT256_FLAG and operator["attributes"]["type"] == UINT256_FLAG:
+						mapping = num["children"][0]
+						safeMathAdd = operator["children"][0]
+						if safeMathAdd["attributes"]["member_name"].lower() == ADD_STR_FLAG and  safeMathAdd["attributes"]["referencedDeclaration"] == addId:
+							#确定了，这一句使用safeMath库里add函数，考察接收结果的是否是我们要的结构
+							for ledger in _mappingList:
+								_id = ledger.split(".")[1]
+								if str(_id) == str(mapping["attributes"]["referencedDeclaration"]):
+									#在payable起始的函数的调用序列的该赋值语句中，有对mapping(address=>uint256)的SafeMath.add操作
+									result.append(ledger)
+			except:
+				continue
+		return result
 
 	def contractNameToNum(self,_callGraph):
 		dotFileName = self.targetContractName + DOT_SUFFIX

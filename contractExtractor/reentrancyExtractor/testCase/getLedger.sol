@@ -9,6 +9,7 @@ contract baseContract2 is baseContract1{
 	function getMoney() external payable{
 		require(balance[msg.sender] + msg.value >= balance[msg.sender]);
 		addMoney(msg.value);
+		addMoreMoney();
 	}
 
 	function addMoney(uint256 _money) internal{
@@ -16,6 +17,10 @@ contract baseContract2 is baseContract1{
 		balance[msg.sender] = balance[msg.sender] + 10;
 		noBalance[msg.sender] = 10;
 		noBalance[msg.sender] -= 10;
+	}
+
+	function addMoreMoney() internal{
+		balance[msg.sender] += 20;
 	}
 }
 
