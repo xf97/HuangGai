@@ -67,6 +67,16 @@ LIBRARY_FLAG = "library"
 ADD_STR_FLAG = "add"
 #sub函数名标志
 SUB_STR_FLAG = "sub"
+#transfer标志
+TRANSFER_FLAG = "transfer"
+#send标志
+SEND_FLAG = "send"
+#收款地址标志
+ADDRESS_PAYABLE_FLAG = "address payable"
+#value标志
+VALUE_FLAG = "value"
+#call标志
+CALL_FLAG = "call"
 
 
 #未使用　
@@ -75,10 +85,13 @@ SEND_ETH_FLAG = "Send ETH"
 #收取以太币标志字符串
 RECEIVE_ETH_FLAG =  "Receive ETH"
 
-
-'''
-考虑使用slither和script
-'''
+#转出以太币路径结构体
+class outEtherInfo:
+	def __init__(self):
+		self.ledgerList = list()	#本路径上出现过的账本列表
+		self.ledgerIndex = -1	#账本下标
+		self.statementList = list()	#语句位置列表
+		self.statementIndex = -1	
 
 class judgePath:
 	def __init__(self, _contractPath, _json):
@@ -116,12 +129,15 @@ class judgePath:
 		increaseLedger = self.findLedger(self.funcCallGraph)
 		#3.3 寻找路径 ，其中存在对增值mapping变量减值的操作，并且有.transfer/.send/.call.value语句
 		#最好能够保存减值操作和传输语句的相对位置（或许能够以调用链中的偏移量来记录），结果记录在出钱语句中
-		decreseLedger = self.outOfEther(self.funcCallGraph, increaseLedger)
+		statementInfo = self.outOfEther(self.funcCallGraph, increaseLedger)
 		#清除生成的缓存资料
 		self.deleteDot()
-		if len(increaseLedger) == 0:
-			return False
-		return True
+		if len(statementInfo) == 0:
+			print("%s %s %s" % (info, "Doesn't meet the extraction criteria.", end))
+			return True
+		else:
+			print("%s %s %s" % (info, "Meet the extraction criteria.", end))
+			return True
 		'''
 		不可用，slither的contract-summary并不准确
 		#1. 使用Slither生成contract-summary, slither将生成每个子类合约的合约总结
@@ -131,26 +147,34 @@ class judgePath:
 		'''
 
 	#待实现
+	#已经实现
 	def outOfEther(self, _callGraph, _ledger):
 		ledgerId = [int(name.split(".")[1]) for name in _ledger]	#获取账本的id
 		newCallGraph = self.contractNameToNum(_callGraph)
 		decreaseLedger = list()
+		pathList = list()
 		for path in newCallGraph:
 			#检查每条路径
 			(ledger, ledgerIndex) = self.findOnePathDecreseLedger(path, ledgerId)
 			(outEtherState, etherIndex) = self.findEtherOutStatement(path)
-			#print(outEtherState, etherIndex)
+			if ledgerIndex != -1 and etherIndex != -1:
+				#该路径下同时存在账本扣减操作和语句转出操作
+				item = outEtherInfo()
+				item.ledgerList = ledger
+				item.ledgerIndex = ledgerIndex	#账本下标
+				item.statementList = outEtherState	#语句位置列表
+				item.statementIndex = etherIndex
+				pathList.append([path, item])
 		newResult = list()
-		for i in decreaseLedger:
+		for i in pathList:
 			if i not in newResult:
 				newResult.append(i)
-		#print(newResult)
 		return newResult
 
 	def findEtherOutStatement(self, _path):
 		'''
 		问题是：当路径中存在多条以太币转出语句时，记录哪一条的位置呢
-		第一条，因为这一条执行需要的状态改变是最少的
+		第一条，因为这一条执行需要的状态改变是最少的，因此危险性最小
 		'''
 		statementList = list()
 		index = -1
@@ -166,20 +190,81 @@ class judgePath:
 						temp = statementList[:]
 						if oneFunc["attributes"]["kind"] == CONSTRUCTOR_FLAG and funcName == CONSTRUCTOR_FLAG:
 							accessStatement = self.findASTNode(oneFunc, "name", "MemberAccess")
-							statementList.extend(self.getStatement_transfer(statem))	
-							statementList.extend(self.getStatement_send(statementList))
-							statementList.extend(self.getStatement_callValue(statementList))
+							statementList.extend(self.getStatement_transfer(accessStatement))	
+							statementList.extend(self.getStatement_send(accessStatement))
+							statementList.extend(self.getStatement_callValue(accessStatement))
 						elif oneFunc["attributes"]["kind"] == FALLBACK_FLAG and funcName == FALLBACK_FLAG:
-							statementList = self.findASTNode(oneFunc, "name", "MemberAccess")
-							statementList.extend(self.getStatement_transfer(statementList))
-							stateMutability.extend(self.getStatement_send(statementList))
-							statementList.extend(self.getStatement_callValue(statementList))
+							accessStatement = self.findASTNode(oneFunc, "name", "MemberAccess")
+							statementList.extend(self.getStatement_transfer(accessStatement))
+							statementList.extend(self.getStatement_send(accessStatement))
+							statementList.extend(self.getStatement_callValue(accessStatement))
 						elif oneFunc["attributes"]["name"] == funcName:
-							statementList = self.findASTNode(oneFunc, "name", "MemberAccess")
-							statementList.extend(self.getStatement_transfer(statementList))
-							statementList.extend(self.getStatement_send(statementList))
-							statementList.extend(self.getStatement_callValue(statementList))
+							accessStatement = self.findASTNode(oneFunc, "name", "MemberAccess")
+							statementList.extend(self.getStatement_transfer(accessStatement))
+							statementList.extend(self.getStatement_send(accessStatement))
+							statementList.extend(self.getStatement_callValue(accessStatement))
+						if len(statementList) > len(temp) and index == -1:
+							index  = _path.index(func)
 		return statementList, index
+
+	'''
+	最终决定不用type作为判断依据，因为不同版本的Solidity这几个函数的type是不同的（会导致我们的可用性范围收窄）
+	'''
+	def getStatement_transfer(self, _astList):
+		result = list()
+		for _ast in _astList:
+			try:
+				if _ast["attributes"]["member_name"] == TRANSFER_FLAG and _ast["attributes"]["referencedDeclaration"] == None:
+					if _ast["children"][0]["attributes"]["type"] == ADDRESS_PAYABLE_FLAG:
+						#找到在memberAccess语句中找到使用.transfer语句
+						startPos, endPos = self.srcToPos(_ast["src"])
+						result.append([startPos, endPos])
+					else:
+						continue
+				else:
+					continue
+			except:
+				continue
+		return result
+
+	def getStatement_send(self, _astList):		
+		result = list()
+		for _ast in _astList:
+			try:
+				if _ast["attributes"]["member_name"] == SEND_FLAG and _ast["attributes"]["referencedDeclaration"] == None:
+					if _ast["children"][0]["attributes"]["type"] == ADDRESS_PAYABLE_FLAG:
+						#找到在memberAccess语句中找到使用.send语句
+						startPos, endPos = self.srcToPos(_ast["src"])
+						result.append([startPos, endPos])
+					else:
+						continue
+				else:
+					continue
+			except:
+				continue
+		return result
+
+	def getStatement_callValue(self, _astList):
+		result = list()
+		for _ast in _astList:
+			try:
+				if _ast["attributes"]["member_name"] == VALUE_FLAG and _ast["attributes"]["referencedDeclaration"] == None:
+					member = _ast["children"][0]
+					if member["attributes"]["member_name"] == CALL_FLAG and member["attributes"]["referencedDeclaration"] == None:
+						addressMember = member["children"][0]
+						if addressMember["attributes"]["type"] == ADDRESS_PAYABLE_FLAG:
+							#找到在memberAccess语句中找到使用.call.value语句
+							startPos, endPos = self.srcToPos(_ast["src"])
+							result.append([startPos, endPos])
+						else:
+							continue
+					else:
+						continue
+				else:
+					continue
+			except:
+				continue
+		return result
 
 	def findOnePathDecreseLedger(self, _path, _ledgerID):
 		'''
@@ -308,8 +393,12 @@ class judgePath:
 		return result
 
 	#待实现
+	#清空本地缓存
 	def deleteDot(self):
-		pass
+		for file in os.listdir():
+			if file.endswith(DOT_SUFFIX):
+				os.remove(file)
+		print("%s %s %s" % (info, "Clear intermediate files.", end))
 
 
 	def getAllFuncCFG(self):

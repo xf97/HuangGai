@@ -114,8 +114,7 @@ class reentrancyExtractor:
 			sourceCode = open(os.path.join(TESTCASE_PATH, "getLedger.sol"), "r", encoding = "utf-8").read()
 			return sourceCode, "getLedger.sol"#solList[index]
 		except:
-			#无法获取源代码，则引发异常　
-			#sys.exit(0)
+			#无法获取源代码，则引发异常
 			raise Exception("Unable to obtain source code " + solList[index])
 		
 
