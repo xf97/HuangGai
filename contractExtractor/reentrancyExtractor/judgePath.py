@@ -77,6 +77,8 @@ ADDRESS_PAYABLE_FLAG = "address payable"
 VALUE_FLAG = "value"
 #call标志
 CALL_FLAG = "call"
+#路径保存文件
+PATH_INFO_FILE = "pathInfo.txt"
 
 
 #未使用　
@@ -116,6 +118,14 @@ class judgePath:
 	def getMainContract(self):
 		return self.inherGraph.getMainContractName()
 
+	#待修改
+	def storePathInfo(self, _statementInfo):
+		print(_statementInfo[0][0])
+		print(_statementInfo[0][1].ledgerList)
+		print(_statementInfo[0][1].ledgerIndex)
+		print(_statementInfo[0][1].statementList)
+		print(_statementInfo[0][1].statementIndex)
+
 	def run(self):
 		#第一步，应该是生成合约所有函数的CFG
 		#因为slither的此功能故障，因此暂时失效此功能
@@ -130,6 +140,7 @@ class judgePath:
 		#3.3 寻找路径 ，其中存在对增值mapping变量减值的操作，并且有.transfer/.send/.call.value语句
 		#最好能够保存减值操作和传输语句的相对位置（或许能够以调用链中的偏移量来记录），结果记录在出钱语句中
 		statementInfo = self.outOfEther(self.funcCallGraph, increaseLedger)
+		self.storePathInfo(statementInfo)
 		#清除生成的缓存资料
 		self.deleteDot()
 		if len(statementInfo) == 0:
