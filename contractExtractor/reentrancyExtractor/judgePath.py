@@ -107,6 +107,7 @@ class judgePath:
 		self.sendEthPath = list()
 		if not os.path.exists(PATH_INFO_PATH):
 			os.mkdir(PATH_INFO_PATH)	#若文件夹不存在，则建立路径信息保存文件夹
+		'''
 		try:
 			#如果存在log.txt，则删除已存在的log.txt
 			if os.path.exists(os.path.join(CACHE_PATH, TERMINAL_FILE)):
@@ -116,6 +117,7 @@ class judgePath:
 			print(compileResult.read())
 		except:
 			print("Failed to record terminal output.")
+		'''
 
 
 	def getMainContract(self):
@@ -160,6 +162,10 @@ class judgePath:
 		#3.3 寻找路径 ，其中存在对增值mapping变量减值的操作，并且有.transfer/.send/.call.value语句
 		#最好能够保存减值操作和传输语句的相对位置（或许能够以调用链中的偏移量来记录），结果记录在出钱语句中
 		statementInfo = self.outOfEther(self.funcCallGraph, increaseLedger)
+		for _statement in statementInfo:
+			if len(_statement[1].ledgerList) > 1:
+				#当超过一个账本时，无法判定哪个才是账本，判定为不符合抽取条件
+				return False
 		#清除生成的缓存资料
 		self.deleteDot()
 		if len(statementInfo) == 0:

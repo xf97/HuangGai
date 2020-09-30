@@ -43,7 +43,15 @@ class reentrancyExtractor:
 		self.cacheJsonAstName = "temp.sol_json.ast"
 		self.defaultSolc = "0.6.0"	#默认使用的solc编译版本
 		self.maxSolc = "0.7.1" #最高被支持的solc版本，合约使用的solc版本高于此版本时，引发异常
-		self.minSolc = "0.4.0"	#最低被支持的solc版本
+		self.minSolc = "0.5.0"	#最低被支持的solc版本
+		self.index = 0
+		'''
+		#try:
+		compileResult = subprocess.run("ulimit -s 102400", check = True, shell = True)	#临时调整系统栈空间
+		
+		except:
+			print("Change stack size..failed")
+		'''
 		try:
 			os.mkdir(CACHE_PATH)	#建立缓存文件夹
 		except:
@@ -52,43 +60,35 @@ class reentrancyExtractor:
 	def extractContracts(self):
 		#当符合条件的合约数量不满足需求时，继续抽取
 		while self.nowNum < self.needs:
-			#try:
-			#拿到一个合约及其源代码
-			(sourceCode, prevFileName) = self.getSourceCode()
-			#print(prevFileName)
-			#print(1)
-			#将当前合约暂存
-			self.cacheContract(sourceCode)
-			#print(2)
-			#调整本地编译器版本
-			self.changeSolcVersion(sourceCode)
-			#print(3)
-			#编译生成当前合约的抽象语法树(以json_ast形式给出)
-			jsonAst = self.compile2Json()
-			#print(4)
-			#根据合约文件本身、抽象语法树来判断该合约是否符合标准
-			if self.judgeContract(os.path.join(self.cacheContractPath), jsonAst, prevFileName) == True:
-				#print(5)
-				#符合标准，加１，写入数据文件
-				self.nowNum += 1 
-				#将暂存文件及其JsonAst文件转移到结果保存文件中
-				self.storeResult(prevFileName)
-				#print(6)
-				#显示进度　
-				print("\r%s当前抽取进度: %.2f%s" % (blue, self.nowNum / self.needs, end))
-				#清空缓存数据
-				rmtree(CACHE_PATH)
-				#重新建立文件夹
-				os.mkdir(CACHE_PATH)
-			else:
-				#self.nowNum += 1
-				continue
-			'''
+			try:
+				#拿到一个合约及其源代码
+				(sourceCode, prevFileName) = self.getSourceCode()
+				#print(prevFileName)
+				#将当前合约暂存
+				self.cacheContract(sourceCode)
+				#调整本地编译器版本
+				self.changeSolcVersion(sourceCode)
+				#编译生成当前合约的抽象语法树(以json_ast形式给出)
+				jsonAst = self.compile2Json()
+				#根据合约文件本身、抽象语法树来判断该合约是否符合标准
+				if self.judgeContract(os.path.join(self.cacheContractPath), jsonAst, prevFileName) == True:
+					#符合标准，加１，写入数据文件
+					self.nowNum += 1 
+					#将暂存文件及其JsonAst文件转移到结果保存文件中
+					self.storeResult(prevFileName)
+					#显示进度　
+					print("\r%s当前抽取进度: %.2f%s" % (blue, self.nowNum / self.needs, end))
+					#清空缓存数据
+					rmtree(CACHE_PATH)
+					#重新建立文件夹
+					os.mkdir(CACHE_PATH)
+				else:
+					#self.nowNum += 1
+					continue
 			except Exception as e:
 				#self.nowNum += 1
 				print("%s %s %s" % (bad, e, end))
 				continue
-			'''
 
 	def getSourceCode(self):
 		'''
@@ -105,31 +105,33 @@ class reentrancyExtractor:
 			else:
 				continue
 		index = randint(0, len(solList) - 1)
-		print(index, solList[index])
-		#index = 0
+		index = self.index
+		#print(index, solList[index])
 		try:
 			#拼接绝对路径
-			#sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
-			sourceCode = open(os.path.join(TESTCASE_PATH, "0x9ec022f82c5004a2fd71ce354ea2e57baf6b81ab.sol"), "r", encoding = "utf-8").read()
+			sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
+			self.index += 1
+			#sourceCode = open(os.path.join(TESTCASE_PATH, "0x6ec8a24cabdc339a06a172f8223ea557055adaa5.sol"), "r", encoding = "utf-8").read()
 			return sourceCode, solList[index]
 		except:
 			#无法获取源代码，则引发异常
+			self.index += 1
 			raise Exception("Unable to obtain source code " + solList[index])
 		
 
 	def changeSolcVersion(self, _sourceCode):
 		#首先明确－如果合约内存在多个solc版本语句，则只不处理该合约
+		#变更，处理有多个solc语句的合约，使用第一个语句的版本
 		#要考虑多种情况，1-pragma solidity 0.5.0
 		#2-pragma solidity ^0.5.0
 		#3-pragma solidity >=0.5.0 <0.6.0
 		#考虑的思路是-使用正则表达式从pragma solidity直接提取到;
 		#然后再取第一个的数字
-		pragmaPattern = re.compile(r"(\b)pragma(\s)+(solidity)(.)+?(;)")
+		pragmaPattern = re.compile(r"(\b)pragma(\s)+(solidity)(\s)*(.)+?(;)")
 		lowVersionPattern = re.compile(r"(\b)(\d)(\.)(\d)(.)(\d)+(\b)")
-		#再考虑，万一没有声明呢？则默认，考虑使用0.6.0作为默认值吧
-		if len(pragmaPattern.findall(_sourceCode)) > 1:
-			raise Exception("Multiple pragma solidity statements.")
-		pragmaStatement = pragmaPattern.search(_sourceCode, re.S)	#允许匹配多行
+		pragmaStatement_mulLine = pragmaPattern.search(_sourceCode, re.S)	#匹配多行
+		pragmaStatement_sinLine = pragmaPattern.search(_sourceCode)	#匹配多行 
+		pragmaStatement = pragmaStatement_sinLine if pragmaStatement_sinLine else pragmaStatement_mulLine #优先使用单行匹配
 		#如果存在声明
 		if pragmaStatement:
 			#抽取出最低版本
@@ -141,14 +143,15 @@ class reentrancyExtractor:
 		try:
 			if self.defaultSolc >= self.minSolc and self.defaultSolc <= self.maxSolc:
 				#在本机支持的solc版本范围内
-				compileResult = subprocess.run("solc use " + self.defaultSolc, check = True, shell = True)	#切换版本				#print(compileResult.read())
+				compileResult = subprocess.run("solc use " + self.defaultSolc, check = True, shell = True)	#切换版本				
+				#print(compileResult.read())
 			else:
 				#如果超出本机支持的solc范围，则引发异常
 				#print("Use unsupported solc version.")
 				raise Exception("Use unsupported solc version.")
 		except Exception as e:
 			#切换编译器失败，则终止运行
-			print(e)
+			raise Exception("Failed to switch the solc version.")
 			return
 			#sys.exit(0)
 
@@ -169,12 +172,12 @@ class reentrancyExtractor:
 		except:
 			raise Exception("Failed to compile the contract.")
 
+	#已经实现
 	def judgeContract(self, _contractPath, _jsonAst, _filename):
 		simpleJudge = judgeAst(_jsonAst)
 		if not simpleJudge.run():
 			#如果不符合标准（简单标准），则返回False
 			return False
-		#关键函数，待实现
 		pathJudge  = judgePath(_contractPath, _jsonAst, _filename)
 		if not pathJudge.run():
 			return False
@@ -195,5 +198,5 @@ class reentrancyExtractor:
 
 #单元测试
 if __name__ == "__main__":
-	ree = reentrancyExtractor(1)
+	ree = reentrancyExtractor(10)
 	ree.extractContracts()

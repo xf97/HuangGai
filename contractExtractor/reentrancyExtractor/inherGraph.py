@@ -29,6 +29,9 @@ class inherGraph:
 		#此处列表的顺序，就已经代表了线性化继承顺序后的从“最基类”到“最子类”的顺序
 		self.idList.extend(self.contractAndItsBases[mainId])
 		self.idList.append(mainId)
+		#移除空值
+		while None in self.idList:
+			self.idList.remove(None)
 		#根据调用，逐个返回contract
 		for _id in self.idList:
 			yield self.findASTNode(self.json, "id", _id)[0]
