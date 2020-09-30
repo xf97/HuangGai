@@ -24,6 +24,7 @@ from inherGraph import inherGraph #该库用于返回主合约的合约名
 from colorPrint import *	#该头文件中定义了色彩显示的信息
 from pydot import io 	#该头文件用来读取.dot文件
 import re
+import json
 
 #缓存路径
 #进行抽取时，合约仍然存于cache文件夹中
@@ -77,8 +78,8 @@ ADDRESS_PAYABLE_FLAG = "address payable"
 VALUE_FLAG = "value"
 #call标志
 CALL_FLAG = "call"
-#路径保存文件
-PATH_INFO_FILE = "pathInfo.txt"
+#路径保存位置
+PATH_INFO_PATH = "./pathInfo/"
 
 
 #未使用　
@@ -96,14 +97,16 @@ class outEtherInfo:
 		self.statementIndex = -1	
 
 class judgePath:
-	def __init__(self, _contractPath, _json):
+	def __init__(self, _contractPath, _json, _filename):
+		self.filename = _filename	#被处理的合约文件名
 		self.contractPath = _contractPath
-		#print(self.contractPath)
 		self.inherGraph = inherGraph(_json)
 		self.targetContractName = self.getMainContract()
 		self.json = _json
 		self.receiveEthPath = list()
 		self.sendEthPath = list()
+		if not os.path.exists(PATH_INFO_PATH):
+			os.mkdir(PATH_INFO_PATH)	#若文件夹不存在，则建立路径信息保存文件夹
 		try:
 			#如果存在log.txt，则删除已存在的log.txt
 			if os.path.exists(os.path.join(CACHE_PATH, TERMINAL_FILE)):
@@ -119,12 +122,29 @@ class judgePath:
 		return self.inherGraph.getMainContractName()
 
 	#待修改
+	#已经实现
 	def storePathInfo(self, _statementInfo):
-		print(_statementInfo[0][0])
-		print(_statementInfo[0][1].ledgerList)
-		print(_statementInfo[0][1].ledgerIndex)
-		print(_statementInfo[0][1].statementList)
-		print(_statementInfo[0][1].statementIndex)
+		try:
+			infoDict = dict()
+			PATH = "pathInfo"
+			offset = 1
+			key = PATH + str(offset)
+			for _statement in _statementInfo:
+				tempDict = dict()
+				tempDict["path"] = _statement[0]
+				tempDict["ledgerList"] = _statement[1].ledgerList
+				tempDict["ledgerIndex"] = _statement[1].ledgerIndex
+				tempDict["statementList"] = _statement[1].statementList
+				tempDict["statementIndex"] = _statement[1].statementIndex
+				infoDict[key] = tempDict
+				offset += 1
+				key = PATH + str(offset)	#更新键值
+			#保存路径信息
+			with open(os.path.join(PATH_INFO_PATH, self.filename.split(".")[0] + ".json"), "w", encoding = "utf-8") as f:
+				json.dump(infoDict, f, indent = 1)
+			print("%s %s %s" % (info, self.filename + "target path information...saved", end))
+		except:
+			print("%s %s %s" % (bad, self.filename + " target path information...failed", end))
 
 	def run(self):
 		#第一步，应该是生成合约所有函数的CFG
@@ -140,13 +160,14 @@ class judgePath:
 		#3.3 寻找路径 ，其中存在对增值mapping变量减值的操作，并且有.transfer/.send/.call.value语句
 		#最好能够保存减值操作和传输语句的相对位置（或许能够以调用链中的偏移量来记录），结果记录在出钱语句中
 		statementInfo = self.outOfEther(self.funcCallGraph, increaseLedger)
-		self.storePathInfo(statementInfo)
 		#清除生成的缓存资料
 		self.deleteDot()
 		if len(statementInfo) == 0:
 			print("%s %s %s" % (info, "Doesn't meet the extraction criteria.", end))
-			return True
+			return False
 		else:
+			#如果符合抽取标准，则保存路径信息 
+			self.storePathInfo(statementInfo)
 			print("%s %s %s" % (info, "Meet the extraction criteria.", end))
 			return True
 		'''
@@ -625,7 +646,6 @@ class judgePath:
 		result = list()
 		f = io.open(dotFileName)
 		contractNameDict = dict()
-		alnumPattern = re.compile("")
 		for line in f.readlines():
 			if line.find(CLUSTER_FLAG) != -1:
 				#找到集群声明标志，拆分出编号和合约名
@@ -642,8 +662,7 @@ class judgePath:
 			aList = list()
 			for func in _list:
 				try:
-					num = func.split("_")[0][1:] #1为了去掉开头的双引号
-					funcName = func.split("_")[1][:-1]  #去掉尾部双引号
+					num, funcName = self.splitTempName(func)
 					for item in contractNameDict.items():
 						if item[1] == num:
 							temp = item[0] + "." + funcName
@@ -675,6 +694,20 @@ class judgePath:
 				temp += char
 		result.append(temp)
 		return result[0], result[1]
+
+	def splitTempName(self, _str):
+		result = list()
+		flag = False
+		temp = str()
+		for char in _str:
+			if char == "_" and flag == False:
+				flag = True
+				result.append(temp)
+				temp = ""
+			else:
+				temp += char
+		result.append(temp)
+		return result[0][1:], result[1][:-1]	#去掉头尾的双引号
 
 
 	def getMapping(self, _json):

@@ -67,7 +67,7 @@ class reentrancyExtractor:
 			jsonAst = self.compile2Json()
 			#print(4)
 			#根据合约文件本身、抽象语法树来判断该合约是否符合标准
-			if self.judgeContract(os.path.join(self.cacheContractPath), jsonAst) == True:
+			if self.judgeContract(os.path.join(self.cacheContractPath), jsonAst, prevFileName) == True:
 				#print(5)
 				#符合标准，加１，写入数据文件
 				self.nowNum += 1 
@@ -95,8 +95,8 @@ class reentrancyExtractor:
 		该函数从源代码数据存储位置提取
 		合约的名称和源代码
 		'''
-		#fileList = os.listdir(SOURCE_CODE_PATH)
-		fileList = os.listdir(TESTCASE_PATH)
+		fileList = os.listdir(SOURCE_CODE_PATH)
+		#fileList = os.listdir(TESTCASE_PATH)
 		solList = list()
 		#根据文件后缀判断文件类型
 		for i in fileList:
@@ -104,15 +104,14 @@ class reentrancyExtractor:
 				solList.append(i)
 			else:
 				continue
-		#读取文件内容
 		index = randint(0, len(solList) - 1)
-		#print(index, solList[index])
+		print(index, solList[index])
 		#index = 0
 		try:
 			#拼接绝对路径
 			#sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
-			sourceCode = open(os.path.join(TESTCASE_PATH, "getLedger.sol"), "r", encoding = "utf-8").read()
-			return sourceCode, "getLedger.sol"#solList[index]
+			sourceCode = open(os.path.join(TESTCASE_PATH, "0x9ec022f82c5004a2fd71ce354ea2e57baf6b81ab.sol"), "r", encoding = "utf-8").read()
+			return sourceCode, solList[index]
 		except:
 			#无法获取源代码，则引发异常
 			raise Exception("Unable to obtain source code " + solList[index])
@@ -127,14 +126,10 @@ class reentrancyExtractor:
 		#然后再取第一个的数字
 		pragmaPattern = re.compile(r"(\b)pragma(\s)+(solidity)(.)+?(;)")
 		lowVersionPattern = re.compile(r"(\b)(\d)(\.)(\d)(.)(\d)+(\b)")
-		#print("2.1")
 		#再考虑，万一没有声明呢？则默认，考虑使用0.6.0作为默认值吧
 		if len(pragmaPattern.findall(_sourceCode)) > 1:
 			raise Exception("Multiple pragma solidity statements.")
-		#print(2.2)
 		pragmaStatement = pragmaPattern.search(_sourceCode, re.S)	#允许匹配多行
-		#print(2.3)
-		#print("pragmaStatement", pragmaStatement)
 		#如果存在声明
 		if pragmaStatement:
 			#抽取出最低版本
@@ -143,14 +138,10 @@ class reentrancyExtractor:
 			if solcVersion:
 				self.defaultSolc = solcVersion.group()
 		#否则使用默认声明
-		#print(self.defaultSolc)
 		try:
 			if self.defaultSolc >= self.minSolc and self.defaultSolc <= self.maxSolc:
-				#print("xixixix")
 				#在本机支持的solc版本范围内
-				compileResult = subprocess.run("solc use " + self.defaultSolc, check = True, shell = True)	#切换版本
-				#print("lalala")
-				#print(compileResult.read())
+				compileResult = subprocess.run("solc use " + self.defaultSolc, check = True, shell = True)	#切换版本				#print(compileResult.read())
 			else:
 				#如果超出本机支持的solc范围，则引发异常
 				#print("Use unsupported solc version.")
@@ -178,13 +169,13 @@ class reentrancyExtractor:
 		except:
 			raise Exception("Failed to compile the contract.")
 
-	def judgeContract(self, _contractPath, _jsonAst):
+	def judgeContract(self, _contractPath, _jsonAst, _filename):
 		simpleJudge = judgeAst(_jsonAst)
 		if not simpleJudge.run():
 			#如果不符合标准（简单标准），则返回False
 			return False
 		#关键函数，待实现
-		pathJudge  = judgePath(_contractPath, _jsonAst)
+		pathJudge  = judgePath(_contractPath, _jsonAst, _filename)
 		if not pathJudge.run():
 			return False
 		return True

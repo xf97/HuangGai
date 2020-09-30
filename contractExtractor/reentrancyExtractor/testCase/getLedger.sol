@@ -8,7 +8,7 @@ contract baseContract2 is baseContract1{
 	mapping(address=>uint256) noBalance;
 	function getMoney() external payable{
 		require(balance[msg.sender] + msg.value >= balance[msg.sender]);
-		//addMoney(msg.value);
+		addMoney(msg.value);
 		addMoreMoney();
 	}
 
@@ -31,10 +31,20 @@ contract myContract is baseContract2{
 
 	function sendMoney(uint256 _amount) external{
 		require(balance[msg.sender] >= _amount);
-		//msg.sender.transfer(_amount);
-		//msg.sender.send(10);
+		msg.sender.transfer(_amount);
+		msg.sender.send(10);
 		msg.sender.call.value(10)("");
 		balance[msg.sender] -= _amount;
 		noBalance[msg.sender] += 10;
+	}
+
+	function sendMoney1() external{
+		balance[msg.sender] -= 10;
+		//msg.sender.transfer(10);
+		_sendMoney1();
+	}
+
+	function _sendMoney1() internal{
+		msg.sender.transfer(10);
 	}
 }
