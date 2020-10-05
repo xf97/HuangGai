@@ -1,5 +1,0 @@
-f851a440: admin()
-8da5cb5b: owner()
-a7304bf7: setAdminByAdmin(address)
-deca5f88: setAdminByOwner(address)
-1e48907b: setOwnerByAdmin(address)

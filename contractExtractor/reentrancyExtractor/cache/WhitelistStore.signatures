@@ -1,7 +1,0 @@
-e09e83e3: addToWhitelist(address,address,uint256)
-ce7eaf01: effectiveTimeMap(address,address)
-b6b35272: isWhitelisted(address,address)
-f8d3277d: removeFromWhitelist(address,address)
-8d167f17: walletKey(address)
-9b19251a: whitelist(address)
-cbb3dc3e: whitelistSize(address)

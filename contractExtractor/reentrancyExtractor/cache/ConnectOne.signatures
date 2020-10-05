@@ -1,5 +1,0 @@
-eb15f781: connectorID()
-06fdde03: name()
-45c9acfe: sell(address,address,uint256,uint256,uint256,uint256)
-56c45b1f: sellThree(address,address,uint256,uint256,bytes,uint256)
-dc5bb7cd: sellTwo(address,address,uint256,uint256,uint256[],uint256,uint256,uint256)

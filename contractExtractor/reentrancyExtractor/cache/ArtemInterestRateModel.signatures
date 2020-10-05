@@ -1,5 +1,0 @@
-1f68f20a: baseRate()
-a385fb96: blocksPerYear()
-15f24053: getBorrowRate(uint256,uint256,uint256)
-2191f92a: isInterestRateModel()
-1b3ed722: multiplier()

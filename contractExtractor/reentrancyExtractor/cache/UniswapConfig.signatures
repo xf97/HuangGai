@@ -1,7 +1,0 @@
-8a003888: getTokenConfig(uint256)
-9f599631: getTokenConfigByCToken(address)
-276c2cba: getTokenConfigBySymbol(string)
-1a125204: getTokenConfigBySymbolHash(bytes32)
-4da21942: getTokenConfigByUnderlying(address)
-e8315742: maxTokens()
-8e499bcf: numTokens()

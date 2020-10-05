@@ -1,6 +1,0 @@
-eb15f781: connectorID()
-ce88b439: deposit(address,uint256,uint256,uint256)
-202bb80c: getEthAddr()
-e82eb6fa: getEventAddr()
-fa821c9b: getMemoryAddr()
-4bd3ab82: withdraw(address,uint256,address,uint256,uint256)

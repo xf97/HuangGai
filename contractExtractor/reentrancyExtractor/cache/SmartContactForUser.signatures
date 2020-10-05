@@ -1,7 +1,0 @@
-5c8fa5f6: checkAppointeePermission(address,address)
-8de54883: checkHolderPermission(address)
-7f7db677: checkOwnerPermission(address)
-893d20e8: getOwner()
-c7c707c4: holderExist(address)
-a6a66072: removeContact(address)
-85c3e133: signContact(address)

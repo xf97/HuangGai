@@ -1,7 +1,0 @@
-ab1be686: getAddressETH()
-f9bda826: getCDAIAddress()
-c9ce5d86: getCETHAddress()
-4ee9159a: getComptrollerAddress()
-e6029515: getDAIAddress()
-cb46dc3a: getMcdAddresses()
-de259242: getPoolAddr()

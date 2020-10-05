@@ -1,5 +1,0 @@
-eb19110d: BuyGenesisLevel1FromNormal(address,address,uint256)
-45b4f43b: BuyGenesisLevel2FromNormal(address,address,uint256)
-e7cba433: BuyGenesisLevel3FromNormal(address,address,uint256)
-919e0b79: ownerMain()
-13b9f0c7: setOwnerMain()

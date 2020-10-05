@@ -1,7 +1,0 @@
-ac39285b: RemoveStakeFromSale(address)
-f96da2f6: SetStakeForSale(address,uint256)
-2464a27d: StakeTransferGenesis(address,address,uint256,address[])
-706cb954: StakeTransferMNE(address,address,uint256)
-919e0b79: ownerMain()
-f8e4df0f: setBalanceStakes(address,address,uint256)
-13b9f0c7: setOwnerMain()

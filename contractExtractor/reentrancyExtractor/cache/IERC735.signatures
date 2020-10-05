@@ -1,4 +1,0 @@
-b1a34e0d: addClaim(uint256,uint256,address,bytes,bytes,string)
-c9100bcb: getClaim(bytes32)
-80e9e9e1: getClaimIdsByTopic(uint256)
-4eee424a: removeClaim(bytes32)

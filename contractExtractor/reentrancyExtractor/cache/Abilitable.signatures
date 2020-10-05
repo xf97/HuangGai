@@ -1,5 +1,0 @@
-45a32c86: addressToAbility(address)
-0ab319e8: grantAbilities(address,uint256)
-ba00a330: isAble(address,uint256)
-f394b6df: revokeAbilities(address,uint256)
-15ec3b8b: setAbilities(address,uint256)

@@ -1,7 +1,0 @@
-c1a287e2: GRACE_PERIOD()
-0e18b681: acceptAdmin()
-591fcdfe: cancelTransaction(address,uint256,string,bytes,uint256)
-6a42b8f8: delay()
-0825f38f: executeTransaction(address,uint256,string,bytes,uint256)
-3a66f901: queueTransaction(address,uint256,string,bytes,uint256)
-f2b06537: queuedTransactions(bytes32)

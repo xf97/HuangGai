@@ -1,5 +1,0 @@
-8eaa6ac0: get(bytes32)
-8da5cb5b: owner()
-715018a6: renounceOwnership()
-ba44593c: set(bytes32,address)
-f2fde38b: transferOwnership(address)

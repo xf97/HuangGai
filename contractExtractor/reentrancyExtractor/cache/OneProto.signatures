@@ -1,4 +1,0 @@
-eb15f781: connectorID()
-45c9acfe: sell(address,address,uint256,uint256,uint256,uint256)
-90ab67e1: sellMulti(address[],uint256,uint256,uint256[],uint256[],uint256,uint256)
-dc5bb7cd: sellTwo(address,address,uint256,uint256,uint256[],uint256,uint256,uint256)

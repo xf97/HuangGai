@@ -1,6 +1,0 @@
-bf7e214f: authority()
-8da5cb5b: owner()
-04f3bcec: resolver()
-7a9e5e4b: setAuthority(address)
-13af4035: setOwner(address)
-4e543b26: setResolver(address)

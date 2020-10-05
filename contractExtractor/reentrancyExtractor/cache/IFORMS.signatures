@@ -1,4 +1,0 @@
-70a08231: balanceOf(address)
-6d1b229d: burnTokens(uint256)
-9092f87b: setTokenLock(uint256,uint256,address)
-a9059cbb: transfer(address,uint256)

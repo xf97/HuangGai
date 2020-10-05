@@ -1,6 +1,0 @@
-c62351a6: BuyNormalAddress(address,address,uint256)
-310ccfb8: RemoveNormalAddressFromSale(address)
-ec87efa8: SetNormalAddressForSale(address,uint256)
-919e0b79: ownerMain()
-f2758b68: setBalanceNormalAddress(address,address,uint256)
-13b9f0c7: setOwnerMain()

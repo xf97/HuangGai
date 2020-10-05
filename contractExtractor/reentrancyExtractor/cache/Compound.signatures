@@ -1,8 +1,0 @@
-70a08231: balanceOf(address)
-f8f9da28: borrowRatePerBlock()
-ba377731: getSupplyBalance(address,address)
-a0712d68: mint(uint256)
-db006a75: redeem(uint256)
-f2b9fdb8: supply(address,uint256)
-ae9d70b0: supplyRatePerBlock()
-f3fef3a3: withdraw(address,uint256)

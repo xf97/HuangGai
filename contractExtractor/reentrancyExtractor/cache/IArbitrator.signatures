@@ -1,7 +1,0 @@
-49912f88: appeal(uint256,bytes)
-f23f16e6: appealCost(uint256,bytes)
-afe15cfb: appealPeriod(uint256)
-f7434ea9: arbitrationCost(bytes)
-c13517e1: createDispute(uint256,bytes)
-1c3db16d: currentRuling(uint256)
-10f169e8: disputeStatus(uint256)

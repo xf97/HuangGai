@@ -1,3 +1,0 @@
-3c4a25d0: addGovernor(address)
-e43581b8: isGovernor(address)
-e026049c: renounceGovernor()

@@ -1,6 +1,0 @@
-8f32d59b: isOwner()
-3c6b16ab: notifyRewardAmount(uint256)
-8da5cb5b: owner()
-715018a6: renounceOwnership()
-0d68b761: setRewardDistribution(address)
-f2fde38b: transferOwnership(address)

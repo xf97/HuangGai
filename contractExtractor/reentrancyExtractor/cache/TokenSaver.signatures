@@ -1,6 +1,0 @@
-58e69202: addTokenType(address[])
-a85adeab: endTimestamp()
-8da5cb5b: owner()
-f79ed94b: reserveAddress()
-34f01925: selfdestruction()
-e6c3b1f6: tokenType(uint256)

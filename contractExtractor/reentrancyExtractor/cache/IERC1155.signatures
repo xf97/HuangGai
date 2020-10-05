@@ -1,7 +1,0 @@
-00fdd58e: balanceOf(address,uint256)
-4e1273f4: balanceOfBatch(address[],uint256[])
-e985e9c5: isApprovedForAll(address,address)
-2eb2c2d6: safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)
-f242432a: safeTransferFrom(address,address,uint256,uint256,bytes)
-a22cb465: setApprovalForAll(address,bool)
-bd85b039: totalSupply(uint256)

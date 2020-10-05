@@ -1,8 +1,0 @@
-bf7e214f: authority()
-60c7d295: cache()
-1cff79cd: execute(address,bytes)
-1f6a1eb9: execute(bytes,bytes)
-8da5cb5b: owner()
-7a9e5e4b: setAuthority(address)
-948f5076: setCache(address)
-13af4035: setOwner(address)

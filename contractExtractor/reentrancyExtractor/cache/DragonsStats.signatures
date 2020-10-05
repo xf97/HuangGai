@@ -1,3 +1,0 @@
-5aeee9f9: incFightLose(uint256)
-2454d1f0: incFightWin(uint256)
-af24cba2: setLastAction(uint256,uint256,uint8)

@@ -1,5 +1,0 @@
-eb15f781: connectorID()
-202bb80c: getEthAddr()
-e82eb6fa: getEventAddr()
-06fdde03: name()
-f3fef3a3: withdraw(address,uint256)

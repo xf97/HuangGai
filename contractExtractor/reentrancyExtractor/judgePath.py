@@ -91,7 +91,8 @@ RECEIVE_ETH_FLAG =  "Receive ETH"
 #转出以太币路径结构体
 class outEtherInfo:
 	def __init__(self):
-		self.ledgerList = list()	#本路径上出现过的账本列表
+		self.ledgerList = list()	#本路径上扣款语句位置 
+		self.ledgerId = list()
 		self.ledgerIndex = -1	#账本下标
 		self.statementList = list()	#语句位置列表
 		self.statementIndex = -1	
@@ -138,6 +139,7 @@ class judgePath:
 				tempDict["ledgerIndex"] = _statement[1].ledgerIndex
 				tempDict["statementList"] = _statement[1].statementList
 				tempDict["statementIndex"] = _statement[1].statementIndex
+				tempDict["ledgerIdList"] = _statement[1].ledgerId
 				infoDict[key] = tempDict
 				offset += 1
 				key = PATH + str(offset)	#更新键值
@@ -163,7 +165,7 @@ class judgePath:
 		#最好能够保存减值操作和传输语句的相对位置（或许能够以调用链中的偏移量来记录），结果记录在出钱语句中
 		statementInfo = self.outOfEther(self.funcCallGraph, increaseLedger)
 		for _statement in statementInfo:
-			if len(_statement[1].ledgerList) > 1:
+			if len(_statement[1].ledgerId) > 1:
 				#当超过一个账本时，无法判定哪个才是账本，判定为不符合抽取条件
 				return False
 		#清除生成的缓存资料
@@ -193,12 +195,13 @@ class judgePath:
 		pathList = list()
 		for path in newCallGraph:
 			#检查每条路径
-			(ledger, ledgerIndex) = self.findOnePathDecreseLedger(path, ledgerId)
+			(ledger, idList, ledgerIndex) = self.findOnePathDecreseLedger(path, ledgerId)
 			(outEtherState, etherIndex) = self.findEtherOutStatement(path)
 			if ledgerIndex != -1 and etherIndex != -1:
 				#该路径下同时存在账本扣减操作和语句转出操作
 				item = outEtherInfo()
 				item.ledgerList = ledger
+				item.ledgerId = idList
 				item.ledgerIndex = ledgerIndex	#账本下标
 				item.statementList = outEtherState	#语句位置列表
 				item.statementIndex = etherIndex
@@ -310,6 +313,7 @@ class judgePath:
 		应该最后一个的，根据转出语句距离最近
 		'''
 		result = list()
+		idList = list()
 		contractList = self.findASTNode(self.json, "name", "ContractDefinition")
 		index = -1
 		for func in _path:
@@ -325,24 +329,34 @@ class judgePath:
 						if oneFunc["attributes"]["kind"] == CONSTRUCTOR_FLAG and funcName == CONSTRUCTOR_FLAG:
 							#找到函数的ast
 							statementList = self.findASTNode(oneFunc, "name", "Assignment")		
-							result.extend(self.getMapping_subEqu(statementList, _ledgerID))	
-							result.extend(self.getMapping_sub(statementList, _ledgerID))
-							result.extend(self.getMapping_SafeMathSub(statementList, _ledgerID))
+							result.extend(self.getMapping_subEqu(statementList, _ledgerID)[0])	
+							idList.extend(self.getMapping_subEqu(statementList, _ledgerID)[1])
+							result.extend(self.getMapping_sub(statementList, _ledgerID)[0])
+							idList.extend(self.getMapping_sub(statementList, _ledgerID)[1])
+							result.extend(self.getMapping_SafeMathSub(statementList, _ledgerID)[0])
+							idList.extend(self.getMapping_SafeMathSub(statementList, _ledgerID)[1])
 						elif oneFunc["attributes"]["kind"] == FALLBACK_FLAG and funcName == FALLBACK_FLAG:
 							statementList = self.findASTNode(oneFunc, "name", "Assignment")
-							result.extend(self.getMapping_subEqu(statementList, _ledgerID))	
-							result.extend(self.getMapping_sub(statementList, _ledgerID))
-							result.extend(self.getMapping_SafeMathSub(statementList, _ledgerID))
+							result.extend(self.getMapping_subEqu(statementList, _ledgerID)[0])	
+							idList.extend(self.getMapping_subEqu(statementList, _ledgerID)[1])
+							result.extend(self.getMapping_sub(statementList, _ledgerID)[0])
+							idList.extend(self.getMapping_sub(statementList, _ledgerID)[1])
+							result.extend(self.getMapping_SafeMathSub(statementList, _ledgerID)[0])
+							idList.extend(self.getMapping_SafeMathSub(statementList, _ledgerID)[1])
 						elif oneFunc["attributes"]["name"] == funcName:
 							statementList = self.findASTNode(oneFunc, "name", "Assignment")	
-							result.extend(self.getMapping_subEqu(statementList, _ledgerID))
-							result.extend(self.getMapping_sub(statementList, _ledgerID))
-							result.extend(self.getMapping_SafeMathSub(statementList, _ledgerID))
+							result.extend(self.getMapping_subEqu(statementList, _ledgerID)[0])	
+							idList.extend(self.getMapping_subEqu(statementList, _ledgerID)[1])
+							result.extend(self.getMapping_sub(statementList, _ledgerID)[0])
+							idList.extend(self.getMapping_sub(statementList, _ledgerID)[1])
+							result.extend(self.getMapping_SafeMathSub(statementList, _ledgerID)[0])
+							idList.extend(self.getMapping_SafeMathSub(statementList, _ledgerID)[1])
 						if len(result) > len(temp):
 							index  = _path.index(func)
 		#最后记得去重
 		result = list(set(result))
-		return result, index
+		idList = list(set(idList))
+		return result, idList, index
 		'''
 		if len(result) == 0:
 			return  result, -1
@@ -352,6 +366,7 @@ class judgePath:
 
 	def getMapping_subEqu(self, _astList, _ledgerID):
 		result = list()
+		idList = list()
 		for _ast in _astList:
 			if _ast["attributes"]["type"] == UINT256_FLAG and _ast["attributes"]["operator"] == SUB_EQU_FLAG:
 				if _ast["children"][0]["attributes"]["type"] == UINT256_FLAG:
@@ -361,17 +376,19 @@ class judgePath:
 						#_id = ledger.split(".")[1]
 						if str(_id) == str(_ast["children"][0]["children"][0]["attributes"]["referencedDeclaration"]):
 							#在payable起始的函数的调用序列的该赋值语句中，有对mapping(address=>uint256)的+=操作
-							result.append(str(_id))
+							idList.append(str(_id))
+							result.append(self.srcToPos(_ast["src"]))
 						else:
 							continue
 				else:
 					continue
 			else:
 				continue
-		return result
+		return result, idList
 
 	def getMapping_sub(self, _astList, _ledgerID):
 		result = list()
+		idList = list()
 		for _ast in _astList:
 			try:
 				if _ast["attributes"]["type"] == UINT256_FLAG and _ast["attributes"]["operator"] == EQU_FLAG:
@@ -383,10 +400,11 @@ class judgePath:
 							#_id = ledger.split(".")[1]
 							if str(_id) == str(num["children"][0]["attributes"]["referencedDeclaration"]):
 								#在payable起始的函数的调用序列的该赋值语句中，有对mapping(address=>uint256)的+=操作
-								result.append(str(_id))
+								idList.append(str(_id))
+								result.append(self.srcToPos(_ast["src"]))
 			except:
 				continue
-		return result
+		return result, idList
 
 	def getMapping_SafeMathSub(self, _astList, _ledgerID):
 		safeMathAst = dict()
@@ -399,7 +417,7 @@ class judgePath:
 				continue
 		subId = int()
 		if len(safeMathAst.keys()) == 0:
-			return list()
+			return list(), list()
 		#用id来指明函数调用
 		for func in self.findASTNode(safeMathAst, "name", "FunctionDefinition"):
 			if func["attributes"]["name"].lower() == SUB_STR_FLAG:
@@ -409,6 +427,7 @@ class judgePath:
 				continue
 		#下一步，来找调用
 		result = list()
+		idList = list()
 		#赋值语句的ast
 		for _ast in _astList:
 			try:
@@ -424,11 +443,12 @@ class judgePath:
 							for _id in _ledgerID:
 								#_id = ledger.split(".")[1]
 								if str(_id) == str(mapping["attributes"]["referencedDeclaration"]):
-									#在payable起始的函数的调用序列的该赋值语句中，有对mapping(address=>uint256)的SafeMath.add操作
-									result.append(str(_id))
+									#在payable起始的函数的调用序列的该赋值语句中，有对mapping(address=>uint256)的SafeMath.sub操作
+									idList.append(str(_id))
+									result.append(self.srcToPos(_ast["src"]))
 			except:
 				continue
-		return result
+		return result, idList
 
 	#待实现
 	#清空本地缓存

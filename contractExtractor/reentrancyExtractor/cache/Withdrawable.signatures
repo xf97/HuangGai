@@ -1,8 +1,0 @@
-8f32d59b: isOwner()
-8da5cb5b: owner()
-715018a6: renounceOwnership()
-f2fde38b: transferOwnership(address)
-522f6815: withdrawEther(address,uint256)
-757b8cf4: withdrawTokensApprove(address,address,uint256)
-f0595dd1: withdrawTokensTransfer(address,address,uint256)
-6cf7ccac: withdrawTokensTransferFrom(address,address,address,uint256)

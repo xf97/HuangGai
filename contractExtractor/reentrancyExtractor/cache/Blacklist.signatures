@@ -1,7 +1,0 @@
-7e239e82: AddBlacklist(address)
-54646b2d: RemoveBlacklist(address)
-79ba5097: acceptOwnership()
-f9f92be4: blacklist(address)
-d4ee1d90: newOwner()
-8da5cb5b: owner()
-f2fde38b: transferOwnership(address)

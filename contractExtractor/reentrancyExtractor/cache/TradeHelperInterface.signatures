@@ -1,4 +1,0 @@
-5a82a5e6: getExpectedDai(uint256)
-f3dcfe08: getExpectedUSDC(uint256)
-d1d5a6a7: tradeDDaiForUSDC(uint256,uint256)
-693da5bd: tradeUSDCForDDai(uint256,uint256)

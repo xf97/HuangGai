@@ -1,6 +1,0 @@
-73a7800b: addressToSubmissions(address,uint256)
-bfbcff1a: getRequestInfo(bytes32,uint256)
-2d8b70a1: getTokenInfo(bytes32)
-3b77d606: queryTokens(bytes32,uint256,bool[8],bool,address)
-9f181b5e: tokenCount()
-4d12e34e: tokensList(uint256)

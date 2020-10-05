@@ -1,4 +1,0 @@
-111002aa: createTask(string)
-b6cb58a5: taskCount()
-8d977672: tasks(uint256)
-455f5024: toggleCompleted(uint256)

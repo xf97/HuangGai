@@ -1,5 +1,0 @@
-70a08231: balanceOf(address)
-95dd9193: borrowBalanceStored(address)
-f8f9da28: borrowRatePerBlock()
-182df0f5: exchangeRateStored()
-ae9d70b0: supplyRatePerBlock()

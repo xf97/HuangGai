@@ -1,8 +1,0 @@
-379607f5: claim(uint256)
-e2bbb158: deposit(uint256,uint256)
-8da5cb5b: owner()
-f2faa1b9: poolMap(uint256)
-715018a6: renounceOwnership()
-a58b2924: setPoolInfo(uint256,address,address,uint256)
-f2fde38b: transferOwnership(address)
-441a3e70: withdraw(uint256,uint256)

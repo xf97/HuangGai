@@ -1,6 +1,0 @@
-bab46259: approvedToken()
-8f32d59b: isOwner()
-8da5cb5b: owner()
-715018a6: renounceOwnership()
-f2fde38b: transferOwnership(address)
-b5c5f672: withdraw(address,uint256,uint256)

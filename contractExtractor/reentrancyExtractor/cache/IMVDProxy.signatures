@@ -1,4 +1,0 @@
-31c6903d: getMVDWalletAddress()
-ba83c16f: getStateHolderAddress()
-21df0da7: getToken()
-dbba0f01: transfer(address,uint256,address)

@@ -1,8 +1,0 @@
-47fe8b1d: UPGRADE_DELAY()
-912f061f: acceptUpgradeRequest(address)
-c44fb8ec: cancelUpgrade(address)
-f3b7dead: getProxyAdmin(address)
-204e1c7a: getProxyImplementation(address)
-a3f5c1d2: nexus()
-c72eeaba: proposeUpgrade(address,address,bytes)
-74adad1d: requests(address)

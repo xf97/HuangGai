@@ -1,3 +1,0 @@
-7362d9c8: addWhitelistAdmin(address)
-bb5f747b: isWhitelistAdmin(address)
-4c5a628c: renounceWhitelistAdmin()

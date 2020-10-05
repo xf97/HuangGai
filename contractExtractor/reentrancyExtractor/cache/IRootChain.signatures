@@ -1,4 +1,0 @@
-ec7e4855: currentHeaderBlock()
-b87e1b66: getLastChildBlock()
-2da25de3: slash()
-6a791f11: submitHeaderBlock(bytes,bytes)

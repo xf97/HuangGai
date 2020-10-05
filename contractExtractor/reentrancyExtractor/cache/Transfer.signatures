@@ -1,5 +1,0 @@
-e3d670d7: balance(address)
-153a1f3e: bulkTransfer(address[],uint256[])
-540d2639: bulkTransferSameValue(address[],uint256)
-41c0e1b5: kill()
-1a695230: transfer(address)

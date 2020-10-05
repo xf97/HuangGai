@@ -1,6 +1,0 @@
-65c72840: getDay(uint256)
-b238ad0e: getDaysInMonth(uint8,uint16)
-a324ad24: getMonth(uint256)
-92d66313: getYear(uint256)
-a6f0e577: isLeapYear(uint16)
-b1999937: leapYearsBefore(uint256)

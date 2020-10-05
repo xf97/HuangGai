@@ -1,6 +1,0 @@
-d81f84b7: getAddr(uint256)
-57bc2ef3: getBytes(uint256)
-a9c70eaa: getUint(uint256)
-eba36dbd: setAddr(uint256,address)
-455ded9e: setBytes(uint256,bytes32)
-61e3c944: setUint(uint256,uint256)

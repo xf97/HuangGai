@@ -1,7 +1,0 @@
-d74f8edd: MAX_OWNER_COUNT()
-db337041: addNiftyKey(address)
-7065cb48: addOwner(address)
-2f54bf6e: isOwner(address)
-e37ce6fa: isValidNiftySender(address)
-942ef0ca: removeNiftyKey(address)
-173825d9: removeOwner(address)

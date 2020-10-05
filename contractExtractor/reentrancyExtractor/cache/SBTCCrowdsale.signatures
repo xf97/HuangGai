@@ -1,6 +1,0 @@
-ce606ee0: contractOwner()
-744bb8d2: crowdsaleHardCap()
-f5a30cee: individualMaxCap()
-d1614df3: individualMinCap()
-4042b66f: weiRaised()
-2e1a7d4d: withdraw(uint256)

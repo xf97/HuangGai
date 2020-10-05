@@ -1,5 +1,0 @@
-70a08231: balanceOf(address)
-a694fc3a: stake(uint256)
-51ed6a30: stakeToken()
-18160ddd: totalSupply()
-2e1a7d4d: withdraw(uint256)

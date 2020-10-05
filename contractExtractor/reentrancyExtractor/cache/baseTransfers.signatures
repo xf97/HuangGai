@@ -1,5 +1,0 @@
-13b9f0c7: setOwnerMain()
-3b8d674f: stopSetup(address)
-18160ddd: totalSupply()
-beabacc8: transfer(address,address,uint256)
-15dacbea: transferFrom(address,address,address,uint256)

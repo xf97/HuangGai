@@ -1,6 +1,0 @@
-970844a3: canCall(uint8,uint256)
-c41a360a: getOwner(uint256)
-46a62eaf: getRatio(uint256)
-cc8e42ce: getSubscribedInfo(uint256)
-438daec7: ratioGoodAfter(uint8,uint256)
-4f84c190: unsubscribeIfMoved(uint256)

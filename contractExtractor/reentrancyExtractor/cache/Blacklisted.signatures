@@ -1,6 +1,0 @@
-f9f92be4: blacklist(address)
-8da5cb5b: owner()
-715018a6: renounceOwnership()
-153b0d1e: setBlacklist(address,bool)
-d1b29f09: setBlacklistBulk(address[],bool)
-f2fde38b: transferOwnership(address)

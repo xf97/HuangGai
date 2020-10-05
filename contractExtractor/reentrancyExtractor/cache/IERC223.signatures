@@ -1,7 +1,0 @@
-70a08231: balanceOf(address)
-313ce567: decimals()
-06fdde03: name()
-95d89b41: symbol()
-18160ddd: totalSupply()
-a9059cbb: transfer(address,uint256)
-be45fd62: transfer(address,uint256,bytes)

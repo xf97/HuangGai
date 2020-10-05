@@ -1,7 +1,0 @@
-3015394c: cancelRequest(uint256)
-f7837eb7: cmul(uint256,uint256)
-f574964f: fillRequest(bytes32,bytes,bytes,uint256,uint8,uint8)
-c58343ef: getRequest(uint256)
-0cf5d850: request(bytes,bytes,uint64,address,uint8)
-420714bd: requestIndex()
-81d12c58: requests(uint256)

@@ -1,4 +1,0 @@
-3fdd4df2: getMetadataLink()
-8d52dd81: onStart(address,address)
-fc41271d: onStop(address)
-5c7cbb5b: quickScope(address,uint256,address,address[],uint256,uint256,uint256)

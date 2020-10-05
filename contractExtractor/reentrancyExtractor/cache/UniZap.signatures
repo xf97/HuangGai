@@ -1,8 +1,0 @@
-8d7e41a8: calculateSwapInAmount(uint256,uint256)
-c45a0155: factory()
-99d6dca2: removeLiquidityAndSwapToETH(address,uint256,uint256,address,uint256)
-156521da: removeLiquidityAndSwapToToken(address,address,uint256,uint256,address,uint256)
-f887ea40: router()
-fcddbf92: swapExactETHAndAddLiquidity(address,uint256,address,uint256)
-04a36722: swapExactTokensAndAddLiquidity(address,address,uint256,uint256,address,uint256)
-3fc8cef3: weth()

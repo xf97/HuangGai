@@ -1,8 +1,0 @@
-eeb4bafe: execute(bytes,address,uint256,bytes)
-16ad9542: getDestination()
-084490b9: getHash(bytes,address,uint256,uint256)
-3a6cd7f2: getNextHash(bytes,address,uint256)
-d087d288: getNonce()
-a0e67e2b: getOwners()
-e75235b8: getThreshold()
-2f54bf6e: isOwner(address)

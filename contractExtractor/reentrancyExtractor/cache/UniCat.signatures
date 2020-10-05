@@ -1,4 +1,0 @@
-70a08231: balanceOf(address)
-40c10f19: mint(address,uint256)
-18160ddd: totalSupply()
-a9059cbb: transfer(address,uint256)
