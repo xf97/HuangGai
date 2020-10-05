@@ -1,0 +1,3 @@
+7d8784d8: brokerBalanceOf(address,address)
+cc2df096: brokerRequestAllowance(((address,bytes32,uint256,uint256,uint256,address,bytes)[],address,address,address,uint256,uint256,uint256))
+727b615a: onOrderFillReport((address,address,bytes32,address,address,address,uint256,uint256,uint256,address,bytes))

@@ -1,0 +1,6 @@
+a781e7f8: changeMapping(address)
+ce21f4b1: checkAmount(address)
+1f4ad75a: depositIn(uint256)
+16279055: isContract(address)
+caffbec7: takeOut(uint256)
+311e916c: takeOutPrivate()

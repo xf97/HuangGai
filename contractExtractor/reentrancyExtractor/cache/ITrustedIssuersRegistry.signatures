@@ -1,0 +1,8 @@
+9f63ea98: addTrustedIssuer(address,uint256[])
+c28fb278: getTrustedIssuerClaimTopics(address)
+d9dd24c5: getTrustedIssuers()
+34a89987: hasClaimTopic(address,uint256)
+ef2ed1a4: isTrustedIssuer(address)
+b93d28eb: removeTrustedIssuer(address)
+e36dce28: transferOwnershipOnIssuersRegistryContract(address)
+04bc7e84: updateIssuerClaimTopics(address,uint256[])

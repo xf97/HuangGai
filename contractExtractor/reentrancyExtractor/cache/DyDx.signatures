@@ -1,0 +1,3 @@
+e5520228: getEarningsRate()
+fd47eda6: getMarketInterestRate(uint256)
+cb04a34c: getMarketTotalPar(uint256)

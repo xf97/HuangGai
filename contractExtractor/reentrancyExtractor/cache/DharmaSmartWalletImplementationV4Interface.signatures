@@ -1,0 +1,4 @@
+d180667d: escape()
+a3ccb280: permanentlyDisableEscapeHatch(uint256,bytes,bytes)
+550c9f36: removeEscapeHatch(uint256,bytes,bytes)
+b848821d: setEscapeHatch(address,uint256,bytes,bytes)

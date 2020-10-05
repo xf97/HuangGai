@@ -1,0 +1,7 @@
+34ee6476: dataShards(uint256)
+e345f8d1: fetchRecord(uint256,bytes32)
+91ad27b4: getInterval()
+7fd99437: getLatestDataShard()
+a63d6e44: getTotalShards()
+947a36fb: interval()
+27a82be5: resetDataShard()

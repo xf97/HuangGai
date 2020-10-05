@@ -1,0 +1,6 @@
+e823fa20: checkDragonStatus(uint256,uint8)
+d2a59d69: dragons(uint256)
+430c2081: isApprovedOrOwner(address,uint256)
+6352211e: ownerOf(uint256)
+950311ab: setCurrentAction(uint256,uint8)
+633de6aa: setTime2Rest(uint256,uint256)

@@ -1,0 +1,7 @@
+a3fbbaae: changeManager(address)
+13da30b2: enableStaticCall(address,bytes4)
+5f54892b: enabled(bytes4)
+5c60da1b: implementation()
+1d4ced87: init(address,address,address[],address[],address[])
+8f6f0332: invoke(address,uint256,bytes)
+481c6a75: manager()

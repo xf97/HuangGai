@@ -1,0 +1,7 @@
+bf7e214f: authority()
+8da5cb5b: owner()
+7a9e5e4b: setAuthority(address)
+13af4035: setOwner(address)
+be9a6555: start()
+07da68f5: stop()
+75f12b21: stopped()

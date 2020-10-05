@@ -1,0 +1,5 @@
+a781e7f8: changeMapping(address)
+1078eef6: checkEthMapping(address)
+a10c2a78: switchToEth(address)
+d09fdaf0: tranEth(uint256,address,address)
+779c5cd9: turnOutAllEth(uint256,address)

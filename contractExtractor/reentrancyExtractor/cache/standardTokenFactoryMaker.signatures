@@ -1,0 +1,4 @@
+672383c4: factories(uint256)
+d1047434: getFactoryCount()
+3d0e6360: newStandardTokenFactory(string,bool,address)
+6b328f79: tipLexDAO()

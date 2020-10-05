@@ -1,0 +1,4 @@
+a2294748: getEscapeHatch()
+f02fedc4: permanentlyDisableEscapeHatch()
+5014b4f4: removeEscapeHatch()
+48b5de18: setEscapeHatch(address)

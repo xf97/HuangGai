@@ -1,0 +1,3 @@
+89c19ddb: concat(string,string)
+f03d90a5: getInterestRate(string,(string,bool))
+ad9889df: getPriceFromOracle(string,string,string,uint256)

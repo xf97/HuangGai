@@ -1,0 +1,6 @@
+a95f5246: disableModule(address)
+bb89af6a: enabledModules()
+2d9ad53d: isModuleEnabled(address)
+1c5ebe2f: isModuleRegistered(address)
+acb9e464: numOfEnabledModules()
+ad64ae4b: registerModule(address)

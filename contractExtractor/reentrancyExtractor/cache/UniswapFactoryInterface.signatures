@@ -1,0 +1,7 @@
+1648f38e: createExchange(address)
+1c2bbd18: exchangeTemplate()
+06f2bf62: getExchange(address)
+59770438: getToken(address)
+aa65a6c0: getTokenWithId(uint256)
+538a3f0e: initializeFactory(address)
+9f181b5e: tokenCount()

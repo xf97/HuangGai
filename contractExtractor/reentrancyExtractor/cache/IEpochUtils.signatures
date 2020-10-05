@@ -1,0 +1,4 @@
+f63e7811: epochPeriodInSeconds()
+c70d7b6c: firstEpochStartTimestamp()
+4408d2ba: getCurrentEpochNumber()
+1c552f00: getEpochNumber(uint256)

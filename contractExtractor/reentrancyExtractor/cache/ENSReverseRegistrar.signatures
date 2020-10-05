@@ -1,0 +1,4 @@
+1e83409a: claim(address)
+0f5a5466: claimWithResolver(address,address)
+bffbe61c: node(address)
+c47f0027: setName(string)

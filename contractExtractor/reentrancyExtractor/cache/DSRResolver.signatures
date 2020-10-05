@@ -1,0 +1,6 @@
+37ef5a21: getColInfo(string)
+3ffad790: getDaiPosition(address)
+ff9a72e0: getDsrRate()
+cb46dc3a: getMcdAddresses()
+94708776: getVaultById(uint256)
+fe7c9c92: getVaults(address)

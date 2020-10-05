@@ -1,0 +1,6 @@
+70a08231: balanceOf(address)
+313ce567: decimals()
+06fdde03: name()
+0c56ae3b: stakingPool()
+95d89b41: symbol()
+18160ddd: totalSupply()

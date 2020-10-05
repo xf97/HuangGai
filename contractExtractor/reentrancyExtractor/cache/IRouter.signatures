@@ -1,0 +1,6 @@
+12f05691: addField(uint256,bytes32,address)
+0a7a696e: bondNr()
+7da1557e: defaultDataContract(uint256)
+a481e08c: f(uint256,bytes32)
+649c4383: setBondNr(uint256)
+71993cfd: setDefaultContract(uint256,address)

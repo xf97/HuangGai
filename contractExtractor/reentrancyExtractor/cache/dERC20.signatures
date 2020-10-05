@@ -1,0 +1,4 @@
+e6aa216c: getExchangeRate()
+3aecd0e3: getTokenBalance(address)
+40c10f19: mint(address,uint256)
+1e9a6950: redeem(address,uint256)

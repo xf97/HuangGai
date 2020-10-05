@@ -1,0 +1,4 @@
+b378e89b: CreateToken(address,uint256)
+a472591c: CreateTokenICO(address,uint256)
+919e0b79: ownerMain()
+13b9f0c7: setOwnerMain()

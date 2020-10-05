@@ -1,0 +1,7 @@
+bf7e214f: authority()
+6c4ba760: osms(bytes32)
+8da5cb5b: owner()
+7a9e5e4b: setAuthority(address)
+c98cdf86: setOsm(bytes32,address)
+13af4035: setOwner(address)
+63c4f031: stop(bytes32)

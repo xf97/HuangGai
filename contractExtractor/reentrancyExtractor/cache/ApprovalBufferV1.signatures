@@ -1,0 +1,3 @@
+2dccbf7b: tradeERC20ForERC20(address,address,uint256,address,bytes)
+fcc48092: tradeERC20ForEth(address,uint256,address,bytes)
+f0835f8b: tradeEthForERC20(address,uint256,address,bytes)

@@ -1,0 +1,5 @@
+b5ab58dc: getAnswer(uint256)
+b633620c: getTimestamp(uint256)
+50d25bcd: latestAnswer()
+668a0f02: latestRound()
+8205bf6a: latestTimestamp()

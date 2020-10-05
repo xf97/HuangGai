@@ -1,0 +1,7 @@
+f851a440: admin()
+8f283970: changeAdmin(address)
+5c60da1b: implementation()
+cf7a1d77: initialize(address,address,bytes)
+d1f57894: initialize(address,bytes)
+3659cfe6: upgradeTo(address)
+4f1ef286: upgradeToAndCall(address,bytes)

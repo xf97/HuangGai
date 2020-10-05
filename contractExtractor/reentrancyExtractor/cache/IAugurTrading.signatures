@@ -1,0 +1,8 @@
+9ae36ee5: logMarketVolumeChanged(address,address,uint256,uint256[],uint256)
+c9e34878: logOrderCanceled(address,address,address,uint256,uint256,bytes32)
+98c7cc36: logOrderCreated(address,bytes32,bytes32)
+5ae5c8e7: logOrderFilled(address,address,address,uint256,uint256,uint256,bytes32,bytes32)
+0848a90c: logProfitLossChanged(address,address,uint256,int256,uint256,int256,int256,int256)
+577bb86e: logZeroXOrderCanceled(address,address,address,uint256,uint256,uint256,uint8,bytes32)
+99b537a0: logZeroXOrderFilled(address,address,bytes32,bytes32,uint8,address[],uint256[])
+f39ec1f7: lookup(bytes32)

@@ -307,7 +307,7 @@ class judgePath:
 	def findOnePathDecreseLedger(self, _path, _ledgerID):
 		'''
 		问题是：如果一条路径中有多个扣款操作，记录哪个的？
-		应该第一个的
+		应该最后一个的，根据转出语句距离最近
 		'''
 		result = list()
 		contractList = self.findASTNode(self.json, "name", "ContractDefinition")
@@ -338,7 +338,7 @@ class judgePath:
 							result.extend(self.getMapping_subEqu(statementList, _ledgerID))
 							result.extend(self.getMapping_sub(statementList, _ledgerID))
 							result.extend(self.getMapping_SafeMathSub(statementList, _ledgerID))
-						if len(result) > len(temp) and index == -1:
+						if len(result) > len(temp):
 							index  = _path.index(func)
 		#最后记得去重
 		result = list(set(result))

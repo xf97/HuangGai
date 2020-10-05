@@ -1,0 +1,4 @@
+11ce7a65: getOffers(address,address,address)
+ea98a950: getOffers(address,uint256)
+9174d449: getOffersAmountToBuyAll(address,address,uint256,address)
+fdd93d4b: getOffersAmountToSellAll(address,address,uint256,address)

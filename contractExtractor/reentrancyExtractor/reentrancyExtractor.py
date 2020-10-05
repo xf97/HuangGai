@@ -44,7 +44,6 @@ class reentrancyExtractor:
 		self.defaultSolc = "0.6.0"	#默认使用的solc编译版本
 		self.maxSolc = "0.7.1" #最高被支持的solc版本，合约使用的solc版本高于此版本时，引发异常
 		self.minSolc = "0.5.0"	#最低被支持的solc版本
-		self.index = 0
 		'''
 		#try:
 		compileResult = subprocess.run("ulimit -s 102400", check = True, shell = True)	#临时调整系统栈空间
@@ -105,17 +104,15 @@ class reentrancyExtractor:
 			else:
 				continue
 		index = randint(0, len(solList) - 1)
-		index = self.index
+		#index = self.index
 		#print(index, solList[index])
 		try:
 			#拼接绝对路径
 			sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
-			self.index += 1
 			#sourceCode = open(os.path.join(TESTCASE_PATH, "0x6ec8a24cabdc339a06a172f8223ea557055adaa5.sol"), "r", encoding = "utf-8").read()
 			return sourceCode, solList[index]
 		except:
 			#无法获取源代码，则引发异常
-			self.index += 1
 			raise Exception("Unable to obtain source code " + solList[index])
 		
 
@@ -198,5 +195,5 @@ class reentrancyExtractor:
 
 #单元测试
 if __name__ == "__main__":
-	ree = reentrancyExtractor(10)
+	ree = reentrancyExtractor(20)
 	ree.extractContracts()

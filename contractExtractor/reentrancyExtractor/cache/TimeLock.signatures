@@ -1,0 +1,8 @@
+94288ce0: addFreezeTime(uint256,uint256)
+d6d68177: deposits(address,uint256)
+78519b61: getDepositByID(address,uint256)
+13fcaf54: getDepositCount(address)
+76727fa3: getTokenCount(address)
+8f4ffcb1: receiveApproval(address,uint256,address,bytes)
+4b02fc72: tokensFrozen(address)
+6623fc46: unfreeze(uint256)

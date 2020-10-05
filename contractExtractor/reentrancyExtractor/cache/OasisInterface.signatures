@@ -1,0 +1,6 @@
+8185402b: buyAllAmount(address,uint256,address,uint256)
+0374fc6f: getBestOffer(address,address)
+144a2752: getBuyAmount(address,address,uint256)
+511fa487: getMinSell(address)
+ff1fd974: getPayAmount(address,address,uint256)
+0621b4f6: sellAllAmount(address,uint256,address,uint256)

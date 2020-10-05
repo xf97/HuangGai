@@ -1,0 +1,3 @@
+0fe204bd: getMolochCount()
+b5301cfc: molochs(uint256)
+56c40ab5: summonMoloch(address,address[],uint256,uint256,uint256,uint256,uint256,uint256)

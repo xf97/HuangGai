@@ -1,0 +1,7 @@
+4e71e0c8: claimOwnership()
+d4ee1d90: newOwner()
+8da5cb5b: owner()
+854cff2f: setWhitelist(address)
+f2fde38b: transferOwnership(address)
+a824c9d2: transferOwnershipUnsafe(address)
+93e59dc1: whitelist()

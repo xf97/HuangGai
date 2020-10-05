@@ -1,0 +1,4 @@
+b40b539b: getV(bytes,uint16)
+16279055: isContract(address)
+4d66a2ae: toUint16(bytes)
+7ae93b19: toUint8(bytes)

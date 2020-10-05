@@ -1,0 +1,4 @@
+5b2ab06c: createIdentity(address)
+51687bd9: isClonedIdentity(address)
+b816f513: libraryAddress()
+4863ba17: setLibraryAddress(address)

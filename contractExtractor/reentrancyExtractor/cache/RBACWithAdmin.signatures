@@ -1,0 +1,6 @@
+d391014b: ROLE_ADMIN()
+47492352: ROLE_PAUSE_ADMIN()
+b25fa92c: adminAddRole(address,string)
+88cee87e: adminRemoveRole(address,string)
+0988ca8c: checkRole(address,string)
+217fe6c6: hasRole(address,string)

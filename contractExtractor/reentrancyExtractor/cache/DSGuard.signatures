@@ -1,0 +1,5 @@
+b7009613: canCall(address,address,bytes4)
+2bc3217d: forbid(address,address,bytes32)
+79d88d87: forbid(bytes32,bytes32,bytes32)
+cbeea68c: permit(address,address,bytes32)
+f0217ce5: permit(bytes32,bytes32,bytes32)

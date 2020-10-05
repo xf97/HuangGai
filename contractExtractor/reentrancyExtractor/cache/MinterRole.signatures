@@ -1,0 +1,3 @@
+983b2d56: addMinter(address)
+aa271e1a: isMinter(address)
+98650275: renounceMinter()

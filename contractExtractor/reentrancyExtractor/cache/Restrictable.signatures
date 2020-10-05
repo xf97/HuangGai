@@ -1,0 +1,6 @@
+dce306ad: disableRestrictions()
+8f32d59b: isOwner()
+2a642407: isRestrictionEnabled()
+8da5cb5b: owner()
+715018a6: renounceOwnership()
+f2fde38b: transferOwnership(address)

@@ -1,0 +1,6 @@
+d5f39488: deployer()
+907cf318: gated()
+78a89567: getTokenCount()
+ae280d35: newToken(string,string,string,uint8,uint256,uint256[],address[])
+c85e07b9: stamp()
+4f64b2be: tokens(uint256)

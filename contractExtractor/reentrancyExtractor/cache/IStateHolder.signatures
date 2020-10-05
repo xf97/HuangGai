@@ -1,0 +1,5 @@
+16cf503e: clear(string)
+bf40fac1: getAddress(string)
+0bb687e3: getUint256(string)
+9b2ea4bd: setAddress(string,address)
+825de8af: setUint256(string,uint256)

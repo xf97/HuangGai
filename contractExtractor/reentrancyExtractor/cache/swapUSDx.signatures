@@ -1,0 +1,8 @@
+c92aecc4: chi()
+8244df7b: getAmountOut(address,uint256,uint256)
+e15c13b0: multiApprove()
+8da5cb5b: owner()
+52bcf404: swapUSDxTo(address,uint256,uint256)
+078d3b79: transferOut(address,address,uint256)
+f2fde38b: transferOwnership(address)
+a3bf224b: underlyingTokens(uint256)

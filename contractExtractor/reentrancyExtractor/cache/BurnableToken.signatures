@@ -1,0 +1,4 @@
+70a08231: balanceOf(address)
+42966c68: burn(uint256)
+18160ddd: totalSupply()
+a9059cbb: transfer(address,uint256)

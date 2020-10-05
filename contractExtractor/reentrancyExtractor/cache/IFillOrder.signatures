@@ -1,0 +1,5 @@
+63a50c2a: fillOrder(address,bytes32,uint256,bytes32,bytes32)
+f5df1f24: fillZeroXOrder(address,uint256,uint256,uint8,address,uint256,bytes32,bytes32,address)
+a3ef2c13: getMarketOutcomeValues(address)
+e09bb556: getMarketVolume(address)
+62c9c6a6: publicFillOrder(bytes32,uint256,bytes32,bytes32)

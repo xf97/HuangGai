@@ -1,0 +1,6 @@
+848d8f28: buy(address,address,uint256,uint256,uint256,uint256)
+eb15f781: connectorID()
+6b241fa8: deposit(address,address,uint256,uint256,uint256,uint256,uint256)
+06fdde03: name()
+45c9acfe: sell(address,address,uint256,uint256,uint256,uint256)
+c7807868: withdraw(address,address,uint256,uint256,uint256,uint256,uint256[])

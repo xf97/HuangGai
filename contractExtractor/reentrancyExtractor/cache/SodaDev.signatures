@@ -1,0 +1,8 @@
+af70abc9: buySodaWithSoETH(uint256)
+b8f83ad9: getReserveRatio(address,address)
+17290e49: getSodaToSoETHRate()
+8da5cb5b: owner()
+715018a6: renounceOwnership()
+adf334eb: sodaMaster()
+f2fde38b: transferOwnership(address)
+9e281a98: withdrawToken(address,uint256)

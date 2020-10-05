@@ -1,0 +1,5 @@
+33549b1b: calcGlobalInterest()
+a18e4a80: custom(bytes32)
+e4933256: decreaseTotalBorrow(uint256)
+1de26e16: deposit(bytes32,uint256)
+9fc3f02f: lender(bytes32)

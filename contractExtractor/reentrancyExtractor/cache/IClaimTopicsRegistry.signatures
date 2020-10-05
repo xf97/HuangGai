@@ -1,0 +1,4 @@
+c7b22551: addClaimTopic(uint256)
+df09d604: getClaimTopics()
+08297846: removeClaimTopic(uint256)
+d5144472: transferOwnershipOnClaimTopicsRegistryContract(address)

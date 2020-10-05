@@ -1,0 +1,7 @@
+a294851a: broadcast_message(string)
+dd89581f: stamp(bytes32)
+6edf20cc: stamp_array(bytes32[])
+b00d1431: stamp_partner_record(bytes32,string,string)
+5f8109db: stamp_partner_record_array(bytes32[],string[],string[])
+baef83a9: stamp_record(bytes32,string)
+8174c4bd: stamp_record_array(bytes32[],string[])

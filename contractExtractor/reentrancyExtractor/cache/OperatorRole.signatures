@@ -1,0 +1,3 @@
+9870d7fe: addOperator(address)
+6d70f7ae: isOperator(address)
+2ab6f8db: renounceOperator()

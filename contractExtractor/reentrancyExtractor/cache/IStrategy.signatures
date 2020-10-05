@@ -1,0 +1,7 @@
+daea85c5: approve(address)
+1e83409a: claim(address)
+47e7ef24: deposit(address,uint256)
+80db0d51: getTargetToken()
+012ac71b: getValuePerShare(address)
+a422125c: pendingValuePerShare(address)
+f3fef3a3: withdraw(address,uint256)

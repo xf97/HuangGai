@@ -1,0 +1,5 @@
+ebbc4965: acceptOwner()
+a6f9dae1: changeOwner(address)
+8129fc1c: initialize()
+c4d66de8: initialize(address)
+8da5cb5b: owner()

@@ -1,0 +1,3 @@
+5f515226: checkBalance(address)
+3edd1128: deposit(address,uint256,bool)
+934785b7: withdraw(address,address,uint256,bool)

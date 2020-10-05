@@ -1,0 +1,5 @@
+70a08231: balanceOf(address)
+98b9a2dc: changeWallet(address)
+9d592c66: percentages(address)
+3ccfd60b: withdraw()
+48179ee5: withdraws(address)

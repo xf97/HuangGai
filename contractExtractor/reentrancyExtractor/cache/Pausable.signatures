@@ -1,0 +1,6 @@
+82dc1ec4: addPauser(address)
+46fbf68e: isPauser(address)
+8456cb59: pause()
+5c975abb: paused()
+6ef8d66d: renouncePauser()
+3f4ba83a: unpause()
