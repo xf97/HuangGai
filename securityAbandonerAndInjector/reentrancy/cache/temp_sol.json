@@ -1,93 +1,26 @@
 {
  "pathInfo1": {
   "path": [
-   "ReferStorage.withdrawFunds",
-   "ReferStorage.onlyParentContract"
+   "tCDP.burn",
+   "ERC20.transferFrom",
+   "ERC20._transfer"
   ],
   "ledgerList": [
    [
-    6730,
-    6798
+    4107,
+    4151
    ]
   ],
-  "ledgerIndex": 0,
+  "ledgerIndex": 2,
   "statementList": [
    [
-    6808,
-    6829
+    17738,
+    17759
    ]
   ],
   "statementIndex": 0,
   "ledgerIdList": [
-   "217"
-  ]
- },
- "pathInfo2": {
-  "path": [
-   "ReferStorage.withdrawFunds",
-   "ReferStorage.balanceAll"
-  ],
-  "ledgerList": [
-   [
-    6730,
-    6798
-   ]
-  ],
-  "ledgerIndex": 0,
-  "statementList": [
-   [
-    6808,
-    6829
-   ]
-  ],
-  "statementIndex": 0,
-  "ledgerIdList": [
-   "217"
-  ]
- },
- "pathInfo3": {
-  "path": [
-   "ReferStorage.getReferrerBalance",
-   "ReferStorage.balanceAll"
-  ],
-  "ledgerList": [
-   [
-    5169,
-    5250
-   ]
-  ],
-  "ledgerIndex": 0,
-  "statementList": [
-   [
-    5264,
-    5281
-   ]
-  ],
-  "statementIndex": 0,
-  "ledgerIdList": [
-   "217"
-  ]
- },
- "pathInfo4": {
-  "path": [
-   "ReferStorage.withdrawFunds"
-  ],
-  "ledgerList": [
-   [
-    6730,
-    6798
-   ]
-  ],
-  "ledgerIndex": 0,
-  "statementList": [
-   [
-    6808,
-    6829
-   ]
-  ],
-  "statementIndex": 0,
-  "ledgerIdList": [
-   "217"
+   "133"
   ]
  }
 }
