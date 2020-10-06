@@ -78,7 +78,7 @@ class reentrancyInjector:
 		addressPattern = re.compile(r"(\[)((\w)|(\.))+(\])")	#用于匹配接收转账的地址
 		for key in infoDict:
 			tempStr = infoDict[key].deductState
-			address = addressPattern.search(tempStr).group()[1:-1]	#截取头尾的方括号
+			address = addressPattern.search(tempStr).group()[1:-1]	#截取头尾的方括号=
 			#拼接插入语句
 			#额外的发币出去会有什么隐患？最影响的应该就是address.balance, address.balance并不能执行+-操作
 			sendEtherState = self.getSendEtherState(address)
@@ -87,6 +87,7 @@ class reentrancyInjector:
 		newSourceCode, newInjectInfo = self.injectStatements(injectInfo, self.sourceCode)
 		#4. 输出并保存结果，然后产生自动标记
 		self.storeFinalResult(newSourceCode, self.preName)
+		#print(newSourceCode)
 		self.storeLabel(newSourceCode, newInjectInfo.keys(), self.preName)
 
 	def storeFinalResult(self, _sourceCode, _preName):
@@ -111,6 +112,8 @@ class reentrancyInjector:
 		indexList = sorted(_injectInfo.keys())
 		offset = list()
 		for index in indexList:
+			print(index)
+			print(_sourceCode[:index])
 			tempCode += _sourceCode[startIndex: index] + _injectInfo[index]
 			startIndex = index
 			offset.append(len(_injectInfo[index]))

@@ -60,37 +60,35 @@ class reentrancyExtractor:
 	def extractContracts(self):
 		#当符合条件的合约数量不满足需求时，继续抽取
 		while self.nowNum < self.needs:
-			#try:
-			#拿到一个合约及其源代码
-			(sourceCode, prevFileName) = self.getSourceCode()
-			#print(prevFileName)
-			#将当前合约暂存
-			self.cacheContract(sourceCode)
-			#调整本地编译器版本
-			self.changeSolcVersion(sourceCode)
-			#编译生成当前合约的抽象语法树(以json_ast形式给出)
-			jsonAst = self.compile2Json()
-			#根据合约文件本身、抽象语法树来判断该合约是否符合标准
-			if self.judgeContract(os.path.join(self.cacheContractPath), jsonAst, prevFileName) == True:
-				#符合标准，加１，写入数据文件
-				self.nowNum += 1 
-				#将暂存文件及其JsonAst文件转移到结果保存文件中
-				self.storeResult(prevFileName)
-				#显示进度　
-				print("\r%s当前抽取进度: %.2f%s" % (blue, self.nowNum / self.needs, end))
-				#清空缓存数据
-				rmtree(CACHE_PATH)
-				#重新建立文件夹
-				os.mkdir(CACHE_PATH)
-			else:
-				#self.nowNum += 1
-				continue
-			'''
+			try:
+				#拿到一个合约及其源代码
+				(sourceCode, prevFileName) = self.getSourceCode()
+				#print(prevFileName)
+				#将当前合约暂存
+				self.cacheContract(sourceCode)
+				#调整本地编译器版本
+				self.changeSolcVersion(sourceCode)
+				#编译生成当前合约的抽象语法树(以json_ast形式给出)
+				jsonAst = self.compile2Json()
+				#根据合约文件本身、抽象语法树来判断该合约是否符合标准
+				if self.judgeContract(os.path.join(self.cacheContractPath), jsonAst, prevFileName) == True:
+					#符合标准，加１，写入数据文件
+					self.nowNum += 1 
+					#将暂存文件及其JsonAst文件转移到结果保存文件中
+					self.storeResult(prevFileName)
+					#显示进度　
+					print("\r%s当前抽取进度: %.2f%s" % (blue, self.nowNum / self.needs, end))
+					#清空缓存数据
+					rmtree(CACHE_PATH)
+					#重新建立文件夹
+					os.mkdir(CACHE_PATH)
+				else:
+					#self.nowNum += 1
+					continue
 			except Exception as e:
 				#self.nowNum += 1
 				print("%s %s %s" % (bad, e, end))
 				continue
-			'''
 
 	def getSourceCode(self):
 		'''
@@ -200,5 +198,5 @@ class reentrancyExtractor:
 
 #单元测试
 if __name__ == "__main__":
-	ree = reentrancyExtractor(15)
+	ree = reentrancyExtractor(40)
 	ree.extractContracts()
