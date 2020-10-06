@@ -5,4 +5,5 @@ contractExtractor/reentrancyExtractor/result/*.sol
 contractExtractor/reentrancyExtractor/result/*.ast
 contractExtractor/reentrancyExtractor/*.dot
 contractExtractor/reentrancyExtractor/pathInfo/*.json
-contractExtractor/securityAbandonerAndInjector/reentrancy/dataset
+contractExtractor/securityAbandonerAndInjector/reentrancy/dataset/*.sol
+contractExtractor/securityAbandonerAndInjector/reentrancy/dataset/*.txt
