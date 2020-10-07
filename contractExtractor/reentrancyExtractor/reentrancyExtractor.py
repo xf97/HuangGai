@@ -111,12 +111,24 @@ class reentrancyExtractor:
 		try:
 			#拼接绝对路径
 			sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
+			#[bug fix]清洗合约中的多字节字符，保证编译结果不错误
+			sourceCode = self.cleanMultibyte(sourceCode)
 			#sourceCode = open(os.path.join(RESULT_PATH, solList[index]), "r", encoding = "utf-8").read()
 			return sourceCode, solList[index]
 		except:
 			#无法获取源代码，则引发异常
 			self.index += 1
 			raise Exception("Unable to obtain source code " + solList[index])
+
+	#清洗合约源代码中的多字节字符
+	def cleanMultibyte(self, _sourceCode):
+		result = str()
+		for char in _sourceCode:
+			if len(char) == len(char.encode()):
+				result += char 
+			else:
+				result += "1"
+		return result
 		
 
 	def changeSolcVersion(self, _sourceCode):
@@ -198,5 +210,5 @@ class reentrancyExtractor:
 
 #单元测试
 if __name__ == "__main__":
-	ree = reentrancyExtractor(40)
+	ree = reentrancyExtractor(50)
 	ree.extractContracts()

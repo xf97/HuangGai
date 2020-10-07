@@ -1,48 +1,26 @@
 {
  "pathInfo1": {
   "path": [
-   "MUSystem.withdraw",
-   "MUSystem.transfer"
+   "tCDP.burn",
+   "ERC20.transferFrom",
+   "ERC20._transfer"
   ],
   "ledgerList": [
    [
-    35523,
-    35566
+    4107,
+    4151
    ]
   ],
-  "ledgerIndex": 1,
+  "ledgerIndex": 2,
   "statementList": [
    [
-    35319,
-    35341
+    17738,
+    17759
    ]
   ],
   "statementIndex": 0,
   "ledgerIdList": [
-   "147"
-  ]
- },
- "pathInfo2": {
-  "path": [
-   "MUSystem.deposit",
-   "MUSystem.transfer"
-  ],
-  "ledgerList": [
-   [
-    35523,
-    35566
-   ]
-  ],
-  "ledgerIndex": 1,
-  "statementList": [
-   [
-    19446,
-    19468
-   ]
-  ],
-  "statementIndex": 0,
-  "ledgerIdList": [
-   "147"
+   "133"
   ]
  }
 }

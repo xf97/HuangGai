@@ -1,0 +1,7 @@
+38d52e0f: asset()
+76809ce3: decimal()
+eb91d37e: getCurrentPrice()
+41976e09: getPrice(address)
+0a9d5a38: sourceAssetAddress()
+ff865ec8: sourceAssetDecimal()
+c70cdcfa: sourceOracleAddress()

@@ -1,0 +1,6 @@
+260fb6a6: canLock(Blocklock.State storage,uint256)
+0dec4c90: isLocked(Blocklock.State storage,uint256)
+3e825e6d: lock(Blocklock.State storage,uint256)
+66112063: setCooldownDuration(Blocklock.State storage,uint256)
+43be6ded: setLockDuration(Blocklock.State storage,uint256)
+cc89d03b: unlock(Blocklock.State storage,uint256)

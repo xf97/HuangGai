@@ -1,0 +1,6 @@
+919cd40f: DISTRIBUTION_END()
+cbcbb507: EMISSION_MANAGER()
+aaf5eb68: PRECISION()
+f11b8188: assets(address)
+b2a5dbfa: configureAssets((uint128,uint256,address)[])
+3373ee4c: getUserAssetData(address,address)

@@ -1,0 +1,7 @@
+3f1fc678: getAuctionInformation()
+da4e364f: getCurrentBid(uint256)
+33187dbb: getDaiAddress()
+bafebc6f: getFlopperAddress()
+45a89214: getMKRAddress()
+c49c2eb6: getTotalNumberOfAuctions()
+6aa633b6: isEnabled()

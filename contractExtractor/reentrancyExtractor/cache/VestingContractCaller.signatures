@@ -1,0 +1,8 @@
+a00686f1: addVestingContract(address)
+a5e6a2fa: batchReleaseTokens()
+e70191bf: getVestingContracts()
+8da5cb5b: owner()
+bc3bea5e: removeVestingContract(address)
+715018a6: renounceOwnership()
+f2fde38b: transferOwnership(address)
+4b8ebd9f: transferVestingContractOwnership(address,address)

@@ -77,7 +77,7 @@ class reentrancy:
 		#1. 根据路径信息，提取路径信息文件和合约到缓存文件夹
 		for contractFile in self.targetContract:
 			#try:
-			contractFile = os.path.join(CONTRACT_PATH, "0x9bdf81e6066d32764b7e75a1b5577237e06d9364.sol")
+			#contractFile = os.path.join(CONTRACT_PATH, "0x9bdf81e6066d32764b7e75a1b5577237e06d9364.sol")
 			pathInfoFile = self.getInfoFile(contractFile, self.targetInfoFile)
 			print(contractFile, pathInfoFile)
 			self.cacheFile(contractFile, pathInfoFile)

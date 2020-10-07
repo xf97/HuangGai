@@ -1,0 +1,8 @@
+aabbb8ca: getInterfaceImplementer(address,bytes32)
+3d584063: getManager(address)
+f712f3e8: implementsERC165Interface(address,bytes4)
+b7056765: implementsERC165InterfaceNoCache(address,bytes4)
+65ba36c1: interfaceHash(string)
+29965a1d: setInterfaceImplementer(address,bytes32,address)
+5df8122f: setManager(address,address)
+a41e7d51: updateERC165Cache(address,bytes4)

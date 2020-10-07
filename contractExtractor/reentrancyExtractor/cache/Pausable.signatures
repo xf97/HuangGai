@@ -1,0 +1,6 @@
+f851a440: admin()
+8da5cb5b: owner()
+ddeb5094: pause(bool,bool)
+64779ad7: pausedOwnerAdmin()
+24bb7c26: pausedPublic()
+f2fde38b: transferOwnership(address)

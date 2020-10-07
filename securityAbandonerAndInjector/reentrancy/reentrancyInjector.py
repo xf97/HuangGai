@@ -112,8 +112,6 @@ class reentrancyInjector:
 		indexList = sorted(_injectInfo.keys())
 		offset = list()
 		for index in indexList:
-			print(index)
-			print(_sourceCode[:index])
 			tempCode += _sourceCode[startIndex: index] + _injectInfo[index]
 			startIndex = index
 			offset.append(len(_injectInfo[index]))

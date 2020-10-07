@@ -1,0 +1,8 @@
+70480275: addAdmin(address)
+76be1585: administrators(address)
+0a2eb301: isAdministrator(address)
+8f32d59b: isOwner()
+8da5cb5b: owner()
+1785f53c: removeAdmin(address)
+715018a6: renounceOwnership()
+f2fde38b: transferOwnership(address)

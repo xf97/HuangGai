@@ -1,0 +1,7 @@
+b2a8c6fe: ceaseFire()
+8a539972: defect(uint256)
+3d8b7894: enlist(uint256)
+e918ad91: enterAuction(uint256)
+e8083863: finalizeAuction(uint256)
+cf44b5d5: getActiveAuctions()
+4e69d560: getStatus()
