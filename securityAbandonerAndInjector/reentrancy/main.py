@@ -76,28 +76,26 @@ class reentrancy:
 	def run(self):
 		#1. 根据路径信息，提取路径信息文件和合约到缓存文件夹
 		for contractFile in self.targetContract:
-			#try:
+			try:
 			#contractFile = os.path.join(CONTRACT_PATH, "0x9bdf81e6066d32764b7e75a1b5577237e06d9364.sol")
-			pathInfoFile = self.getInfoFile(contractFile, self.targetInfoFile)
-			print(contractFile, pathInfoFile)
-			self.cacheFile(contractFile, pathInfoFile)
-			#2. 屏蔽目标语句
-			RA = reentrancyAbandoner(CACHE_CONTRACT_PATH, CACHE_PATHINFO_PATH)
-			RA.shield()
-			RA.output()	
-			#3. 根据目标路径，插入语句 
-			RI = reentrancyInjector(IR_CONTRACT_PATH, IR_PATHINFO_PATH, self.getOriginalContractName(contractFile))
-			RI.inject()
-			RI.output()
-			#4. 输出进度
-			self.nowNum += 1
-			print("\r当前注入进度: %.2f" % (self.nowNum / len(self.targetContract)))
-			'''
+				pathInfoFile = self.getInfoFile(contractFile, self.targetInfoFile)
+				print(contractFile, pathInfoFile)
+				self.cacheFile(contractFile, pathInfoFile)
+				#2. 屏蔽目标语句
+				RA = reentrancyAbandoner(CACHE_CONTRACT_PATH, CACHE_PATHINFO_PATH)
+				RA.shield()
+				RA.output()	
+				#3. 根据目标路径，插入语句 
+				RI = reentrancyInjector(IR_CONTRACT_PATH, IR_PATHINFO_PATH, self.getOriginalContractName(contractFile))
+				RI.inject()
+				RI.output()
+				#4. 输出进度
+				self.nowNum += 1
+				print("\r当前注入进度: %.2f" % (self.nowNum / len(self.targetContract)))
 			except Exception as e:
 				self.nowNum += 1
-				print("%s %s %s" % (bad, e, end))
+				print(bad, e, end)
 				continue
-			'''
 
 	def getOriginalContractName(self, _contractPath):
 		return os.path.splitext(os.path.split(_contractPath)[1])[0]

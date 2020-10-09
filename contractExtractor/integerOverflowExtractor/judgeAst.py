@@ -65,27 +65,23 @@ class judgeAst:
 			return False
 
 	def storeInjectInfo(self, _astList, _idList):
-		#try:
-		srcList = list()
-		for ast in _astList:
-			srcList.append(self.srcToPos(ast["src"]))
-		#去重
-		srcList	= list(set(srcList))
-		idList = list(set(_idList))
-		resultDict = dict()
-		resultDict["idList"] = idList
-		resultDict["srcList"] = srcList
-		#保存信息
-		with open(os.path.join(INJECT_INFO_PATH, self.filename.split(".")[0] + ".json"), "w", encoding = "utf-8") as f:
-			json.dump(resultDict, f, indent = 1)
-		print("%s %s %s" % (info, self.filename + "target injected information...saved", end))
-		'''
+		try:
+			srcList = list()
+			for ast in _astList:
+				srcList.append(self.srcToPos(ast["src"]))
+			#去重
+			srcList	= list(set(srcList))
+			idList = list(set(_idList))
+			resultDict = dict()
+			resultDict["idList"] = idList
+			resultDict["srcList"] = srcList
+			#保存信息
+			with open(os.path.join(INJECT_INFO_PATH, self.filename.split(".")[0] + ".json"), "w", encoding = "utf-8") as f:
+				json.dump(resultDict, f, indent = 1)
+			print("%s %s %s" % (info, self.filename + " target injected information...saved", end))
 		except:
 			print("%s %s %s" % (bad, self.filename + " target injected information...failed", end))
 			#raise Exception()
-		'''
-
-
 
 	def srcToPos(self, _src):
 		temp = _src.split(":")
