@@ -64,6 +64,12 @@ class judgeAst:
 		else:
 			return False
 
+	#该函数用于判断给定的assignment的ast中的一个参数有外部给定
+	def aNumProvideByExter(self, _ast):
+		if not _ast:
+			return False
+		return True
+
 	def storeInjectInfo(self, _astList, _idList):
 		try:
 			srcList = list()

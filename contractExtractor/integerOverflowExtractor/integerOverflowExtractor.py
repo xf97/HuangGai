@@ -92,11 +92,11 @@ class integerOverflowExtractor:
 		#print(index, solList[index])
 		try:
 			#拼接绝对路径
-			#sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
-			sourceCode = open(os.path.join(TESTCASE_PATH, "overFlow.sol"), "r", encoding = "utf-8").read()
+			sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
+			#sourceCode = open(os.path.join(TESTCASE_PATH, "overFlow.sol"), "r", encoding = "utf-8").read()
 			#[bug fix]清洗合约中的多字节字符，保证编译结果不错误
 			sourceCode = self.cleanMultibyte(sourceCode)
-			return sourceCode, "overFlow.sol"#solList[index] 
+			return sourceCode, solList[index] 
 		except:
 			#无法获取源代码，则引发异常
 			self.index += 1
@@ -188,5 +188,5 @@ class integerOverflowExtractor:
 
 #单元测试
 if __name__ == "__main__":
-	ioe = integerOverflowExtractor(1)
+	ioe = integerOverflowExtractor(100)
 	ioe.extractContracts()

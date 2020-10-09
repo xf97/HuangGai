@@ -86,27 +86,25 @@ class integerOverflow:
 
 	def run(self):
 		for contractFile in self.targetContract:
-			#try:
-			#1. 获取每个合约的源代码, ast和注入信息
-			pathInfoFile = self.getInfoFile(contractFile, self.targetInfoFile)
-			astFile = self.getAstFile(contractFile, self.targetAstFile)
-			print(contractFile, pathInfoFile, astFile)
-			#2. 缓存当前文件
-			self.cacheFile(contractFile, pathInfoFile, astFile)
-			#3. 根据目标路径和源代码注入bug
-			IJ = integerOverflowInjector(CACHE_CONTRACT_PATH, CACHE_PATHINFO_PATH, astFile, self.getOriginalContractName(contractFile))
-			if IJ.inject() == False:
-				raise Exception("No target statements were found.")
-			IJ.output()
-			#4. 输出进度
-			self.nowNum += 1
-			print("\r当前注入进度: %.2f" % (self.nowNum / len(self.targetContract)))
-			'''
+			try:
+				#1. 获取每个合约的源代码, ast和注入信息
+				pathInfoFile = self.getInfoFile(contractFile, self.targetInfoFile)
+				astFile = self.getAstFile(contractFile, self.targetAstFile)
+				print(contractFile, pathInfoFile, astFile)
+				#2. 缓存当前文件
+				self.cacheFile(contractFile, pathInfoFile, astFile)
+				#3. 根据目标路径和源代码注入bug
+				IJ = integerOverflowInjector(CACHE_CONTRACT_PATH, CACHE_PATHINFO_PATH, astFile, self.getOriginalContractName(contractFile))
+				if IJ.inject() == False:
+					raise Exception("No target statements were found.")
+				IJ.output()
+				#4. 输出进度
+				self.nowNum += 1
+				print("\r当前注入进度: %.2f" % (self.nowNum / len(self.targetContract)))
 			except Exception as e:
 				self.nowNum += 1
 				print(e)
 				continue
-			'''
 
 	def getOriginalContractName(self, _contractPath):
 		return os.path.splitext(os.path.split(_contractPath)[1])[0]

@@ -17,6 +17,8 @@ DATASET_PATH = "./dataset/"
 TUPLE_FLAG = "tuple()"
 #require和assert函数类型标志
 REQUIRE_FUNC_TYPE_FLAG = "function (bool) pure"
+#require的另一种形式 的定义
+REQUIRE_FUNC_STRING_TYPE_FLAG = "function (bool,string memory) pure"
 #require标志
 REQUIRE_FLAG = "require"
 #assert标志
@@ -73,15 +75,13 @@ class integerOverflowInjector:
 			funcAstList = self.findASTNode(self.ast, "id", funcId)
 			for func in funcAstList:
 				srcList = self.getRequireStatement(func)
-				print(srcList)
 				srcList.extend(self.getAssertStatement(func))
-				print(srcList)
-				if not srcList:
-					#如果函数中没有require和assert语句，很奇怪，异常情况
-					#保守起见，不注入这一个
-					return False
 				for src in srcList:
 					srcAndItsStr[src[0]] = COMMENT_FLAG
+		if not srcAndItsStr:
+			#如果函数中没有require和assert语句，很奇怪，异常情况
+			#保守起见，不注入这一个
+			return False		
 		#2.根据找到的整数运算语句位置，标记整数溢出bug
 		for src in self.info["srcList"]:
 			#注意，这里的src是语句的结束位置，而不是该语句结束的分号位置，为了能够准确地标记bug，那么应该寻找分号位置
@@ -96,7 +96,6 @@ class integerOverflowInjector:
 		newSourceCode, newInjectInfo = self.insertStatement(srcAndItsStr)
 		#4. 输出并保存结果，然后产生自动标记
 		self.storeFinalResult(newSourceCode, self.preName)
-		#print(newSourceCode)
 		self.storeLabel(newSourceCode, newInjectInfo.keys(), self.preName)
 		return True
 
@@ -157,12 +156,13 @@ class integerOverflowInjector:
 			if call["attributes"]["type"] == TUPLE_FLAG:
 				children0 = call["children"][0]
 				children1 = call["children"][1]
-				if children0["attributes"]["type"] == REQUIRE_FUNC_TYPE_FLAG and \
+				if (children0["attributes"]["type"] == REQUIRE_FUNC_TYPE_FLAG or \
+					children0["attributes"]["type"] == REQUIRE_FUNC_STRING_TYPE_FLAG) and \
 				   children0["attributes"]["value"] == REQUIRE_FLAG and \
 				   children1["name"] == BINARY_OPERATION_FLAG and \
 				   children1["attributes"]["type"] == BOOL_FLAG and \
 				   children1["attributes"]["commonType"]["typeString"] == COMMON_TYPE_STRING:
-				   #to do 调试bug，然后尝试增加抽取语句
+				   #然后尝试增加抽取语句
 				   #找到require语句
 				   srcList.append(self.srcToPos(call["src"]))
 				else:

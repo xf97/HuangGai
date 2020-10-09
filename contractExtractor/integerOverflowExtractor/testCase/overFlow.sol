@@ -157,7 +157,17 @@ contract MyContract{
         num = num + 10;
 	}
 
-	function addNumSafeMath(uint256 _num) external{
+    function addNum1() external{
+        //No overflow
+        addNumSafeMath(10);
+    }
+
+    function addNum2(uint256 _num) external{
+        //overflow
+        addNumSafeMath(_num);
+    }
+
+	function addNumSafeMath(uint256 _num) internal{
 		num = num.add(_num);
 	}
 }
