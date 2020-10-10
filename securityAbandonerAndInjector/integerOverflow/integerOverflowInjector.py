@@ -4,6 +4,7 @@
 import json
 import copy
 import os
+import subprocess
 
 #标记语句
 LABEL_STATEMENT = "line_number: "
@@ -70,6 +71,8 @@ class integerOverflowInjector:
 		#下述数据结构保存不同字符串和对应插入位置的关系
 		#字典，Key插入位置，元素值插入语句
 		srcAndItsStr = dict()
+		#修复bug，根据id找到函数，再根据函数调用图，将在id函数中被调用的函数的id也加入其中
+		self.getCalledId(self.info["idList"])
 		#1. 根据self.info和self.ast找出指定函数中的目标require和assert语句
 		for funcId in self.info["idList"]:
 			funcAstList = self.findASTNode(self.ast, "id", funcId)
@@ -96,20 +99,43 @@ class integerOverflowInjector:
 		newSourceCode, newInjectInfo = self.insertStatement(srcAndItsStr)
 		#4. 输出并保存结果，然后产生自动标记
 		self.storeFinalResult(newSourceCode, self.preName)
-		self.storeLabel(newSourceCode, newInjectInfo.keys(), self.preName)
+		self.storeLabel(newSourceCode, newInjectInfo, self.preName)
 		return True
+
+	def getCalledId(self, _list):
+		calleeIdList = list()
+		for funcId in _list:
+			funcAstList = self.findASTNode(self.ast, "id", funcId)	#这里找到的是函数的ast
+			#从中抽取functionCall
+			funcCallList = self.findASTNode(funcAstList[0], "name", "FunctionCall")
+			if not funcCallList:
+				continue
+			else:
+				for funcCall in funcCallList:
+					if funcCall["children"][0]["attributes"]["referencedDeclaration"] > 0 and \
+					   funcCall["children"][0]["attributes"]["value"] != REQUIRE_FLAG and \
+					   funcCall["children"][0]["attributes"]["value"] != ASSERT_FLAG:
+					   calleeIdList.append(funcCall["children"][0]["attributes"]["referencedDeclaration"]) 
+					else:
+						continue
+		#print(calleeIdList)
+		_list.extend(calleeIdList)
+
 
 	def storeFinalResult(self, _sourceCode, _preName):
 		with open(os.path.join(DATASET_PATH, _preName + INJECTED_CONTRACT_SUFFIX), "w+",  encoding = "utf-8") as f:
 			f.write(_sourceCode)
 		return
 	
-	def storeLabel(self, _sourceCode, _indexList, _preName):
+	def storeLabel(self, _sourceCode, _dict, _preName):
 		lineBreak = "\n"
 		labelLineList = list()
-		for index in _indexList:
-			num = _sourceCode[:index].count(lineBreak)
-			labelLineList.append(LABEL_STATEMENT + str(num) + lineBreak)
+		for index, value in _dict.items():
+			if value == COMMENT_FLAG:
+				continue
+			else:
+				num = _sourceCode[:index].count(lineBreak)
+				labelLineList.append(LABEL_STATEMENT + str(num) + lineBreak)
 		with open(os.path.join(DATASET_PATH, _preName + INJECTED_INFO_SUFFIX), "w+",  encoding = "utf-8") as f:
 			f.writelines(labelLineList)
 		return

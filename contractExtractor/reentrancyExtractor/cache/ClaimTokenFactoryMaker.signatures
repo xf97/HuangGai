@@ -1,6 +1,0 @@
-84673931: _lexDAO()
-672383c4: factories(uint256)
-d1047434: getFactoryCount()
-268904e6: newClaimTokenFactory(string,bool,address)
-6b328f79: tipLexDAO()
-bcb6c0b5: updateDAO(address)

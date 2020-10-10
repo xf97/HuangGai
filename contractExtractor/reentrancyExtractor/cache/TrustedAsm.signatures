@@ -1,0 +1,4 @@
+3e0178af: basePrice(address,uint256)
+dc98a0a1: getAmtForSale(address)
+c6c3bbe6: mint(address,address,uint256)
+25c76f86: notifyTransferFrom(address,address,address,uint256)

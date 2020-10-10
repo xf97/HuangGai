@@ -1,8 +1,0 @@
-ebbc4965: acceptOwner()
-429b62e5: admins(address)
-a6f9dae1: changeOwner(address)
-8129fc1c: initialize()
-c4d66de8: initialize(address)
-8da5cb5b: owner()
-75f3974b: setAdminPermission(address,bool)
-eb21d9c4: setAdminPermission(address[],bool)

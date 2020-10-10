@@ -1,4 +1,0 @@
-c190c2ec: getAccountWei((address,uint256),uint256)
-56ea84b2: getMarketCurrentIndex(uint256)
-8928378e: getMarketPrice(uint256)
-cb04a34c: getMarketTotalPar(uint256)

@@ -1,0 +1,6 @@
+ace748a5: ClaimComp(address,uint256)
+6660b195: ClaimCompThree(address,address[],address[],uint256)
+1790181d: ClaimCompTwo(address,address[],uint256)
+eb15f781: connectorID()
+8ab65686: delegate(address,address)
+06fdde03: name()

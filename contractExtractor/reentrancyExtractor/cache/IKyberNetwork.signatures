@@ -1,0 +1,6 @@
+238dafe0: enabled()
+8ff68a80: getExpectedRateWithHintAndFee(address,address,uint256,uint256,bytes)
+8881654e: getNetworkData()
+32c8bd9f: listTokenForReserve(address,address,bool)
+3de39c11: maxGasPrice()
+c43190f5: tradeWithHintAndFee(address,address,uint256,address,address,uint256,uint256,address,uint256,bytes)

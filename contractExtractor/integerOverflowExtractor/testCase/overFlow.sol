@@ -144,27 +144,39 @@ library SafeMath {
     }
 }
 
-contract MyContract{
+contract baseContract1{
+    address public owner;
+
+    modifier onlyOwner(){
+        require(msg.sender == owner);
+        _;
+    } 
+}
+
+contract MyContract is baseContract1{
 	using SafeMath for uint256;
 	uint num;
 	constructor(uint256 _num) public{
+        owner = msg.sender;
 		num = _num;
 	}
 
 	function addNum(uint _num) external{
-		num += _num;
-        num -= _num;
         num = num + 10;
+        addNumSafeMath(num);
 	}
 
-    function addNum1() external{
+    function addNum1() onlyOwner external{
         //No overflow
         addNumSafeMath(10);
     }
 
-    function addNum2(uint256 _num) external{
+    function addNum2(uint256 _num, address _newOwner) external{
         //overflow
-        addNumSafeMath(_num);
+        owner = _newOwner;
+        uint newNum = _num - 10;
+        uint newNum1 = _num;
+        addNumSafeMath(newNum);
     }
 
 	function addNumSafeMath(uint256 _num) internal{

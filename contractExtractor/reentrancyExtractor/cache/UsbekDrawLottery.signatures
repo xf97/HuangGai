@@ -1,8 +1,0 @@
-3c33be6a: currLotteryId()
-f33deab9: getWinnersId()
-b555e5bf: launchDraw(uint256,uint256,uint256,string)
-790ca413: launchTime()
-23d14149: lotteryName()
-660d5887: registeredUsers()
-c3ba5a54: winnersAmount()
-6f614954: winnersId(uint256)

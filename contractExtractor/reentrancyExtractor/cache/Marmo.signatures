@@ -1,8 +1,0 @@
-c4d252f5: cancel(bytes32)
-19ab453c: init(address)
-61b69fde: isCanceled(bytes32)
-150b7a02: onERC721Received(address,address,uint256,bytes)
-ed3d9e17: relay(address,bytes,bytes)
-b2b2b7dc: relayedAt(bytes32)
-1dd3dd0b: relayedBy(bytes32)
-238ac933: signer()

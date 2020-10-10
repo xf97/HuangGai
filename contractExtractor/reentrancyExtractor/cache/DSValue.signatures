@@ -1,8 +1,0 @@
-bf7e214f: authority()
-8da5cb5b: owner()
-59e02dd7: peek()
-1504460f: poke(bytes32)
-57de26a4: read()
-7a9e5e4b: setAuthority(address)
-13af4035: setOwner(address)
-ac4c25b2: void()

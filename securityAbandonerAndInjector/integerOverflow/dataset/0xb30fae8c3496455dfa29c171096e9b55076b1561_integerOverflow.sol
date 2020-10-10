@@ -26,7 +26,7 @@ library SafeMath {
 
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
-        //assert(c >= a);
+        assert(c >= a);
         return c;
     }
 }
@@ -96,11 +96,9 @@ contract BasicToken is Ownable, ERC20Basic {
         uint sendAmount = _value.sub(fee);
         balances[msg.sender] = balances[msg.sender].sub(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
 
-        balances[_to] = balances[_to].add(sendAmount);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+        balances[_to] = balances[_to].add(sendAmount);
         if (fee > 0) {
-            balances[owner] = balances[owner].add(fee);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+            balances[owner] = balances[owner].add(fee);
             emit Transfer(msg.sender, owner, fee);
         }
         if(isContract(_to)) {
@@ -142,11 +140,9 @@ contract StandardToken is BasicToken, ERC20 {
         uint sendAmount = _value.sub(fee);
         balances[_from] = balances[_from].sub(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
 
-        balances[_to] = balances[_to].add(sendAmount);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+        balances[_to] = balances[_to].add(sendAmount);
         if (fee > 0) {
-            balances[owner] = balances[owner].add(fee);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+            balances[owner] = balances[owner].add(fee);
             emit Transfer(_from, owner, fee);
         }
         emit Transfer(_from, _to, sendAmount);

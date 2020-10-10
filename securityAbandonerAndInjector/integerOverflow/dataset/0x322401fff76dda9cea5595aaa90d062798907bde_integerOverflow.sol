@@ -1223,10 +1223,8 @@ contract FToken is Exponential, Initializable {
 
         uint256 allowanceNew = startingAllowance.sub(tokens);
 
-        accountTokens[src] = accountTokens[src].sub(tokens);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
-        accountTokens[dst] = accountTokens[dst].add(tokens);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+        accountTokens[src] = accountTokens[src].sub(tokens);
+        accountTokens[dst] = accountTokens[dst].add(tokens);
 
         if (startingAllowance != uint256(-1)) {
             transferAllowances[src][spender] = allowanceNew;
@@ -1579,12 +1577,10 @@ contract FToken is Exponential, Initializable {
 
         require(accrualBlockNumber == getBlockNumber(), "Blocknumber fails");
 
-        tmp.totalSupplyNew = totalSupply.sub(tmp.withdrawTokens);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+        tmp.totalSupplyNew = totalSupply.sub(tmp.withdrawTokens);
         tmp.accountTokensNew = accountTokens[withdrawer].sub(
             tmp.withdrawTokens
-        );	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+        );
 
         require(
             controller.getCashPrior(underlying) >= tmp.withdrawAmount,
@@ -1644,12 +1640,10 @@ contract FToken is Exponential, Initializable {
 
         require(accrualBlockNumber == getBlockNumber(), "Blocknumber fails");
 
-        tmp.totalSupplyNew = totalSupply.sub(tmp.withdrawTokens);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+        tmp.totalSupplyNew = totalSupply.sub(tmp.withdrawTokens);
         tmp.accountTokensNew = accountTokens[withdrawer].sub(
             tmp.withdrawTokens
-        );	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+        );
 
         totalSupply = tmp.totalSupplyNew;
         accountTokens[withdrawer] = tmp.accountTokensNew;
@@ -1929,13 +1923,11 @@ contract FToken is Exponential, Initializable {
             tmp.repayAmount = repayAmount;
         }
 
-        tmp.accountBorrowsNew = tmp.accountBorrows.sub(tmp.repayAmount);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+        tmp.accountBorrowsNew = tmp.accountBorrows.sub(tmp.repayAmount);
         if (totalBorrows < tmp.repayAmount) {
             tmp.totalBorrowsNew = 0;
         } else {
-            tmp.totalBorrowsNew = totalBorrows.sub(tmp.repayAmount);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+            tmp.totalBorrowsNew = totalBorrows.sub(tmp.repayAmount);
         }
 
         accountBorrows[borrower].principal = tmp.accountBorrowsNew;
@@ -2183,10 +2175,8 @@ contract FToken is Exponential, Initializable {
         require(borrower != liquidator, "Liquidator cannot be borrower");
         controller.seizeCheck(msg.sender, seizerToken);
 
-        accountTokens[borrower] = accountTokens[borrower].sub(seizeTokens);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
-        accountTokens[liquidator] = accountTokens[liquidator].add(seizeTokens);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+        accountTokens[borrower] = accountTokens[borrower].sub(seizeTokens);
+        accountTokens[liquidator] = accountTokens[liquidator].add(seizeTokens);
 
         emit Transfer(borrower, liquidator, seizeTokens);
     }
@@ -2206,16 +2196,14 @@ contract FToken is Exponential, Initializable {
             totalReserves,
             reduceAmount,
             "reduce reserves underflow"
-        );	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+        );
     }
 
     function _addReservesFresh(uint256 addAmount) external onlyController {
         accrueInterest();
 
         require(accrualBlockNumber == getBlockNumber(), "Blocknumber fails");
-        totalReserves = SafeMath.add(totalReserves, addAmount);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+        totalReserves = SafeMath.add(totalReserves, addAmount);
     }
 
     function addTotalCash(uint256 _addAmount) public onlyBankComponent {

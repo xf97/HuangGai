@@ -105,14 +105,15 @@ class reentrancyExtractor:
 				solList.append(i)
 			else:
 				continue
-		index = randint(0, len(solList) - 1)
-		#index = self.index
+		#index = randint(0, len(solList) - 1)
+		index = self.index
 		#print(index, solList[index])
 		try:
 			#拼接绝对路径
 			sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
 			#[bug fix]清洗合约中的多字节字符，保证编译结果不错误
 			sourceCode = self.cleanMultibyte(sourceCode)
+			self.index += 1
 			#sourceCode = open(os.path.join(RESULT_PATH, solList[index]), "r", encoding = "utf-8").read()
 			return sourceCode, solList[index]
 		except:
@@ -210,5 +211,5 @@ class reentrancyExtractor:
 
 #单元测试
 if __name__ == "__main__":
-	ree = reentrancyExtractor(50)
+	ree = reentrancyExtractor(60)
 	ree.extractContracts()

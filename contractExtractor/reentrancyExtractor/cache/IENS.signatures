@@ -1,0 +1,7 @@
+02571be3: owner(bytes32)
+0178b8bf: resolver(bytes32)
+5b0fc9c3: setOwner(bytes32,address)
+1896f70a: setResolver(bytes32,address)
+06ab5923: setSubnodeOwner(bytes32,bytes32,address)
+14ab9038: setTTL(bytes32,uint64)
+16a25cbd: ttl(bytes32)

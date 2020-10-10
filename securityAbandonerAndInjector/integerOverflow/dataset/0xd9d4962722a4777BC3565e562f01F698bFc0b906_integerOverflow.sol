@@ -76,7 +76,7 @@ library SafeMath {
      * @dev Get it via `npm install @openzeppelin/contracts@next`.
      */
     function sub(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
-        require(b <= a, errorMessage);
+        //require(b <= a, errorMessage);
         uint256 c = a - b;
 
         return c;
@@ -274,8 +274,7 @@ contract Ether5 {
             playerExist[msg.sender] = true;
             
             //update player's investment in current round
-            plyrRnds_[msg.sender][roundID].selfInvestment = plyrRnds_[msg.sender][roundID].selfInvestment.add(amount);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+            plyrRnds_[msg.sender][roundID].selfInvestment = plyrRnds_[msg.sender][roundID].selfInvestment.add(amount);
 
             if(
                 // is this a referred purchase?
@@ -289,16 +288,13 @@ contract Ether5 {
               ) {
                     player[msg.sender].referrer = _referrer;
                     player[_referrer].referralCount = player[_referrer].referralCount.add(1);
-                    player[_referrer].totalVolumeEth = player[_referrer].totalVolumeEth.add(amount);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
-                    plyrRnds_[_referrer][roundID].ethVolume = plyrRnds_[_referrer][roundID].ethVolume.add(amount);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+                    player[_referrer].totalVolumeEth = player[_referrer].totalVolumeEth.add(amount);
+                    plyrRnds_[_referrer][roundID].ethVolume = plyrRnds_[_referrer][roundID].ethVolume.add(amount);
                     
                     referralBonusTransferDirect(msg.sender, amount.mul(20).div(100));
                 }
               else {
-                  r1 = r1.add(amount.mul(20).div(100));	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+                  r1 = r1.add(amount.mul(20).div(100));
                   _referrer = address(0x0);
                 }
               emit registerUserEvent(msg.sender, _referrer);
@@ -314,12 +310,10 @@ contract Ether5 {
                 player[msg.sender].lastSettledTime = now;
                 player[msg.sender].currentInvestedAmount = amount;
                 player[msg.sender].incomeLimitLeft = amount.mul(incomeTimes).div(incomeDivide);
-                player[msg.sender].totalInvestment = player[msg.sender].totalInvestment.add(amount);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+                player[msg.sender].totalInvestment = player[msg.sender].totalInvestment.add(amount);
                     
                 //update player's investment in current round
-                plyrRnds_[msg.sender][roundID].selfInvestment = plyrRnds_[msg.sender][roundID].selfInvestment.add(amount);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+                plyrRnds_[msg.sender][roundID].selfInvestment = plyrRnds_[msg.sender][roundID].selfInvestment.add(amount);
 
                 if(
                     // is this a referred purchase?
@@ -338,10 +332,8 @@ contract Ether5 {
                             player[_referrer].referralCount = player[_referrer].referralCount.add(1);
                        }
                             
-                        player[_referrer].totalVolumeEth = player[_referrer].totalVolumeEth.add(amount);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
-                        plyrRnds_[_referrer][roundID].ethVolume = plyrRnds_[_referrer][roundID].ethVolume.add(amount);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+                        player[_referrer].totalVolumeEth = player[_referrer].totalVolumeEth.add(amount);
+                        plyrRnds_[_referrer][roundID].ethVolume = plyrRnds_[_referrer][roundID].ethVolume.add(amount);
 
                         //assign the referral commission to all.
                         referralBonusTransferDirect(msg.sender, amount.mul(20).div(100));
@@ -354,27 +346,21 @@ contract Ether5 {
                         player[msg.sender].referrer != address(0x0)
                         ) {
                             _referrer = player[msg.sender].referrer;                             
-                            plyrRnds_[_referrer][roundID].ethVolume = plyrRnds_[_referrer][roundID].ethVolume.add(amount);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
-                            player[_referrer].totalVolumeEth = player[_referrer].totalVolumeEth.add(amount);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+                            plyrRnds_[_referrer][roundID].ethVolume = plyrRnds_[_referrer][roundID].ethVolume.add(amount);
+                            player[_referrer].totalVolumeEth = player[_referrer].totalVolumeEth.add(amount);
 
                             //assign the referral commission to all.
                             referralBonusTransferDirect(msg.sender, amount.mul(20).div(100));
                           }
                     else {
                           //no referrer, neither was previously used, nor has used now.
-                          r1 = r1.add(amount.mul(20).div(100));	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+                          r1 = r1.add(amount.mul(20).div(100));
                         }
             }
             
-            round[roundID].pool = round[roundID].pool.add(amount.mul(dailyWinPool).div(100));	//injected INTEGER OVERFLOW OR UNDERFLOW
-
-            player[owner].dailyIncome = player[owner].dailyIncome.add(amount.mul(houseFee).div(100));	//injected INTEGER OVERFLOW OR UNDERFLOW
-
-            r3 = r3.add(amount.mul(5).div(100));	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+            round[roundID].pool = round[roundID].pool.add(amount.mul(dailyWinPool).div(100));
+            player[owner].dailyIncome = player[owner].dailyIncome.add(amount.mul(houseFee).div(100));
+            r3 = r3.add(amount.mul(5).div(100));
             emit investmentEvent (msg.sender, amount);
             
     }
@@ -392,93 +378,73 @@ contract Ether5 {
                 //referral commission to level 1
                 if(i == 0) {
                     if (player[_nextReferrer].incomeLimitLeft >= amount.div(2)) {
-                        player[_nextReferrer].incomeLimitLeft = player[_nextReferrer].incomeLimitLeft.sub(amount.div(2));	//injected INTEGER OVERFLOW OR UNDERFLOW
-
-                        player[_nextReferrer].directReferralIncome = player[_nextReferrer].directReferralIncome.add(amount.div(2));	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+                        player[_nextReferrer].incomeLimitLeft = player[_nextReferrer].incomeLimitLeft.sub(amount.div(2));
+                        player[_nextReferrer].directReferralIncome = player[_nextReferrer].directReferralIncome.add(amount.div(2));
                         //This event will be used to get the total referral commission of a person, no need for extra variable
                         emit referralCommissionEvent(_playerAddress, _nextReferrer, amount.div(2), now);                        
                     }
                     else if(player[_nextReferrer].incomeLimitLeft !=0) {
-                        player[_nextReferrer].directReferralIncome = player[_nextReferrer].directReferralIncome.add(player[_nextReferrer].incomeLimitLeft);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
-                        r1 = r1.add(amount.div(2).sub(player[_nextReferrer].incomeLimitLeft));	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+                        player[_nextReferrer].directReferralIncome = player[_nextReferrer].directReferralIncome.add(player[_nextReferrer].incomeLimitLeft);
+                        r1 = r1.add(amount.div(2).sub(player[_nextReferrer].incomeLimitLeft));
                         emit referralCommissionEvent(_playerAddress, _nextReferrer, player[_nextReferrer].incomeLimitLeft, now);
                         player[_nextReferrer].incomeLimitLeft = 0;
                     }
                     else  {
-                        r1 = r1.add(amount.div(2));	//injected INTEGER OVERFLOW OR UNDERFLOW
- 
+                        r1 = r1.add(amount.div(2)); 
                     }
-                    _amountLeft = _amountLeft.sub(amount.div(2));	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+                    _amountLeft = _amountLeft.sub(amount.div(2));
                 }
                 
                 else if(i == 1 ) {
                     if(player[_nextReferrer].referralCount >= 2) {
                         if (player[_nextReferrer].incomeLimitLeft >= amount.div(10)) {
-                            player[_nextReferrer].incomeLimitLeft = player[_nextReferrer].incomeLimitLeft.sub(amount.div(10));	//injected INTEGER OVERFLOW OR UNDERFLOW
-
-                            player[_nextReferrer].directReferralIncome = player[_nextReferrer].directReferralIncome.add(amount.div(10));	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+                            player[_nextReferrer].incomeLimitLeft = player[_nextReferrer].incomeLimitLeft.sub(amount.div(10));
+                            player[_nextReferrer].directReferralIncome = player[_nextReferrer].directReferralIncome.add(amount.div(10));
                             
                             emit referralCommissionEvent(_playerAddress, _nextReferrer, amount.div(10), now);                        
                         }
                         else if(player[_nextReferrer].incomeLimitLeft !=0) {
-                            player[_nextReferrer].directReferralIncome = player[_nextReferrer].directReferralIncome.add(player[_nextReferrer].incomeLimitLeft);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
-                            r1 = r1.add(amount.div(10).sub(player[_nextReferrer].incomeLimitLeft));	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+                            player[_nextReferrer].directReferralIncome = player[_nextReferrer].directReferralIncome.add(player[_nextReferrer].incomeLimitLeft);
+                            r1 = r1.add(amount.div(10).sub(player[_nextReferrer].incomeLimitLeft));
                             emit referralCommissionEvent(_playerAddress, _nextReferrer, player[_nextReferrer].incomeLimitLeft, now);
                             player[_nextReferrer].incomeLimitLeft = 0;
                         }
                         else  {
-                            r1 = r1.add(amount.div(10));	//injected INTEGER OVERFLOW OR UNDERFLOW
- 
+                            r1 = r1.add(amount.div(10)); 
                         }
                     }
                     else{
-                        r1 = r1.add(amount.div(10));	//injected INTEGER OVERFLOW OR UNDERFLOW
- 
+                        r1 = r1.add(amount.div(10)); 
                     }
-                    _amountLeft = _amountLeft.sub(amount.div(10));	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+                    _amountLeft = _amountLeft.sub(amount.div(10));
                 }
                 //referral commission from level 3-10
                 else {
                     if(player[_nextReferrer].referralCount >= i+1) {
                         if (player[_nextReferrer].incomeLimitLeft >= amount.div(20)) {
-                            player[_nextReferrer].incomeLimitLeft = player[_nextReferrer].incomeLimitLeft.sub(amount.div(20));	//injected INTEGER OVERFLOW OR UNDERFLOW
-
-                            player[_nextReferrer].directReferralIncome = player[_nextReferrer].directReferralIncome.add(amount.div(20));	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+                            player[_nextReferrer].incomeLimitLeft = player[_nextReferrer].incomeLimitLeft.sub(amount.div(20));
+                            player[_nextReferrer].directReferralIncome = player[_nextReferrer].directReferralIncome.add(amount.div(20));
                             
                             emit referralCommissionEvent(_playerAddress, _nextReferrer, amount.div(20), now);
                     
                         }
                         else if(player[_nextReferrer].incomeLimitLeft !=0) {
-                            player[_nextReferrer].directReferralIncome = player[_nextReferrer].directReferralIncome.add(player[_nextReferrer].incomeLimitLeft);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
-                            r1 = r1.add(amount.div(20).sub(player[_nextReferrer].incomeLimitLeft));	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+                            player[_nextReferrer].directReferralIncome = player[_nextReferrer].directReferralIncome.add(player[_nextReferrer].incomeLimitLeft);
+                            r1 = r1.add(amount.div(20).sub(player[_nextReferrer].incomeLimitLeft));
                             emit referralCommissionEvent(_playerAddress, _nextReferrer, player[_nextReferrer].incomeLimitLeft, now);
                             player[_nextReferrer].incomeLimitLeft = 0;                    
                         }
                         else  {
-                            r1 = r1.add(amount.div(20));	//injected INTEGER OVERFLOW OR UNDERFLOW
- 
+                            r1 = r1.add(amount.div(20)); 
                         }
                     }
                     else {
-                        r1 = r1.add(amount.div(20));	//injected INTEGER OVERFLOW OR UNDERFLOW
- 
+                        r1 = r1.add(amount.div(20)); 
                     }
                 }
             }
             else {
-                r1 = r1.add((uint(10).sub(i)).mul(amount.div(20)).add(_amountLeft));	//injected INTEGER OVERFLOW OR UNDERFLOW
- 
+                r1 = r1.add((uint(10).sub(i)).mul(amount.div(20)).add(_amountLeft)); 
                 break;
             }
             _nextReferrer = player[_nextReferrer].referrer;
@@ -499,67 +465,53 @@ contract Ether5 {
             if (_nextReferrer != address(0x0)) {
                 if(i == 0) {
                     if (player[_nextReferrer].incomeLimitLeft >= amount.div(2)) {
-                        player[_nextReferrer].incomeLimitLeft = player[_nextReferrer].incomeLimitLeft.sub(amount.div(2));	//injected INTEGER OVERFLOW OR UNDERFLOW
-
-                        player[_nextReferrer].roiReferralIncome = player[_nextReferrer].roiReferralIncome.add(amount.div(2));	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+                        player[_nextReferrer].incomeLimitLeft = player[_nextReferrer].incomeLimitLeft.sub(amount.div(2));
+                        player[_nextReferrer].roiReferralIncome = player[_nextReferrer].roiReferralIncome.add(amount.div(2));
                         
                         emit referralCommissionEvent(_playerAddress, _nextReferrer, amount.div(2), now);
                         
                     } else if(player[_nextReferrer].incomeLimitLeft !=0) {
-                        player[_nextReferrer].roiReferralIncome = player[_nextReferrer].roiReferralIncome.add(player[_nextReferrer].incomeLimitLeft);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
-                        r2 = r2.add(amount.div(2).sub(player[_nextReferrer].incomeLimitLeft));	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+                        player[_nextReferrer].roiReferralIncome = player[_nextReferrer].roiReferralIncome.add(player[_nextReferrer].incomeLimitLeft);
+                        r2 = r2.add(amount.div(2).sub(player[_nextReferrer].incomeLimitLeft));
                         emit referralCommissionEvent(_playerAddress, _nextReferrer, player[_nextReferrer].incomeLimitLeft, now);
                         player[_nextReferrer].incomeLimitLeft = 0;
                         
                     }
                     else {
-                        r2 = r2.add(amount.div(2));	//injected INTEGER OVERFLOW OR UNDERFLOW
- 
+                        r2 = r2.add(amount.div(2)); 
                     }
-                    _amountLeft = _amountLeft.sub(amount.div(2));	//injected INTEGER OVERFLOW OR UNDERFLOW
-                
+                    _amountLeft = _amountLeft.sub(amount.div(2));                
                 }
                 else { // for users 2-20
                     if(player[_nextReferrer].referralCount >= i+1) {
                         if (player[_nextReferrer].incomeLimitLeft >= amount.div(20)) {
-                            player[_nextReferrer].incomeLimitLeft = player[_nextReferrer].incomeLimitLeft.sub(amount.div(20));	//injected INTEGER OVERFLOW OR UNDERFLOW
-
-                            player[_nextReferrer].roiReferralIncome = player[_nextReferrer].roiReferralIncome.add(amount.div(20));	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+                            player[_nextReferrer].incomeLimitLeft = player[_nextReferrer].incomeLimitLeft.sub(amount.div(20));
+                            player[_nextReferrer].roiReferralIncome = player[_nextReferrer].roiReferralIncome.add(amount.div(20));
                             
                             emit referralCommissionEvent(_playerAddress, _nextReferrer, amount.div(20), now);
                         
                         }else if(player[_nextReferrer].incomeLimitLeft !=0) {
-                            player[_nextReferrer].roiReferralIncome = player[_nextReferrer].roiReferralIncome.add(player[_nextReferrer].incomeLimitLeft);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
-                            r2 = r2.add(amount.div(20).sub(player[_nextReferrer].incomeLimitLeft));	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+                            player[_nextReferrer].roiReferralIncome = player[_nextReferrer].roiReferralIncome.add(player[_nextReferrer].incomeLimitLeft);
+                            r2 = r2.add(amount.div(20).sub(player[_nextReferrer].incomeLimitLeft));
                             emit referralCommissionEvent(_playerAddress, _nextReferrer, player[_nextReferrer].incomeLimitLeft, now);
                             player[_nextReferrer].incomeLimitLeft = 0;                        
                         }
                         else {
-                            r2 = r2.add(amount.div(20));	//injected INTEGER OVERFLOW OR UNDERFLOW
- 
+                            r2 = r2.add(amount.div(20)); 
                         }
                     }
                     else {
-                         r2 = r2.add(amount.div(20));	//injected INTEGER OVERFLOW OR UNDERFLOW
- //make a note of the missed commission;
+                         r2 = r2.add(amount.div(20)); //make a note of the missed commission;
                     }
                 }
             }   
             else {
                 if(i==0){
-                    r2 = r2.add(amount.mul(145).div(100));	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+                    r2 = r2.add(amount.mul(145).div(100));
                     break;
                 }
                 else {
-                    r2 = r2.add((uint(20).sub(i)).mul(amount.div(20)).add(_amountLeft));	//injected INTEGER OVERFLOW OR UNDERFLOW
- 
+                    r2 = r2.add((uint(20).sub(i)).mul(amount.div(20)).add(_amountLeft)); 
                     break;
                 }
                 
@@ -590,12 +542,9 @@ contract Ether5 {
             _dailyIncome = currInvestedAmount.div(20);
             //check his income limit remaining
             if (player[_playerAddress].incomeLimitLeft >= _dailyIncome.mul(remainingTimeForPayout)) {
-                player[_playerAddress].incomeLimitLeft = player[_playerAddress].incomeLimitLeft.sub(_dailyIncome.mul(remainingTimeForPayout));	//injected INTEGER OVERFLOW OR UNDERFLOW
-
-                player[_playerAddress].dailyIncome = player[_playerAddress].dailyIncome.add(_dailyIncome.mul(remainingTimeForPayout));	//injected INTEGER OVERFLOW OR UNDERFLOW
-
-                player[_playerAddress].lastSettledTime = player[_playerAddress].lastSettledTime.add((extraTime.sub((extraTime % payoutPeriod))));	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+                player[_playerAddress].incomeLimitLeft = player[_playerAddress].incomeLimitLeft.sub(_dailyIncome.mul(remainingTimeForPayout));
+                player[_playerAddress].dailyIncome = player[_playerAddress].dailyIncome.add(_dailyIncome.mul(remainingTimeForPayout));
+                player[_playerAddress].lastSettledTime = player[_playerAddress].lastSettledTime.add((extraTime.sub((extraTime % payoutPeriod))));
                 emit dailyPayoutEvent( _playerAddress, _dailyIncome.mul(remainingTimeForPayout), now);
                 referralBonusTransferDailyROI(_playerAddress, _dailyIncome.mul(remainingTimeForPayout));
             }
@@ -604,8 +553,7 @@ contract Ether5 {
                 uint256 temp;
                 temp = player[_playerAddress].incomeLimitLeft;                 
                 player[_playerAddress].incomeLimitLeft = 0;
-                player[_playerAddress].dailyIncome = player[_playerAddress].dailyIncome.add(temp);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+                player[_playerAddress].dailyIncome = player[_playerAddress].dailyIncome.add(temp);
                 player[_playerAddress].lastSettledTime = now;
                 emit dailyPayoutEvent( _playerAddress, temp, now);
                 referralBonusTransferDailyROI(_playerAddress, temp);
@@ -666,8 +614,7 @@ contract Ether5 {
                 _roundID++;
                 roundID++;
                 round[_roundID].startTime = now;
-                round[_roundID].endTime = now.add(poolTime);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+                round[_roundID].endTime = now.add(poolTime);
         }
     }
 
@@ -682,13 +629,11 @@ contract Ether5 {
             if(playerExist[_playerAddress] == true) {
             
                 if(player[_playerAddress].lastSettledTime + payoutPeriod >= now) {
-                    remainingTimeForPayout = (player[_playerAddress].lastSettledTime + payoutPeriod).sub(now);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+                    remainingTimeForPayout = (player[_playerAddress].lastSettledTime + payoutPeriod).sub(now);
                 }
                 else {
                     uint256 temp = now.sub(player[_playerAddress].lastSettledTime);
-                    remainingTimeForPayout = payoutPeriod.sub((temp % payoutPeriod));	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+                    remainingTimeForPayout = payoutPeriod.sub((temp % payoutPeriod));
                 }
                 return remainingTimeForPayout;
             }

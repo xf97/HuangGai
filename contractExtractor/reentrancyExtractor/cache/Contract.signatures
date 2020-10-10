@@ -1,0 +1,4 @@
+2f107734: accts(uint256)
+aa9606eb: getAcctsLength()
+1da0b8fc: getHash(address)
+63ba75f5: setHash(address,string)

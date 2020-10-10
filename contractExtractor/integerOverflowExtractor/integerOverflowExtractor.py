@@ -2,8 +2,9 @@
 #-*- coding: utf-8 -*-
 
 '''
-四个抽取标准
+两个抽取标准
 1. 合约中存在，使用SafeMath库进行的，由三个uint256参与的赋值语句
+2. safeMath的add/sub函数的参数由外部给定(作为public或external函数的参数)
 '''
 
 import sys
@@ -15,6 +16,7 @@ from colorPrint import *	#该头文件中定义了色彩显示的信息
 import json
 from shutil import rmtree
 from judgeAst import judgeAst
+
 
 #源代码数据存储位置
 SOURCE_CODE_PATH = "../../contractSpider/contractCodeGetter/sourceCode"
@@ -96,7 +98,7 @@ class integerOverflowExtractor:
 			#sourceCode = open(os.path.join(TESTCASE_PATH, "overFlow.sol"), "r", encoding = "utf-8").read()
 			#[bug fix]清洗合约中的多字节字符，保证编译结果不错误
 			sourceCode = self.cleanMultibyte(sourceCode)
-			return sourceCode, solList[index] 
+			return sourceCode, solList[index] #"overFlow.sol"
 		except:
 			#无法获取源代码，则引发异常
 			self.index += 1
