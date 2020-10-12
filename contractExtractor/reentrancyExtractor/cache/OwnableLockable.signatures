@@ -1,0 +1,7 @@
+8f32d59b: isOwner()
+f83d08ba: lock()
+cf309012: locked()
+8da5cb5b: owner()
+715018a6: renounceOwnership()
+f2fde38b: transferOwnership(address)
+a69df4b5: unlock()

@@ -1,0 +1,2 @@
+13f4a0ea: getWhitelist(address,address)
+80bfbe68: setWhitelist(address,address,uint256)

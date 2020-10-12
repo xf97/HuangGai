@@ -1,0 +1,3 @@
+06b3efd6: assetBalanceOf(address)
+9dc29fac: burn(address,uint256)
+40c10f19: mint(address,uint256)

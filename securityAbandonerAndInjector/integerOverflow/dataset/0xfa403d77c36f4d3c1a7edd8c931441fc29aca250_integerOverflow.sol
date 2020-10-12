@@ -32,7 +32,7 @@ library SafeMath {
     }
 
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-        //require(b <= a);
+        require(b <= a);
         uint256 c = a - b;
 
         return c;
@@ -75,8 +75,7 @@ contract ERC20Standard {
 
 	function transfer(address _recipient, uint _value) public onlyPayloadSize(2*32) {
 	    require(balances[msg.sender] >= _value && _value > 0);
-	    balances[msg.sender] = balances[msg.sender].sub(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+	    balances[msg.sender] = balances[msg.sender].sub(_value);
 	    balances[_recipient] = balances[_recipient].add(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
 
 	    emit Transfer(msg.sender, _recipient, _value);        
@@ -86,10 +85,8 @@ contract ERC20Standard {
 	    require(balances[_from] >= _value && allowed[_from][msg.sender] >= _value && _value > 0);
             balances[_to] = balances[_to].add(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
 
-            balances[_from] = balances[_from].sub(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
-            allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+            balances[_from] = balances[_from].sub(_value);
+            allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
             emit Transfer(_from, _to, _value);
         }
 

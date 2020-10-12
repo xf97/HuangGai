@@ -1,0 +1,3 @@
+848d8f28: buy(address,address,uint256,uint256,uint256,uint256)
+eb15f781: connectorID()
+45c9acfe: sell(address,address,uint256,uint256,uint256,uint256)

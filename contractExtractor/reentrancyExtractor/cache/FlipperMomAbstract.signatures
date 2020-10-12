@@ -1,2 +1,7 @@
+bf7e214f: authority()
+e4881813: cat()
 9c52a7f1: deny(address)
+8da5cb5b: owner()
 65fae35e: rely(address)
+7a9e5e4b: setAuthority(address)
+13af4035: setOwner(address)

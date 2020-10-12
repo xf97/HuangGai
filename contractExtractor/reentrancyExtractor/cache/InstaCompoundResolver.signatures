@@ -1,0 +1,6 @@
+ab1be686: getAddressETH()
+d1088d78: getCompTokenData(address,address)
+9f3915cc: getCompTokensData(address,address[])
+4ee9159a: getComptrollerAddress()
+b18b78dd: getOracleAddress()
+06fdde03: name()

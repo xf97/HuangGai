@@ -1,0 +1,2 @@
+809a9e55: getExpectedRate(address,address,uint256)
+cb3c28c7: trade(address,uint256,address,address,uint256,uint256,address)

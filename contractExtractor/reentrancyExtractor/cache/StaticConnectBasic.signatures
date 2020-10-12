@@ -1,0 +1,3 @@
+eb15f781: connectorID()
+06fdde03: name()
+f3fef3a3: withdraw(address,uint256)

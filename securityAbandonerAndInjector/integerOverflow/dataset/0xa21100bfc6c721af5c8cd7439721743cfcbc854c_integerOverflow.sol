@@ -74,8 +74,7 @@ contract Wiener is ERC20 {
         require(_value <= balances[msg.sender]);
         require(block.timestamp >= 1545102693);
 
-        balances[msg.sender] = balances[msg.sender].sub(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+        balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
 
         emit Transfer(msg.sender, _to, _value);
@@ -88,12 +87,10 @@ contract Wiener is ERC20 {
         require(_value <= allowed[_from][msg.sender]);
         require(block.timestamp >= 1545102693);
 
-        balances[_from] = balances[_from].sub(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+        balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
 
-        allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+        allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
         emit Transfer(_from, _to, _value);
         return true;
     }

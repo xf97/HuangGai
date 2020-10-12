@@ -64,10 +64,8 @@ contract StandardToken is Token {
         require(_to != address(0));
         require(balances[msg.sender] >= _value && balances[_to].add(_value) >= balances[_to]);
 
-        balances[msg.sender] = balances[msg.sender].sub(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
-        balances[_to] = balances[_to].add(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+        balances[msg.sender] = balances[msg.sender].sub(_value);
+        balances[_to] = balances[_to].add(_value);
 
         emit Transfer(msg.sender, _to, _value);
         return true;
@@ -97,8 +95,7 @@ contract StandardToken is Token {
 
         balances[_to] = balances[_to].add(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
 
-        allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+        allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
 
         emit Transfer(_from, _to, _value);
         return true;

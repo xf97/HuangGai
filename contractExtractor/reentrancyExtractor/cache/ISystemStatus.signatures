@@ -1,0 +1,5 @@
+7118d431: requireExchangeActive()
+7c312541: requireIssuanceActive()
+42a28e21: requireSynthActive(bytes32)
+6132eba4: requireSynthsActive(bytes32,bytes32)
+086dabd1: requireSystemActive()

@@ -1,0 +1,5 @@
+eb15f781: connectorID()
+68936809: deposit(address,uint256,uint256,uint256,uint256)
+06fdde03: name()
+45c9acfe: sell(address,address,uint256,uint256,uint256,uint256)
+64095b4f: withdraw(address,uint256,uint256,uint256,uint256)

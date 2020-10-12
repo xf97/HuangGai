@@ -1,0 +1,6 @@
+3644e515: DOMAIN_SEPARATOR()
+ce7e8fcf: init(address[],uint256,uint256)
+affed0e0: nonce()
+025e7c27: owners(uint256)
+8d068043: requiredSignatures()
+16636745: submit(uint8[],bytes32[],bytes32[],address,uint256,bytes)

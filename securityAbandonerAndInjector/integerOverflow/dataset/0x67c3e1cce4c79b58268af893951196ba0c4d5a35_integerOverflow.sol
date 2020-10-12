@@ -350,8 +350,7 @@ contract FairyStake is Owned {
                 
         require(IERC20(FRT).transfer(msg.sender, tokens.sub(_unstakingFee)), "Error in un-staking tokens");
         
-        stakers[msg.sender].stakedTokens = stakers[msg.sender].stakedTokens.sub(tokens);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+        stakers[msg.sender].stakedTokens = stakers[msg.sender].stakedTokens.sub(tokens);
         stakers[msg.sender].lastDividends = owing;
         stakers[msg.sender].fromTotalDividend= totalDividends;
         stakers[msg.sender].round =  round;

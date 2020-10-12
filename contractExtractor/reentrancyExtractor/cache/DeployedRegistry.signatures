@@ -1,3 +1,0 @@
-0d1e3591: isAuthorizedTransferFrom(uint32,address,address,uint256,address,address)
-abe61783: isContentIdRegisteredToCaller(uint32,string)
-12d26ac8: isMinter(uint32,address)

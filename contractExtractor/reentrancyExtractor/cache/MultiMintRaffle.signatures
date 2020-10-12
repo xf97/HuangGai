@@ -1,0 +1,6 @@
+8f32d59b: isOwner()
+e467f7e0: mint(address[],uint256[])
+8da5cb5b: owner()
+33c1420a: raffle()
+715018a6: renounceOwnership()
+f2fde38b: transferOwnership(address)

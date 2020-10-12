@@ -1,0 +1,5 @@
+ad5c4648: WETH()
+f305d719: addLiquidityETH(address,uint256,uint256,uint256,address,uint256)
+e6a43905: getPair(address,address)
+7ff36ab5: swapExactETHForTokens(uint256,address[],address,uint256)
+18cbafe5: swapExactTokensForETH(uint256,uint256,address[],address,uint256)

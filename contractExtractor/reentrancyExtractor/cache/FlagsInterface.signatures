@@ -1,0 +1,6 @@
+357e47fe: getFlag(address)
+7d723cac: getFlags(address[])
+28286596: lowerFlags(address[])
+d74af263: raiseFlag(address)
+760bc82d: raiseFlags(address[])
+517e89fe: setRaisingAccessController(address)

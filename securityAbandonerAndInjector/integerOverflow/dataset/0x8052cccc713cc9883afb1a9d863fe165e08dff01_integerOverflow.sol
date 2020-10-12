@@ -601,8 +601,7 @@ contract BalanceSheet is Claimable {
     }
 
     function subBalance(address _addr, uint256 _value) public onlyOwner {
-        balanceOf[_addr] = balanceOf[_addr].sub(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+        balanceOf[_addr] = balanceOf[_addr].sub(_value);
     }
 
     function setBalance(address _addr, uint256 _value) public onlyOwner {

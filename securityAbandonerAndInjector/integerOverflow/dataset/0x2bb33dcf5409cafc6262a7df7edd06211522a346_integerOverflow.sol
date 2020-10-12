@@ -82,8 +82,7 @@ contract BasicToken is ERC20Basic {
 
         require(_value <= balances[msg.sender]);
         // SafeMath.sub will throw if there is not enough balance.
-        balances[msg.sender] = balances[msg.sender].sub(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+        balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
 
         emit Transfer(msg.sender, _to, _value);
@@ -112,11 +111,9 @@ contract StandardToken is ERC20, BasicToken {
         require(_value <= balances[_owner]);
         require(_value <= allowed[_owner][msg.sender]);
 
-        balances[_owner] = balances[_owner].sub(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+        balances[_owner] = balances[_owner].sub(_value);
         if (allowed[_owner][msg.sender] < MAX_UINT) {
-            allowed[_owner][msg.sender] = allowed[_owner][msg.sender].sub(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+            allowed[_owner][msg.sender] = allowed[_owner][msg.sender].sub(_value);
         }
         totalSupply_ = totalSupply_.sub(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
 
@@ -135,15 +132,13 @@ contract StandardToken is ERC20, BasicToken {
 
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
-        balances[_from] = balances[_from].sub(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+        balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
 
 
   
         if (allowed[_from][msg.sender] < MAX_UINT) {
-            allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+            allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
         }
         emit Transfer(_from, _to, _value);
         return true;

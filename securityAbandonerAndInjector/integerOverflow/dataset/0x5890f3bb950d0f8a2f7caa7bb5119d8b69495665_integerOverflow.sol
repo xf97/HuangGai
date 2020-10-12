@@ -83,8 +83,7 @@ contract LexToken {
         transferable = _transferable; 
         balanceOf[owner] = ownerSupply;
         balanceOf[address(this)] = saleSupply;
-        totalSupply = ownerSupply.add(saleSupply);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+        totalSupply = ownerSupply.add(saleSupply);
         emit Transfer(address(0), owner, ownerSupply);
         emit Transfer(address(0), address(this), saleSupply);
     }
@@ -152,8 +151,7 @@ contract LexToken {
         require(totalSupply.add(amount) <= totalSupplyCap, "capped"); 
         balanceOf[to] = balanceOf[to].add(amount);	//injected INTEGER OVERFLOW OR UNDERFLOW
  
-        totalSupply = totalSupply.add(amount);	//injected INTEGER OVERFLOW OR UNDERFLOW
- 
+        totalSupply = totalSupply.add(amount); 
         emit Transfer(address(0), to, amount); 
     }
     

@@ -59,7 +59,7 @@ class reentrancyExtractor:
 
 	def extractContracts(self):
 		#当符合条件的合约数量不满足需求时，继续抽取
-		while self.nowNum < self.needs:
+		while self.nowNum < self.needs and self.index < self.maxIndex:
 			try:
 				#拿到一个合约及其源代码
 				(sourceCode, prevFileName) = self.getSourceCode()
@@ -89,6 +89,11 @@ class reentrancyExtractor:
 				#self.nowNum += 1
 				print("%s %s %s" % (bad, e, end))
 				continue
+		if self.nowNum >= self.needs:
+			print("Complete the extraction.")
+		if self.index >= self.maxIndex:
+			print("The data set lacks a sufficient number of contracts that meet the extraction criteria.")
+		return
 
 	def getSourceCode(self):
 		'''
@@ -105,6 +110,7 @@ class reentrancyExtractor:
 				solList.append(i)
 			else:
 				continue
+		self.maxIndex = len(solList)
 		#index = randint(0, len(solList) - 1)
 		index = self.index
 		#print(index, solList[index])

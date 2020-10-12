@@ -1,0 +1,8 @@
+07425caf: WOM_TOKEN()
+7ab7ea5a: addAllocation(address,uint256,uint256)
+b81b8630: allocation(address)
+d2d1fb25: claimAllocation()
+8da5cb5b: owner()
+c58156e0: removeAllocation(address)
+715018a6: renounceOwnership()
+f2fde38b: transferOwnership(address)

@@ -1,0 +1,4 @@
+820a2d66: depositStake(TellorStorage.TellorStorageStruct storage)
+4601f1cd: init(TellorStorage.TellorStorageStruct storage)
+c9cf5e4c: requestStakingWithdraw(TellorStorage.TellorStorageStruct storage)
+44bacc4b: withdrawStake(TellorStorage.TellorStorageStruct storage)

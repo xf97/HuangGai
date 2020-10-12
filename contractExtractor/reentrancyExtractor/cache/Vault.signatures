@@ -1,0 +1,8 @@
+8f32d59b: isOwner()
+8da5cb5b: owner()
+715018a6: renounceOwnership()
+f1615f21: setSwaps(address)
+4c984185: swaps()
+c0ee0b8a: tokenFallback(address,uint256,bytes)
+f2fde38b: transferOwnership(address)
+d9caed12: withdraw(address,address,uint256)

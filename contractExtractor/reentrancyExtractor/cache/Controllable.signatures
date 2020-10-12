@@ -1,2 +1,4 @@
-e2b4ce97: controllerNode()
-7d73b231: ensRegistry()
+f77c4791: controller()
+5aa6e675: governance()
+9137c1a7: setStorage(address)
+975057e7: store()

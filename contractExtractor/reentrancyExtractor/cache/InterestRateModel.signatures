@@ -1,3 +1,2 @@
 15f24053: getBorrowRate(uint256,uint256,uint256)
-b8168816: getSupplyRate(uint256,uint256,uint256,uint256)
 2191f92a: isInterestRateModel()

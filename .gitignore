@@ -7,3 +7,8 @@ contractExtractor/reentrancyExtractor/*.dot
 contractExtractor/reentrancyExtractor/pathInfo/*.json
 contractExtractor/securityAbandonerAndInjector/reentrancy/dataset/*.sol
 contractExtractor/securityAbandonerAndInjector/reentrancy/dataset/*.txt
+contractSpider/contractCodeGetter/sourceCode/*.sol
+contractSpider/contractCodeGetter/data/*.json
+contractExtractor/securityAbandonerAndInjector/integerOverflow/dataset/*.sol
+contractExtractor/securityAbandonerAndInjector/integerOverflow/dataset/*.txt
+contractExtractor/securityAbandonerAndInjector/integerOverflow/manualCheck/*.solcontractExtractor/securityAbandonerAndInjector/integerOverflow/manualCheck/*.txt

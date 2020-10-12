@@ -1,0 +1,6 @@
+fb3bdb41: swapETHForExactTokens(uint256,address[],address,uint256)
+7ff36ab5: swapExactETHForTokens(uint256,address[],address,uint256)
+18cbafe5: swapExactTokensForETH(uint256,uint256,address[],address,uint256)
+38ed1739: swapExactTokensForTokens(uint256,uint256,address[],address,uint256)
+4a25d94a: swapTokensForExactETH(uint256,uint256,address[],address,uint256)
+8803dbee: swapTokensForExactTokens(uint256,uint256,address[],address,uint256)

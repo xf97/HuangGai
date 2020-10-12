@@ -279,7 +279,7 @@ library SafeMath {
      * - Subtraction cannot overflow.
      */
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-        //require(b <= a, "SafeMath: subtraction overflow");
+        require(b <= a, "SafeMath: subtraction overflow");
         uint256 c = a - b;
 
         return c;
@@ -1992,8 +1992,7 @@ contract BondingManager is ManagerProxyTarget, IBondingManager {
         // Increment ID for next unbonding lock
         del.nextUnbondingLockId = unbondingLockId.add(1);
         // Decrease delegator's bonded amount
-        del.bondedAmount = del.bondedAmount.sub(_amount);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+        del.bondedAmount = del.bondedAmount.sub(_amount);
 
         if (del.bondedAmount == 0) {
             // Delegator no longer delegated to anyone if it does not have a bonded amount

@@ -160,7 +160,7 @@ library SafeMath {
      * - Subtraction cannot overflow.
      */
     function sub(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
-        //require(b <= a, errorMessage);
+        require(b <= a, errorMessage);
         uint256 c = a - b;
 
         return c;
@@ -1028,8 +1028,7 @@ contract PuddleSamurai is Ownable {
         updatePool(_pid);
         uint256 pending = user.amount.mul(pool.accPuddlePerShare).div(1e12).sub(user.rewardDebt);
         safePuddleTransfer(msg.sender, pending);
-        user.amount = user.amount.sub(_amount);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+        user.amount = user.amount.sub(_amount);
         user.rewardDebt = user.amount.mul(pool.accPuddlePerShare).div(1e12);
         pool.lpToken.safeTransfer(address(msg.sender), _amount);
         emit Withdraw(msg.sender, _pid, _amount);

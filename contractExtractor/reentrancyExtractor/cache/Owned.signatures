@@ -1,2 +1,4 @@
+79ba5097: acceptOwnership()
+d4ee1d90: newOwner()
 8da5cb5b: owner()
 f2fde38b: transferOwnership(address)

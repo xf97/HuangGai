@@ -5,6 +5,7 @@ import json
 import os
 from colorPrint import *	#该头文件中定义了色彩显示的信息
 from dataDependency import dataDependency #该文件将产生一个由外部传参(public或external函数参数)影响的本次变量的id列表
+import re
 
 #缓存路径
 CACHE_PATH = "./cache/"
@@ -24,13 +25,13 @@ ADD_STR_FLAG = "add"
 SUB_STR_FLAG = "sub"
 
 class judgeAst:
-	def __init__(self, _json, _filename):
+	def __init__(self, _json, _sourceCode, _filename):
 		self.cacheContractPath = "./cache/temp.sol"
 		self.cacheFolder = "./cache/"
 		self.json =  _json
 		self.filename = _filename
 		self.DD = dataDependency(self.cacheContractPath, self.json)
-		self.sourceCode = self.getSourceCode(_contractPath)
+		self.sourceCode = _sourceCode
 
 	def getSourceCode(self, _contractPath):
 		try:
@@ -62,16 +63,20 @@ class judgeAst:
 							#找到了使用safemath的add/sub进行操作的，三个操作数都是uint256的ast
 							_id = subChildren1["attributes"]["referencedDeclaration"]
 							if _id in self.DD.getIdList():
-								_funcSourceCode = self.getFuncSourceCode(ast, funcAstList)
-								useIdList.append(subChildren0["attributes"]["referencedDeclaration"])
-								weNeedAst.append(ast)
+								funcSourceCode = self.getFuncSourceCode(ast, funcAstList)
+								assignmentSourceCode = self.sourceCode[self.srcToPos(ast["src"])[0]: self.srcToPos(ast["src"])[1]]
+								if self.varInRequireOrAssert(assignmentSourceCode, funcSourceCode):
+									#此函数用于判断赋值语句的双方是否在本函数中被“过分”地检查过，，没有的话，才认定为被注入
+									useIdList.append(subChildren0["attributes"]["referencedDeclaration"])
+									weNeedAst.append(ast)
 							else:
 								continue
 						else:
 							continue
 				else:
 					continue
-			except:
+			except Exception as e:
+				#print(e)
 				continue
 		if len(weNeedAst) > 0:
 			#存储注入bug时需要的信息
@@ -98,8 +103,61 @@ class judgeAst:
 	#然后通过截取赋值语句中接收数据的变量
 	#再去require和assert语句中查找接收数据的变量是否存在
 	#如果存在，就返回false; 不存在，就返回true
-	def varInRequire(self, _assignmentState, _funcSourceCode):
-		pass
+	def varInRequireOrAssert(self, _assignmentState, _funcSourceCode):
+		#指定正则表达式，以捕获目标语句
+		#1. 捕获safemath的两个操作数
+		sumNum = _assignmentState.split("=")[0].strip()	#接收结果的字符串
+		addendPattern = re.compile(r"(\.)add(\s)*(\()(.)+?(\))")
+		subendPattern = re.compile(r"(\.)sub(\s)*(\()(.)+?(\))")
+		operand = str()
+		if ADD_STR_FLAG in _assignmentState:
+			operand = addendPattern.search(_assignmentState).group()
+		elif SUB_STR_FLAG in _assignmentState:
+			operand = subendPattern.search(_assignmentState).group()
+		#切分字符串，以获取操作数
+		operand = operand.split("(", 1)[1]
+		operand = operand.rsplit(")", 1)[0]	#从后向前切分
+		#2. 捕获所有的assert和require语句
+		#2.1 清洗函数源代码中的注释部分
+		funcSourceCode = self.cleanComment(_funcSourceCode)
+		#2.2 在sourceCode中捕捉require和assert语句
+		#通过查看ast，获知无法通过ast来准确快速地获取整句require或assert语句，故采用正则表达式
+		requirePattern = re.compile(r"require(\()(.)+?(\))(\s)*(;)")	#可能会有换行，采用非贪婪模式匹配
+		assertPattern = re.compile(r"assert(\()(.)+?(\))(\s)*(;)")
+		requireAndAssertList = list()
+		for item in requirePattern.finditer(funcSourceCode):
+			requireAndAssertList.append(item.group())
+		for item in assertPattern.finditer(funcSourceCode):
+			requireAndAssertList.append(item.group())
+		#3. 最后判断，两个操作数是否在require或者assert语句中检查过
+		#如果检查过，返回true; 如果没有，返回false
+		for statement in requireAndAssertList:
+			if sumNum in statement and operand in statement:
+				return False
+			else:
+				continue
+		return True
+
+	def cleanComment(self, _code):
+		#使用正则表达式捕捉单行和多行注释
+		singleLinePattern = re.compile(r"(//)(.)+")	#提前编译，以提高速度
+		multipleLinePattern = re.compile(r"(/\*)(.)+?(\*/)")
+		#记录注释的下标
+		indexList = list()
+		for item in singleLinePattern.finditer(_code):
+			indexList.append(item.span())
+		for item in multipleLinePattern.finditer(_code, re.S):
+			#多行注释，要允许多行匹配
+			indexList.append(item.span())
+		#拼接新结果
+		startIndedx = 0
+		newCode = str()
+		for item in indexList:
+			newCode += _code[startIndedx: item[0]]	#不包括item[0]
+			startIndedx = item[1] + 1 #加一的目的是不覆盖前序的尾巴
+		newCode += _code[startIndedx:]
+		return newCode
+
 
 
 	#该函数用于判断给定的assignment的ast中的一个参数有外部给定

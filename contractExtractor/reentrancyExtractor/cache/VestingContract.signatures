@@ -4,6 +4,8 @@
 1f8db268: releaseInterval()
 ec715a31: releaseToken()
 715018a6: renounceOwnership()
+efca2eed: totalDistributed()
+7e1c0c09: totalTokens()
 f2fde38b: transferOwnership(address)
 a3d272ce: updateReceivingAddress(address)
 c4b6c5fa: updateVestingSchedule(uint256[])

@@ -1,0 +1,5 @@
+2d06177a: addManager(address)
+a6f9dae1: changeOwner(address)
+fdff9b4d: managers(address)
+8da5cb5b: owner()
+377e32e6: revokeManager(address)

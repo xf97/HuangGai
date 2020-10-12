@@ -1,0 +1,5 @@
+1ed86f19: addModule(address)
+eb15f781: connectorID()
+e82eb6fa: getEventAddr()
+06fdde03: name()
+a0632461: removeModule(address)

@@ -1,0 +1,3 @@
+cdebfa0b: molochSummoner()
+e4f0e390: setMolochSummoner(address)
+9daf93b8: summonMinion(address,address)

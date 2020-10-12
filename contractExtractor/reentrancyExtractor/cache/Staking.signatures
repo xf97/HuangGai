@@ -1,0 +1,5 @@
+0e89439b: stake(uint256,bytes)
+7033e4a6: supportsHistory()
+817b1cd2: totalStaked()
+4b341aed: totalStakedFor(address)
+c8fd6ed0: unstake(uint256,bytes)

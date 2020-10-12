@@ -1,0 +1,4 @@
+aabbb8ca: getInterfaceImplementer(address,bytes32)
+3d584063: getManager(address)
+29965a1d: setInterfaceImplementer(address,bytes32,address)
+5df8122f: setManager(address,address)

@@ -1,0 +1,3 @@
+7250e224: addDistributor(address)
+8f0c86fa: isDistributor(address)
+644241db: renounceDistributor()

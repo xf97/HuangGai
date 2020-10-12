@@ -1,0 +1,7 @@
+5a1db8c4: addModule(address,address)
+e26b013b: defaultLimit()
+43cd5c7e: getCurrentLimit(address)
+7cb8f8ba: getDailyUnspent(address)
+a0aec105: getPendingLimit(address)
+19ab453c: init(address)
+9be65a60: recoverToken(address)

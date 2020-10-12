@@ -1,0 +1,5 @@
+927da105: allowance(address,address,address)
+e1f21c67: approve(address,address,uint256)
+f7888aec: balanceOf(address,address)
+beabacc8: transfer(address,address,uint256)
+15dacbea: transferFrom(address,address,address,uint256)

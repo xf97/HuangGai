@@ -1,0 +1,3 @@
+21f8a721: getAddress(bytes32)
+51456061: getSynth(bytes32)
+dacb2d01: requireAndGetAddress(bytes32,string)

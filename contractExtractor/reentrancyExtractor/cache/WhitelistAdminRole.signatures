@@ -1,0 +1,3 @@
+7362d9c8: addWhitelistAdmin(address)
+bb5f747b: isWhitelistAdmin(address)
+6897e974: removeWhitelistAdmin(address)

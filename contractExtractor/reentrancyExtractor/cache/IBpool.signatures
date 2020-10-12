@@ -1,0 +1,5 @@
+15e84af9: getSpotPrice(address,address)
+2f37b624: isBound(address)
+fde924f7: isPublicSwap()
+8201aa3f: swapExactAmountIn(address,uint256,address,uint256,uint256)
+7c5e9ea4: swapExactAmountOut(address,uint256,address,uint256,uint256)

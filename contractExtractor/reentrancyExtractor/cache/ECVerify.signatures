@@ -1,0 +1,3 @@
+77d32e94: ecrecovery(bytes32,bytes)
+98ea1c51: ecrecovery(bytes32,uint8,bytes32,bytes32)
+39cdde32: ecverify(bytes32,bytes,address)

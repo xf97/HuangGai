@@ -1,4 +1,0 @@
-dd62ed3e: allowance(address,address)
-70a08231: balanceOf(address)
-18160ddd: totalSupply()
-23b872dd: transferFrom(address,address,uint256)

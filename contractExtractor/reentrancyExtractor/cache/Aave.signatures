@@ -1,4 +1,5 @@
 c858f5f9: borrow(address,uint256,uint256,uint16)
 bf92857c: getUserAccountData(address)
+28dd2d01: getUserReserveData(address,address)
 5ceae9c4: repay(address,uint256,address)
 5a3b74b9: setUserUseReserveAsCollateral(address,bool)

@@ -57,7 +57,7 @@ class integerOverflowExtractor:
 				#编译生成当前合约的抽象语法树(以json_ast形式给出)
 				jsonAst = self.compile2Json()
 				#根据合约文件本身、抽象语法树来判断该合约是否符合标准
-				if self.judgeContract(jsonAst, prevFileName) == True:
+				if self.judgeContract(jsonAst, sourceCode, prevFileName) == True:
 					#符合标准，加１，写入数据文件
 					self.nowNum += 1 
 					#将暂存文件及其JsonAst文件转移到结果保存文件中
@@ -95,16 +95,16 @@ class integerOverflowExtractor:
 		try:
 			#拼接绝对路径
 			sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
-			#sourceCode = open(os.path.join(TESTCASE_PATH, "overFlow.sol"), "r", encoding = "utf-8").read()
+			#sourceCode = open(os.path.join(TESTCASE_PATH, "0x2bb33dcf5409cafc6262a7df7edd06211522a346.sol"), "r", encoding = "utf-8").read()
 			#[bug fix]清洗合约中的多字节字符，保证编译结果不错误
 			sourceCode = self.cleanMultibyte(sourceCode)
 			return sourceCode, solList[index] #"overFlow.sol"
 		except:
 			#无法获取源代码，则引发异常
-			self.index += 1
+			#self.index += 1
 			raise Exception("Unable to obtain source code " + solList[index])
 
-		#清洗合约源代码中的多字节字符
+	#清洗合约源代码中的多字节字符
 	def cleanMultibyte(self, _sourceCode):
 		result = str()
 		for char in _sourceCode:
@@ -168,8 +168,9 @@ class integerOverflowExtractor:
 			raise Exception("Failed to compile the contract.")
 
 	#待实现
-	def judgeContract(self, _jsonAst, _filename):
-		JA = judgeAst(_jsonAst, _filename)
+	#已经实现
+	def judgeContract(self, _jsonAst, _sourceCode, _filename):
+		JA = judgeAst(_jsonAst, _sourceCode, _filename)
 		if not JA.run():
 			#如果不符合抽取标准，则返回False
 			return False
@@ -190,5 +191,5 @@ class integerOverflowExtractor:
 
 #单元测试
 if __name__ == "__main__":
-	ioe = integerOverflowExtractor(100)
+	ioe = integerOverflowExtractor(1000)
 	ioe.extractContracts()

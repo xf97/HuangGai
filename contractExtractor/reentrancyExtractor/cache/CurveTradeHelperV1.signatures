@@ -1,0 +1,5 @@
+b8bf2752: getExchangeRateAndExpectedDai(uint256)
+3a9ceb4b: tradeCUSDCForCDai(uint256)
+1b9051ce: tradeCUSDCForCDaiAtAnyRate()
+759f46ad: tradeDUSDCForDDai(uint256)
+8b3d922a: tradeDUSDCForDDaiAtAnyRate()

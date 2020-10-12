@@ -1,0 +1,7 @@
+70a08231: balanceOf(address)
+8dc30b70: bidOf(address)
+9c3ee244: claimableBalanceOf(address)
+80f55605: market()
+8b034136: totalBids()
+d6ff02e2: totalClaimableSupply()
+18160ddd: totalSupply()

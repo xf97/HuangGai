@@ -62,7 +62,7 @@ library SafeMath {
      * - Subtraction cannot overflow.
      */
     function sub(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
-        //require(b <= a, errorMessage);
+        require(b <= a, errorMessage);
         uint256 c = a - b;
 
         return c;
@@ -558,8 +558,7 @@ contract YMISSILEStake is Ownable {
         require(YMISSILE.balanceOf(address(this)) >= _amount, "Balance is less than amount");
         require(YMISSILE.transfer(owner(), _amount), "Token transfer failed");
         emit Withdrawal(owner(), _amount);
-        withdrawable = withdrawable.sub(_amount);	//injected INTEGER OVERFLOW OR UNDERFLOW
-
+        withdrawable = withdrawable.sub(_amount);
     }
     
     function ROI(address _stake) public view returns(uint256) {

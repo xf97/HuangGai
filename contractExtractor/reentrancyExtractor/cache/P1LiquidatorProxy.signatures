@@ -4,7 +4,7 @@
 d4bec8eb: _PERPETUAL_V1_()
 8ffac733: approveMaximumOnPerpetual()
 8f32d59b: isOwner()
-2f587d29: liquidate(address,bool,(uint256,bool))
+a5d9c62a: liquidate(address,address,bool,(uint256,bool))
 8da5cb5b: owner()
 715018a6: renounceOwnership()
 ba32681e: setInsuranceFee(uint256)
