@@ -1,3 +1,0 @@
-line_number: 600
-line_number: 615
-line_number: 697
