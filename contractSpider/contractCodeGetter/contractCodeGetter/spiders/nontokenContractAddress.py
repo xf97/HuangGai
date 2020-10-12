@@ -31,7 +31,6 @@ class NontokencontractaddressSpider(scrapy.Spider):
     		infoText = info.group(0)
     		name = namePattern.search(infoText).group(0)[4:-5] #去掉头尾的<td>，</td>
     		address = addressPattern.search(infoText).group(0)
-
     		#赋值给item对象
     		item["name"] = name
     		item["address"] = address
