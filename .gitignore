@@ -11,4 +11,6 @@ contractSpider/contractCodeGetter/sourceCode/*.sol
 contractSpider/contractCodeGetter/data/*.json
 contractExtractor/securityAbandonerAndInjector/integerOverflow/dataset/*.sol
 contractExtractor/securityAbandonerAndInjector/integerOverflow/dataset/*.txt
-contractExtractor/securityAbandonerAndInjector/integerOverflow/manualCheck/*.solcontractExtractor/securityAbandonerAndInjector/integerOverflow/manualCheck/*.txt
+contractExtractor/securityAbandonerAndInjector/integerOverflow/manualCheck/*.solcontractExtractor/securityAbandonerAndInjector/integerOverflow/manualCheck/*.txt*.sol
+*.json
+*.ast
