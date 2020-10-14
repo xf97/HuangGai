@@ -43,12 +43,43 @@ class integerOverflowExtractor:
 		except:
 			print("The cache folder already exists.")
 
+	def preFilter(self, _sourceCode):
+		#因为数据集中大部分合约都是0.4版本的，不支持，为了加快抽取效率，添加前置过滤器
+		unsupportedPattern = re.compile(r"(\b)pragma(\s)+solidity(\s)+0(\.)4(\.)")
+		if unsupportedPattern.search(self.cleanComment(_sourceCode)):
+			#如果合约中包含使用0.4版本的solidity，就直接不抽取
+			return False
+		return True
+
+	def cleanComment(self, _code):
+		#使用正则表达式捕捉单行和多行注释
+		singleLinePattern = re.compile(r"(//)(.)+")	#提前编译，以提高速度
+		multipleLinePattern = re.compile(r"(/\*)(.)+?(\*/)")
+		#记录注释的下标
+		indexList = list()
+		for item in singleLinePattern.finditer(_code):
+			indexList.append(item.span())
+		for item in multipleLinePattern.finditer(_code, re.S):
+			#多行注释，要允许多行匹配
+			indexList.append(item.span())
+		#拼接新结果
+		startIndedx = 0
+		newCode = str()
+		for item in indexList:
+			newCode += _code[startIndedx: item[0]]	#不包括item[0]
+			startIndedx = item[1] + 1 #加一的目的是不覆盖前序的尾巴
+		newCode += _code[startIndedx:]
+		return newCode
+
 	def extractContracts(self):
 		#当符合条件的合约数量不满足需求时，继续抽取
 		while self.nowNum < self.needs:
 			try:
 				#拿到一个合约及其源代码
 				(sourceCode, prevFileName) = self.getSourceCode()
+				if not self.preFilter(sourceCode):
+					#前置过滤器
+					continue
 				print(prevFileName)
 				#将当前合约暂存
 				self.cacheContract(sourceCode)

@@ -158,8 +158,6 @@ class judgeAst:
 		newCode += _code[startIndedx:]
 		return newCode
 
-
-
 	#该函数用于判断给定的assignment的ast中的一个参数有外部给定
 	#未使用
 	def aNumProvideByExter(self, _ast):

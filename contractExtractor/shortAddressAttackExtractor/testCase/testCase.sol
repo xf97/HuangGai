@@ -64,24 +64,43 @@ library SafeMath {
 contract ShortAddress {
     mapping (address => uint) balances;
     using SafeMath for uint256;
+    address owner;
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
     constructor() public {
         balances[msg.sender] = 10000;
+        owner = msg.sender;
+    }
+
+    modifier onlyPayloadSize1(uint size){
+    	assert(msg.data.length >= size + 4);
+    	_;
+    }
+
+    modifier onlyPayloadSize2(uint size){
+    	if(msg.data. length < size + 4){
+    		revert();
+    	}
+    	_;
     }
 
     //This function does not check the length of the data, so it may be attacked by a short address.
     //When Ethereum packs transaction data, if the data contains the address type and the length of the address type is less than 32 bits, the subsequent data is used to make up the 32 bits. This can be used to launch short address attack.
-    function sendCoin(address to, uint amount) public returns (bool sufficient) {
+    function sendCoin(address payable to, uint amount) public  returns (bool sufficient) {
+    	//assert(msg. data.length >=  68);
+        uint amount1 = balances[owner];
         if(balances[msg.sender] < amount) return false;
         balances[msg.sender] = balances[msg.sender].sub(amount);
-        balances[to] = balances[to].add(amount);
+        //balances[to] = balances[to].add(amount);
+        to.transfer(amount1);
+        to.send(amount);
+        to.call.value(10)("");
         emit Transfer(msg.sender, to, amount);
         return true;
     }
 
-    function getBalance(address addr) public view returns (uint) {
+    function getBalance(address addr) public onlyPayloadSize2(36) view returns (uint) {
         return balances[addr];
     }
 }

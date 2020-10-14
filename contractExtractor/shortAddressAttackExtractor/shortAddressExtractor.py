@@ -48,12 +48,43 @@ class shortAddressAttackExtractor:
 		except:
 			print("The cache folder already exists.")
 
+	def preFilter(self, _sourceCode):
+		#因为数据集中大部分合约都是0.4版本的，不支持，为了加快抽取效率，添加前置过滤器
+		unsupportedPattern = re.compile(r"(\b)pragma(\s)+solidity(\s)+0(\.)4(\.)")
+		if unsupportedPattern.search(self.cleanComment(_sourceCode)):
+			#如果合约中包含使用0.4版本的solidity，就直接不抽取
+			return False
+		return True
+
+	def cleanComment(self, _code):
+		#使用正则表达式捕捉单行和多行注释
+		singleLinePattern = re.compile(r"(//)(.)+")	#提前编译，以提高速度
+		multipleLinePattern = re.compile(r"(/\*)(.)+?(\*/)")
+		#记录注释的下标
+		indexList = list()
+		for item in singleLinePattern.finditer(_code):
+			indexList.append(item.span())
+		for item in multipleLinePattern.finditer(_code, re.S):
+			#多行注释，要允许多行匹配
+			indexList.append(item.span())
+		#拼接新结果
+		startIndedx = 0
+		newCode = str()
+		for item in indexList:
+			newCode += _code[startIndedx: item[0]]	#不包括item[0]
+			startIndedx = item[1] + 1 #加一的目的是不覆盖前序的尾巴
+		newCode += _code[startIndedx:]
+		return newCode
+
 	def extractContracts(self):
 		#当符合条件的合约数量不满足需求时，继续抽取
 		while self.nowNum < self.needs:
 			try:
 				#拿到一个合约及其源代码
 				(sourceCode, prevFileName) = self.getSourceCode()
+				if not self.preFilter(sourceCode):
+					#前置过滤器
+					continue
 				print(prevFileName)
 				#将当前合约暂存
 				self.cacheContract(sourceCode)
@@ -86,7 +117,6 @@ class shortAddressAttackExtractor:
 		'''
 		fileList = os.listdir(SOURCE_CODE_PATH)
 		#fileList = os.listdir(TESTCASE_PATH)
-		#fileList  = os.listdir(RESULT_PATH)
 		solList = list()
 		#根据文件后缀判断文件类型
 		for i in fileList:
@@ -100,10 +130,10 @@ class shortAddressAttackExtractor:
 		try:
 			#拼接绝对路径
 			sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
-			#sourceCode = open(os.path.join(TESTCASE_PATH, "0x2bb33dcf5409cafc6262a7df7edd06211522a346.sol"), "r", encoding = "utf-8").read()
+			#sourceCode = open(os.path.join(TESTCASE_PATH, "testCase.sol"), "r", encoding = "utf-8").read()
 			#[bug fix]清洗合约中的多字节字符，保证编译结果不错误
 			sourceCode = self.cleanMultibyte(sourceCode)
-			return sourceCode, solList[index] #"overFlow.sol"
+			return sourceCode, solList[index] #"overFlow.sol" "testCase.sol" #
 		except:
 			#无法获取源代码，则引发异常
 			#self.index += 1
@@ -151,6 +181,7 @@ class shortAddressAttackExtractor:
 				raise Exception("Use unsupported solc version.")
 		except Exception as e:
 			#切换编译器失败，则终止运行
+			print(e)
 			raise Exception("Failed to switch the solc version.")
 			return
 			#sys.exit(0)
@@ -194,5 +225,5 @@ class shortAddressAttackExtractor:
 			raise Exception("Failed to store the result.")
 				
 if __name__ == "__main__":
-	saae = shortAddressAttackExtractor(10)
+	saae = shortAddressAttackExtractor(100)
 	saae.extractContracts()
