@@ -29,7 +29,7 @@ ROBOTSTXT_OBEY = False
 # See also autothrottle settings and docs
 # unit: second
 # 为防止被封ip，设置下载间隙
-DOWNLOAD_DELAY = 2
+DOWNLOAD_DELAY = 5
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
 #CONCURRENT_REQUESTS_PER_IP = 16
