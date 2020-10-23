@@ -498,7 +498,7 @@ contract BKRW is ERC20 {
 
     function lock(address _holder, uint256 _amount, uint256 _releaseTime) public onlyOwner {
         require(super.balanceOf(_holder) >= _amount, "Balance is too small.");
-        _balances[_holder] = _balances[_holder].sub(_amount);	//injected INTEGER OVERFLOW OR UNDERFLOW
+        _balances[_holder] = _balances[_holder].sub(_amount);	
 
         lockInfo[_holder].push(
             LockInfo(_releaseTime, _amount)
@@ -508,7 +508,7 @@ contract BKRW is ERC20 {
 
     function lockAfter(address _holder, uint256 _amount, uint256 _afterTime) public onlyOwner {
         require(super.balanceOf(_holder) >= _amount, "Balance is too small.");
-        _balances[_holder] = _balances[_holder].sub(_amount);	//injected INTEGER OVERFLOW OR UNDERFLOW
+        _balances[_holder] = _balances[_holder].sub(_amount);	
 
         lockInfo[_holder].push(
             LockInfo(now + _afterTime, _amount)
@@ -533,7 +533,7 @@ contract BKRW is ERC20 {
         require(_to != address(0), "wrong address");
         require(_value <= super.balanceOf(owner), "Not enough balance");
 
-        _balances[owner] = _balances[owner].sub(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
+        _balances[owner] = _balances[owner].sub(_value);	
 
         lockInfo[_to].push(
             LockInfo(_releaseTime, _value)
@@ -548,7 +548,7 @@ contract BKRW is ERC20 {
         require(_to != address(0), "wrong address");
         require(_value <= super.balanceOf(owner), "Not enough balance");
 
-        _balances[owner] = _balances[owner].sub(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
+        _balances[owner] = _balances[owner].sub(_value);	
 
         lockInfo[_to].push(
             LockInfo(now + _afterTime, _value)

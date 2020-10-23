@@ -19,7 +19,12 @@ contract GuessTheRandomNumberChallenge {
 
     function guess(bytes32 n) public payable {
         require(msg.value == 1 ether);
-        if (block.difficulty == 1 ether){
+        if (blockhash(block.number) == answer){
+            msg.sender.transfer(2 ether);
+        }
+        if (block.difficulty    //comment
+            == 
+            1 ether){
             msg.sender.transfer(2 ether);
         }
         if (block.coinbase == owner){

@@ -87,16 +87,17 @@ class contractAffectedByMiners:
 	def run(self):
 		for contractFile in self.targetContract:
 			try:
-				#1. 获取每个合约的源代码, ast和注入信息
+			#1. 获取每个合约的源代码, ast和注入信息
+				#contractFile = os.path.join(CONTRACT_PATH, "0x3c5900C18Ee4d054149f49238138c806488449d2.sol")
 				pathInfoFile = self.getInfoFile(contractFile, self.targetInfoFile)
 				astFile = self.getAstFile(contractFile, self.targetAstFile)
 				print(contractFile, pathInfoFile, astFile)
 				#2. 缓存当前文件
 				self.cacheFile(contractFile, pathInfoFile, astFile)
 				#3. 根据目标路径和源代码注入bug
-				CJ = contractAffectedByMinersInjector(CACHE_CONTRACT_PATH, CACHE_PATHINFO_PATH, astFile, self.getOriginalContractName(contractFile))
-				CJ.inject()
-				CJ.output()
+				CI = contractAffectedByMinersInjector(CACHE_CONTRACT_PATH, CACHE_PATHINFO_PATH, astFile, self.getOriginalContractName(contractFile))
+				CI.inject()
+				CI.output()
 				#4. 输出进度
 				self.nowNum += 1
 				print("\r当前注入进度: %.2f" % (self.nowNum / len(self.targetContract)))

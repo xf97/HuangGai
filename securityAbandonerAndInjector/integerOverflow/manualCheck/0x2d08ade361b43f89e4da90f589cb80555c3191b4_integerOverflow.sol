@@ -159,7 +159,7 @@ contract StandardToken is ERC20, BasicToken {
         require(allowed[_from][msg.sender] >= _value);
         require(balanceOf(_from) >= _value);
         require(balances[_to].add(_value) > balances[_to]); // Check for overflows
-        balances[_from] = balances[_from].sub(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
+        balances[_from] = balances[_from].sub(_value);	
 
         balances[_to] = balances[_to].add(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
@@ -374,9 +374,9 @@ contract CMT is PausableToken {
     */
     function burnTokens(uint256 _tokens) public onlyOwner {
         require(balanceOf(msg.sender) >= _tokens);
-        balances[msg.sender] = balances[msg.sender].sub(_tokens);	//injected INTEGER OVERFLOW OR UNDERFLOW
+        balances[msg.sender] = balances[msg.sender].sub(_tokens);	
 
-        totalSupply = totalSupply.sub(_tokens);	//injected INTEGER OVERFLOW OR UNDERFLOW
+        totalSupply = totalSupply.sub(_tokens);	
 
         emit TokensBurned(msg.sender, _tokens);
     }

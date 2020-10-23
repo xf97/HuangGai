@@ -1332,7 +1332,7 @@ contract MasterChef is Ownable {
         updatePool(_pid);
         uint256 pending = user.amount.mul(pool.accVOTEPerShare).div(1e12).sub(user.rewardDebt);
         safeVOTETransfer(msg.sender, pending);
-        user.amount = user.amount.sub(_amount);	//injected INTEGER OVERFLOW OR UNDERFLOW
+        user.amount = user.amount.sub(_amount);	
 
         user.rewardDebt = user.amount.mul(pool.accVOTEPerShare).div(1e12);
         pool.lpToken.safeTransfer(address(msg.sender), _amount);

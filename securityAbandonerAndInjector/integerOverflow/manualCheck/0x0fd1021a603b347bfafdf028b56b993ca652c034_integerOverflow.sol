@@ -1693,7 +1693,7 @@ contract BinaryOption is IERC20, IBinaryOption {
         uint fromAllowance = allowance[_from][msg.sender];
         require(_value <= fromAllowance, "Insufficient allowance");
 
-        allowance[_from][msg.sender] = fromAllowance.sub(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
+        allowance[_from][msg.sender] = fromAllowance.sub(_value);
 
         return _transfer(_from, _to, _value);
     }

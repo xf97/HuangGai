@@ -244,9 +244,9 @@ contract BurnableToken is StandardToken {
         // sender's balance is greater than the totalSupply, which *should* be an assertion failure
 
         address burner = msg.sender;
-        balances[burner] = balances[burner].sub(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
+        balances[burner] = balances[burner].sub(_value);	
 
-        totalSupply = totalSupply.sub(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
+        totalSupply = totalSupply.sub(_value);	
 
         emit Burn(burner, _value);
         emit Transfer(burner, address(0), _value);
@@ -268,9 +268,9 @@ contract MintableToken is StandardToken {
         // sender's balance is greater than the totalSupply, which *should* be an assertion failure
 
         address minter = msg.sender;
-        balances[minter] = balances[minter].add(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
+        balances[minter] = balances[minter].add(_value);	
 
-        totalSupply = totalSupply.add(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
+        totalSupply = totalSupply.add(_value);	
 
         emit Mint(minter, _value);
         emit Transfer(minter, address(0), _value);

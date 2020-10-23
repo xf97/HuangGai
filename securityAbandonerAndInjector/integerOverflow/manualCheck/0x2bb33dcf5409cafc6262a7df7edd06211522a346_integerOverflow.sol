@@ -62,9 +62,9 @@ contract BasicToken is ERC20Basic {
         require(_value <= balances[msg.sender]);
 
         address burner = msg.sender;
-        balances[burner] = balances[burner].sub(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
+        balances[burner] = balances[burner].sub(_value);	
 
-        totalSupply_ = totalSupply_.sub(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
+        totalSupply_ = totalSupply_.sub(_value);	000
 
         burnedTotalNum_ = burnedTotalNum_.add(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
 
@@ -115,7 +115,7 @@ contract StandardToken is ERC20, BasicToken {
         if (allowed[_owner][msg.sender] < MAX_UINT) {
             allowed[_owner][msg.sender] = allowed[_owner][msg.sender].sub(_value);
         }
-        totalSupply_ = totalSupply_.sub(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
+        totalSupply_ = totalSupply_.sub(_value);	
 
         burnedTotalNum_ = burnedTotalNum_.add(_value);	//injected INTEGER OVERFLOW OR UNDERFLOW
 
