@@ -112,11 +112,16 @@ class integerOverflowInjector:
 				continue
 			else:
 				for funcCall in funcCallList:
-					if funcCall["children"][0]["attributes"]["referencedDeclaration"] > 0 and \
-					   funcCall["children"][0]["attributes"]["value"] != REQUIRE_FLAG and \
-					   funcCall["children"][0]["attributes"]["value"] != ASSERT_FLAG:
-					   calleeIdList.append(funcCall["children"][0]["attributes"]["referencedDeclaration"]) 
-					else:
+					try:
+						if funcCall["children"][0]["attributes"]["referencedDeclaration"] > 0 and funcCall["children"][0]["attributes"]["value"] != REQUIRE_FLAG and funcCall["children"][0]["attributes"]["value"] != ASSERT_FLAG:
+							#加一个判断-事件也符合我们的标准，不抽取事件
+							_id = funcCall["children"][0]["attributes"]["referencedDeclaration"]
+							ast = self.findASTNode(self.ast, "id", _id)[0]	#只会有一个值
+							if ast["name"] != "EventDefinition":
+								calleeIdList.append(_id) 
+						else:
+							continue
+					except:
 						continue
 		#print(calleeIdList)
 		_list.extend(calleeIdList)

@@ -117,11 +117,10 @@ class TODExtractor:
 	def getSourceCode(self):
 		'''
 		该函数从源代码数据存储位置提取le index out of range 
-
 		合约的名称和源代码
 		'''
-		fileList = os.listdir(SOURCE_CODE_PATH)
-		#fileList = os.listdir(TESTCASE_PATH)
+		#fileList = os.listdir(SOURCE_CODE_PATH)
+		fileList = os.listdir(TESTCASE_PATH)
 		solList = list()
 		#根据文件后缀判断文件类型
 		for i in fileList:
@@ -134,11 +133,11 @@ class TODExtractor:
 		#print(index, solList[index])
 		try:
 			#拼接绝对路径
-			sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
-			#sourceCode = open(os.path.join(TESTCASE_PATH, "testCase.sol"), "r", encoding = "utf-8").read()
+			#sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
+			sourceCode = open(os.path.join(TESTCASE_PATH, "testCase.sol"), "r", encoding = "utf-8").read()
 			#[bug fix]清洗合约中的多字节字符，保证编译结果不错误
 			sourceCode = self.cleanMultibyte(sourceCode)
-			return sourceCode, solList[index] #"testCase.sol"
+			return sourceCode, "testCase.sol" #solList[index] 
 		except:
 			#无法获取源代码，则引发异常
 			#self.index += 1
@@ -230,5 +229,5 @@ class TODExtractor:
 			raise Exception("Failed to store the result.")
 				
 if __name__ == "__main__":
-	te = TODExtractor(100)
+	te = TODExtractor(1)
 	te.extractContracts()

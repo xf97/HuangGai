@@ -76,6 +76,7 @@ class judgeAst:
 			else:
 				continue
 		#2. 进入每个合约，看每个函数是否符合标准
+		#满足抽取标准的合约实在太少，弱化抽取标准
 		for contract in contractList:
 			#换一个合约就重新声明一次
 			funcFlag = self.judgeFunc(contract)
@@ -106,14 +107,16 @@ class judgeAst:
 
 	#判断单个合约内是否存在所有需求的事件
 	def judgeEvent(self, _contractAst):
-		TransferFlag = False
+		#TransferFlag = False
 		ApprovalFlag = False
 		for event in self.findASTNode(_contractAst, "name", "EventDefinition"):
+			'''
 			if not TransferFlag:
 				TransferFlag = self.getTransferEvent(event)
+			'''
 			if not ApprovalFlag:
 				ApprovalFlag = self.getApprovalEvent(event)
-		return TransferFlag and ApprovalFlag
+		return ApprovalFlag
 
 
 	#单个合约是否存在所有需求的事件
@@ -181,7 +184,6 @@ class judgeAst:
 				transferFlag = self.getTransfer(func)
 			if not allowanceFlag:
 				allowanceFlag = self.getAllowance(func)
-
 			if not transferFromFlag:
 				transferFromFlag = self.getTransferFrom(func)
 			'''

@@ -52,6 +52,7 @@ class txOriginForAuthenticationInjector:
 			return str()
 
 	#待实现
+	#已经实现
 	def inject(self):
 		#1. 直接替换msg.sender为tx.origin就可以了
 		srcAndItsStr = dict()
