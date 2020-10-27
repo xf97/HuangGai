@@ -127,7 +127,6 @@ class judgeAst:
 		else:
 			return False
 	
-	#未使用
 	def judgeIdList(self, _idList, _ast):
 		msgSenderFlag, idFlag = False, False
 		for operation in self.findASTNode(_ast, "name", "BinaryOperation"):

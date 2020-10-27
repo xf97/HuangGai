@@ -2,13 +2,13 @@
 #-*- coding: utf-8 -*-
 
 '''
-此文件用于从数据集中抽取可能包含或者注入后可以包含未解决异常的合约
-'''
-
-'''
-抽取标准：
-1. 符合ERC20标准--可能得借助外部工具
-2. 有approve函数
+两个抽取标准
+1. 合约中存在自毁语句
+2. 包含自毁语句的函数能够被外界直接调用
+记录信息标准
+1. 记录可能存在的身份验证语句的源代码位置
+2. 记录自毁语句的位置
+3. 分门别类的记录
 '''
 
 import sys
@@ -19,8 +19,9 @@ import subprocess	#使用subprocess的popen，该popen是同步IO的
 from colorPrint import *	#该头文件中定义了色彩显示的信息
 import json
 from shutil import rmtree
-from judgeAst import judgeAst	#用于判断合约是否符合抽取标准
+from judgeAst import judgeAst
 import time
+
 
 #源代码数据存储位置
 SOURCE_CODE_PATH = "../../contractSpider/contractCodeGetter/sourceCode"
@@ -32,7 +33,7 @@ RESULT_PATH = "./result/"
 #缓存路径
 CACHE_PATH = "./cache/"
 
-class TODExtractor:
+class suicideContractExtractor:
 	def __init__(self, _needsNum = 100):
 		self.needs = _needsNum
 		self.nowNum = 0
@@ -76,7 +77,7 @@ class TODExtractor:
 		return newCode
 
 	def extractContracts(self):
-		stime = time.time()
+		startTime = time.time()
 		contractNum = 0
 		#当符合条件的合约数量不满足需求时，继续抽取
 		while self.nowNum < self.needs:
@@ -110,17 +111,19 @@ class TODExtractor:
 					continue
 			except Exception as e:
 				print("%s %s %s" % (bad, e, end))
-				continue	
-		print(time.time() - stime)
+				continue
+		endTime = time.time()
+		print(endTime - startTime)
 		print(contractNum)
 
 	def getSourceCode(self):
 		'''
-		该函数从源代码数据存储位置提取le index out of range 
+		该函数从源代码数据存储位置提取
 		合约的名称和源代码
 		'''
 		fileList = os.listdir(SOURCE_CODE_PATH)
 		#fileList = os.listdir(TESTCASE_PATH)
+		#fileList  = os.listdir(RESULT_PATH)
 		solList = list()
 		#根据文件后缀判断文件类型
 		for i in fileList:
@@ -137,7 +140,7 @@ class TODExtractor:
 			#sourceCode = open(os.path.join(TESTCASE_PATH, "testCase.sol"), "r", encoding = "utf-8").read()
 			#[bug fix]清洗合约中的多字节字符，保证编译结果不错误
 			sourceCode = self.cleanMultibyte(sourceCode)
-			return sourceCode, solList[index] #"testCase.sol" 
+			return sourceCode, solList[index] #"testCase.sol"
 		except:
 			#无法获取源代码，则引发异常
 			#self.index += 1
@@ -185,7 +188,6 @@ class TODExtractor:
 				raise Exception("Use unsupported solc version.")
 		except Exception as e:
 			#切换编译器失败，则终止运行
-			print(e)
 			raise Exception("Failed to switch the solc version.")
 			return
 			#sys.exit(0)
@@ -208,7 +210,6 @@ class TODExtractor:
 			raise Exception("Failed to compile the contract.")
 
 	#待实现
-	#已经实现
 	def judgeContract(self, _jsonAst, _sourceCode, _filename):
 		JA = judgeAst(_jsonAst, _sourceCode, _filename)
 		if not JA.run():
@@ -227,7 +228,9 @@ class TODExtractor:
 			return
 		except:
 			raise Exception("Failed to store the result.")
-				
+
+
+#单元测试
 if __name__ == "__main__":
-	te = TODExtractor(100)
-	te.extractContracts()
+	sce = suicideContractExtractor(100)
+	sce.extractContracts()
