@@ -1,27 +1,17 @@
 #!/usr/bin/python
 #-*- coding: utf-8 -*-
 
-'''
-两个抽取标准
-1. 合约中存在自毁语句
-2. 包含自毁语句的函数能够被外界直接调用
-记录信息标准
-1. 记录可能存在的身份验证语句的源代码位置
-2. 记录自毁语句的位置
-3. 分门别类的记录
-'''
-
 import sys
 import os
 from random import randint
 import re
 import subprocess	#使用subprocess的popen，该popen是同步IO的
 from colorPrint import *	#该头文件中定义了色彩显示的信息
+from judgeAst import judgeAst #该头文件用于判断合约的ast中是否存在三个较为简单的特征
+from judgePath import judgePath #该头文件用于判断合约中是否存在目标路径
 import json
 from shutil import rmtree
-from judgeAst import judgeAst
-import time
-
+import time #计时模块
 
 #源代码数据存储位置
 SOURCE_CODE_PATH = "../../contractSpider/contractCodeGetter/sourceCode"
@@ -30,20 +20,32 @@ SOURCE_CODE_PREFIX_PATH = "../../contractSpider/contractCodeGetter/sourceCode"
 TESTCASE_PATH = "./testCase/"
 #结果存储位置
 RESULT_PATH = "./result/"
+
 #缓存路径
 CACHE_PATH = "./cache/"
 
-class suicideContractExtractor:
+'''
+目前的想法是通过裁剪重入的抽取模块
+抽取标准：
+1. 有收钱函数-已解决
+2. 最好能够找到转出以太币语句的位置(没有也行)-明天改造出钱语句
+标记位置-标记在收钱的函数上
+'''
+
+
+class lockedEtherExtractor:
+	#默认每次的抽取输出是100
 	def __init__(self, _needsNum = 100):
 		self.needs = _needsNum
 		self.nowNum = 0
-		self.defaultSolc = "0.6.0"	#默认使用的solc编译版本
-		self.maxSolc = "0.7.1" #最高被支持的solc版本，合约使用的solc版本高于此版本时，引发异常
-		self.minSolc = "0.5.0"	#最低被支持的solc版本
 		self.cacheContractPath = "./cache/temp.sol" 
 		self.cacheJsonAstPath = "./cache/"	#默认json_ast存储名: json_ast
 		self.cacheJsonAstName = "temp.sol_json.ast"
-		#self.index = 0
+		self.defaultSolc = "0.6.0"	#默认使用的solc编译版本
+		self.maxSolc = "0.7.1" #最高被支持的solc版本，合约使用的solc版本高于此版本时，引发异常
+		self.minSolc = "0.5.0"	#最低被支持的solc版本
+		self.index = 0
+		self.maxIndex = 100	#初始值，在第一次运行时即被更改
 		try:
 			os.mkdir(CACHE_PATH)	#建立缓存文件夹
 		except:
@@ -81,7 +83,7 @@ class suicideContractExtractor:
 		startTime = time.time()
 		contractNum = 0
 		#当符合条件的合约数量不满足需求时，继续抽取
-		while self.nowNum < self.needs:
+		while self.nowNum < self.needs and self.index < self.maxIndex:
 			contractNum += 1
 			try:
 				#拿到一个合约及其源代码
@@ -97,7 +99,7 @@ class suicideContractExtractor:
 				#编译生成当前合约的抽象语法树(以json_ast形式给出)
 				jsonAst = self.compile2Json()
 				#根据合约文件本身、抽象语法树来判断该合约是否符合标准
-				if self.judgeContract(jsonAst, sourceCode, prevFileName) == True:
+				if self.judgeContract(os.path.join(self.cacheContractPath), jsonAst, prevFileName) == True:
 					#符合标准，加１，写入数据文件
 					self.nowNum += 1 
 					#将暂存文件及其JsonAst文件转移到结果保存文件中
@@ -109,21 +111,28 @@ class suicideContractExtractor:
 					#重新建立文件夹
 					os.mkdir(CACHE_PATH)
 				else:
+					#self.nowNum += 1
 					continue
 			except Exception as e:
+				#self.nowNum += 1
 				print("%s %s %s" % (bad, e, end))
 				continue
 		endTime = time.time()
 		print(endTime - startTime)
 		print(contractNum)
+		if self.nowNum >= self.needs:
+			print("Complete the extraction.")
+		if self.index >= self.maxIndex:
+			print("The data set lacks a sufficient number of contracts that meet the extraction criteria.")
+		return
 
 	def getSourceCode(self):
 		'''
 		该函数从源代码数据存储位置提取
 		合约的名称和源代码
 		'''
-		fileList = os.listdir(SOURCE_CODE_PATH)
-		#fileList = os.listdir(TESTCASE_PATH)
+		#fileList = os.listdir(SOURCE_CODE_PATH)
+		fileList = os.listdir(TESTCASE_PATH)
 		#fileList  = os.listdir(RESULT_PATH)
 		solList = list()
 		#根据文件后缀判断文件类型
@@ -132,21 +141,22 @@ class suicideContractExtractor:
 				solList.append(i)
 			else:
 				continue
-		index = randint(0, len(solList) - 1)
-		#index = self.index
-		#print(index)
+		self.maxIndex = len(solList)
+		#index = randint(0, len(solList) - 1)
+		index = self.index
 		#print(index, solList[index])
 		try:
 			#拼接绝对路径
-			sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
-			#sourceCode = open(os.path.join(TESTCASE_PATH, "0x0c9423f96fe7aff683ba0cf4605a07ffd6a90389.sol"), "r", encoding = "utf-8").read()
+			#sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
+			sourceCode = open(os.path.join(TESTCASE_PATH, "testCase.sol"), "r", encoding = "utf-8").read()
 			#[bug fix]清洗合约中的多字节字符，保证编译结果不错误
 			sourceCode = self.cleanMultibyte(sourceCode)
-			#self.index += 1
-			return sourceCode, solList[index] #"testCase.sol"
+			self.index += 1
+			#sourceCode = open(os.path.join(RESULT_PATH, solList[index]), "r", encoding = "utf-8").read()
+			return sourceCode, "testCase.sol" #solList[index]
 		except:
 			#无法获取源代码，则引发异常
-			#self.index += 1
+			self.index += 1
 			raise Exception("Unable to obtain source code " + solList[index])
 
 	#清洗合约源代码中的多字节字符
@@ -158,6 +168,7 @@ class suicideContractExtractor:
 			else:
 				result += "1"
 		return result
+		
 
 	def changeSolcVersion(self, _sourceCode):
 		#首先明确－如果合约内存在多个solc版本语句，则只不处理该合约
@@ -212,12 +223,17 @@ class suicideContractExtractor:
 		except:
 			raise Exception("Failed to compile the contract.")
 
-	#待实现
-	def judgeContract(self, _jsonAst, _sourceCode, _filename):
-		JA = judgeAst(_jsonAst, _sourceCode, _filename)
-		if not JA.run():
-			#如果不符合抽取标准，则返回False
+	#已经实现
+	def judgeContract(self, _contractPath, _jsonAst, _filename):
+		simpleJudge = judgeAst(_jsonAst)
+		if not simpleJudge.run():
+			#如果不符合标准（简单标准），则返回False
 			return False
+		'''
+		pathJudge  = judgePath(_contractPath, _jsonAst, _filename)
+		if not pathJudge.run():
+			return False
+		'''
 		return True
 
 	def storeResult(self, _filename):
@@ -235,5 +251,5 @@ class suicideContractExtractor:
 
 #单元测试
 if __name__ == "__main__":
-	sce = suicideContractExtractor(100)
-	sce.extractContracts()
+	lee = lockedEtherExtractor(1)
+	lee.extractContracts()

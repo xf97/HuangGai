@@ -41,6 +41,22 @@ MSG_FLAG = "msg"
 ORIGIN_FLAG = "origin"
 #tx标志
 TX_FLAG = "tx"
+#元组标志
+TUPLE_FLAG = "tuple()"
+#require和assert函数类型标志
+REQUIRE_FUNC_TYPE_FLAG = "function (bool) pure"
+#require的另一种形式 的定义
+REQUIRE_FUNC_STRING_TYPE_FLAG = "function (bool,string memory) pure"
+#require标志
+REQUIRE_FLAG = "require"
+#assert标志
+ASSERT_FLAG = "assert"
+#二进制运算标志
+BINARY_OPERATION_FLAG = "BinaryOperation"
+#布尔类型标志
+BOOL_FLAG = "bool"
+#require或者assert参数类型
+COMMON_TYPE_STRING = "address"
 
 class judgeAst:
 	def __init__(self, _json, _sourceCode, _filename):
@@ -101,9 +117,17 @@ class judgeAst:
 		#6. 进入到函数及修改器中，寻找身份验证语句(根据slither的做法，将msg.sender认定为身份验证标志)
 		#我扩展一下，将对msg.sender或tx.origin进行相等检验的语句认定为身份验证语句-把BinaryOperation中的部分换成true
 		#就可以报废了身份验证语句
+		#slither这个方法并不好，造成大量漏报，考虑增补，将所有的require和assert语句都替换
 		injectInfo[AUTH_KEY].extend(self.getAuthStateSrc(targetFuncList))
 		injectInfo[AUTH_KEY].extend(self.getAuthStateSrc(targetModifierList))
-		print(injectInfo)
+		#[bug fix and feature enhance] 增加对require和assert语句的捕捉
+		#targetFuncList和targetModifierList是ast的list
+		for ast in targetFuncList:
+			injectInfo[AUTH_KEY].extend(self.getRequireStatement(ast))
+			injectInfo[AUTH_KEY].extend(self.getAssertStatement(ast))
+		for ast in targetModifierList:
+			injectInfo[AUTH_KEY].extend(self.getRequireStatement(ast))
+			injectInfo[AUTH_KEY].extend(self.getAssertStatement(ast))
 		#7. 存储信息
 		if not injectInfo[SUICIDE_KEY]:
 			#没有包含自毁语句，返回false
@@ -111,6 +135,41 @@ class judgeAst:
 		else:
 			self.storeInjectInfo(injectInfo)
 			return True
+
+	def getAssertStatement(self, _ast):
+		funcCall = self.findASTNode(_ast, "name", "FunctionCall")
+		srcList = list()	#assert语句中BinaryOperation的源代码位置
+		for call in funcCall:
+			if call["attributes"]["type"] == TUPLE_FLAG:
+				children0 = call["children"][0]	#children[0]是运算符
+				children1 = call["children"][1]	#children[1]是第一个参数－也只有一个
+				if children0["attributes"]["type"] == REQUIRE_FUNC_TYPE_FLAG and \
+				   children0["attributes"]["value"] == ASSERT_FLAG:
+				   	sPos, ePos = self.srcToPos(children1["src"])
+				   	srcList.append([sPos, ePos])
+				else:
+					continue
+			else:
+				continue
+		return srcList
+
+	def getRequireStatement(self, _ast):
+		funcCall = self.findASTNode(_ast, "name", "FunctionCall")
+		srcList = list()
+		for call in funcCall:
+			if call["attributes"]["type"] == TUPLE_FLAG:
+				children0 = call["children"][0]
+				children1 = call["children"][1]
+				if (children0["attributes"]["type"] == REQUIRE_FUNC_TYPE_FLAG or \
+					children0["attributes"]["type"] == REQUIRE_FUNC_STRING_TYPE_FLAG) and \
+				   children0["attributes"]["value"] == REQUIRE_FLAG:
+				   	sPos, ePos = self.srcToPos(children1["src"])
+				   	srcList.append([sPos, ePos])
+				else:
+					continue
+			else:
+				continue
+		return srcList
 
 	def getAuthStateSrc(self, _astList):
 		srcList = list()

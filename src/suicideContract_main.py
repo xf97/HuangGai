@@ -10,19 +10,19 @@ CACHE_PATHINFO_PATH = "./cache/temp_sol.json"
 #缓存抽象语法树文件
 CACHE_AST_PATH = "./cache/temp.sol_json.ast"
 #源代码保存路径
-CONTRACT_PATH = "../../contractExtractor/txOriginForAuthenticationExtractor/result"
+CONTRACT_PATH = "../../contractExtractor/suicideContractExtractor/result"
 #注入信息保存路径
-INJECT_INFO_PATH = "../../contractExtractor/txOriginForAuthenticationExtractor/injectInfo"
+INJECT_INFO_PATH = "../../contractExtractor/suicideContractExtractor/injectInfo"
 #sol文件后缀
 SOL_SUFFIX = ".sol"
 #json.ast文件后缀
 JSON_AST_SUFFIX = "_json.ast"
 
-from txOriginForAuthenticationInjector import txOriginForAuthenticationInjector	#注入器
+from suicideContractInjector import suicideContractInjector	#注入器
 import os
 import time
 
-class txOriginForAuthentication:
+class suicideContract:
 	def __init__(self, _injectInfo, _contractPath):
 		self.injectInfo = _injectInfo	#所有文件的路径信息情况
 		self.targetInfoFile = self.targetPathInfo(self.injectInfo)
@@ -85,34 +85,32 @@ class txOriginForAuthentication:
 		except:
 			raise Exception("Failed to cache contract.")
 
+	#修改合约，注意对msg.data.length的审核
 	def run(self):
-		stime = time.time()
+		sTime = time.time()
 		contractNum = 0
 		for contractFile in self.targetContract:
 			contractNum += 1
-			#try:
-			#1. 获取每个合约的源代码, ast和注入信息
-			contractFile = os.path.join(CONTRACT_PATH, "0xbc27d7c5d79c3868c969efde3a0912f79a914eb7.sol")
-			pathInfoFile = self.getInfoFile(contractFile, self.targetInfoFile)
-			astFile = self.getAstFile(contractFile, self.targetAstFile)
-			print(contractFile, pathInfoFile, astFile)
-			#2. 缓存当前文件
-			self.cacheFile(contractFile, pathInfoFile, astFile)
-			#3. 根据目标路径和源代码注入bug
-			TI = txOriginForAuthenticationInjector(CACHE_CONTRACT_PATH, CACHE_PATHINFO_PATH, astFile, self.getOriginalContractName(contractFile))
-			TI.inject()
-			TI.output()
-			#4. 输出进度
-			self.nowNum += 1
-			print("\r当前注入进度: %.2f" % (self.nowNum / len(self.targetContract)))
-			break
-			'''
+			try:
+				#1. 获取每个合约的源代码, ast和注入信息
+				#contractFile = os.path.join(CONTRACT_PATH, "testCase.sol")
+				pathInfoFile = self.getInfoFile(contractFile, self.targetInfoFile)
+				astFile = self.getAstFile(contractFile, self.targetAstFile)
+				print(contractFile, pathInfoFile, astFile)
+				#2. 缓存当前文件
+				self.cacheFile(contractFile, pathInfoFile, astFile)
+				#3. 根据目标路径和源代码注入bug
+				SI = suicideContractInjector(CACHE_CONTRACT_PATH, CACHE_PATHINFO_PATH, astFile, self.getOriginalContractName(contractFile))
+				SI.inject()
+				SI.output()
+				#4. 输出进度
+				self.nowNum += 1
+				print("\r当前注入进度: %.2f" % (self.nowNum / len(self.targetContract)))
 			except Exception as e:
 				self.nowNum += 1
 				print(e)
 				continue
-			'''
-		print(time.time() - stime)
+		print(time.time() - sTime)
 		print(contractNum)
 
 	def getOriginalContractName(self, _contractPath):
@@ -120,6 +118,6 @@ class txOriginForAuthentication:
 
 #单元测试
 if __name__ == "__main__":
-	tofa = txOriginForAuthentication(INJECT_INFO_PATH, CONTRACT_PATH)
-	tofa.run()
+	sc = suicideContract(INJECT_INFO_PATH, CONTRACT_PATH)
+	sc.run()
 
