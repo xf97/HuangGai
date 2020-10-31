@@ -256,5 +256,5 @@ class reentrancyExtractor:
 
 #单元测试
 if __name__ == "__main__":
-	ree = reentrancyExtractor(10)
+	ree = reentrancyExtractor(50)
 	ree.extractContracts()

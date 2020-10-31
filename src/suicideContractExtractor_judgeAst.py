@@ -41,8 +41,6 @@ MSG_FLAG = "msg"
 ORIGIN_FLAG = "origin"
 #tx标志
 TX_FLAG = "tx"
-#元组标志
-TUPLE_FLAG = "tuple()"
 #require和assert函数类型标志
 REQUIRE_FUNC_TYPE_FLAG = "function (bool) pure"
 #require的另一种形式 的定义

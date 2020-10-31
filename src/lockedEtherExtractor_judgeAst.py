@@ -113,14 +113,17 @@ class judgeAst:
 		#结果去重
 		self.funcHashAndItsStatement =  list(set(self.funcHashAndItsStatement))
 		#遍历结束，检查结果
-		#print(self.funcHashAndItsStatement)
+		#print(type(self.funcHashAndItsStatement))
 		for item in self.funcHashAndItsStatement:
-			if self.payableFlag:
-				return True
-			elif item[1] == PAYABLE_FLAG:
+			if item[1] == PAYABLE_FLAG:
 				self.payableFlag = True
+				break
 		#print(self.payableFlag)
-		return self.payableFlag
+		#[code update] 通过函数的源代码位置来确定函数位置
+		if self.payableFlag:
+			return True, [item[2] for item in self.funcHashAndItsStatement]
+		else:
+			return False, list()
 
 	#传入：合约ast
 	#传出：合约名
@@ -177,7 +180,7 @@ class judgeAst:
 			if item["attributes"]["member_name"] == "value" and item["attributes"]["type"] == "function (uint256) pure returns (function (bytes memory) payable returns (bool,bytes memory))":
 				if item["children"][0]["attributes"]["member_name"] == "call" and item["children"][0]["attributes"]["type"] == "function (bytes memory) payable returns (bool,bytes memory)":
 					signature = self.getMemberTypeSig(item, funcList, _contractName)
-					result.append((signature, CALL_FLAG))
+					result.append((signature, CALL_FLAG, item["src"]))
 		if len(result) > 0:
 			return True, result
 		else:
@@ -233,7 +236,7 @@ class judgeAst:
 						if func[0] == functionName:
 							#print(func[1])
 							signature = func[1]
-				result.append((signature, PAYABLE_FLAG))
+				result.append((signature, PAYABLE_FLAG, item["src"]))
 		if len(result) > 0:
 			return True, result
 		else:
@@ -244,7 +247,7 @@ class judgeAst:
 		varList = self.findASTNode(_ast, "name", "VariableDeclaration")
 		for item in varList:
 			if item["attributes"]["stateVariable"] == True and item["attributes"]["type"] == "mapping(address => uint256)":
-				result.append((-1, MAPPING_FLAG))
+				result.append((-1, MAPPING_FLAG, item["src"]))
 		if len(result) > 0:
 			return True, result
 		else:

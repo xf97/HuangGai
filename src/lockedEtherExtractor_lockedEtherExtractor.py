@@ -7,7 +7,7 @@ from random import randint
 import re
 import subprocess	#使用subprocess的popen，该popen是同步IO的
 from colorPrint import *	#该头文件中定义了色彩显示的信息
-from judgeAst import judgeAst #该头文件用于判断合约的ast中是否存在三个较为简单的特征
+from judgeAst import judgeAst #该头文件用于判断合约的ast中是否存在收钱函数
 from judgePath import judgePath #该头文件用于判断合约中是否存在目标路径
 import json
 from shutil import rmtree
@@ -20,6 +20,12 @@ SOURCE_CODE_PREFIX_PATH = "../../contractSpider/contractCodeGetter/sourceCode"
 TESTCASE_PATH = "./testCase/"
 #结果存储位置
 RESULT_PATH = "./result/"
+#注入所需信息存储路径
+INJECT_INFO_PATH = "./injectInfo/"
+#接收以太币函数键值
+PAYABLE_FUNC_KEY = "payableFunc"
+#转出以太币语句
+ETHER_OUT_KEY = "etherOutStatement"
 
 #缓存路径
 CACHE_PATH = "./cache/"
@@ -83,40 +89,43 @@ class lockedEtherExtractor:
 		startTime = time.time()
 		contractNum = 0
 		#当符合条件的合约数量不满足需求时，继续抽取
-		while self.nowNum < self.needs and self.index < self.maxIndex:
+		while self.nowNum < self.needs:
 			contractNum += 1
-			try:
-				#拿到一个合约及其源代码
-				(sourceCode, prevFileName) = self.getSourceCode()
-				if not self.preFilter(sourceCode):
-					#前置过滤器
-					continue
-				print(prevFileName)
-				#将当前合约暂存
-				self.cacheContract(sourceCode)
-				#调整本地编译器版本
-				self.changeSolcVersion(sourceCode)
-				#编译生成当前合约的抽象语法树(以json_ast形式给出)
-				jsonAst = self.compile2Json()
-				#根据合约文件本身、抽象语法树来判断该合约是否符合标准
-				if self.judgeContract(os.path.join(self.cacheContractPath), jsonAst, prevFileName) == True:
-					#符合标准，加１，写入数据文件
-					self.nowNum += 1 
-					#将暂存文件及其JsonAst文件转移到结果保存文件中
-					self.storeResult(prevFileName)
-					#显示进度　
-					print("\r%s当前抽取进度: %.2f%s" % (blue, self.nowNum / self.needs, end))
-					#清空缓存数据
-					rmtree(CACHE_PATH)
-					#重新建立文件夹
-					os.mkdir(CACHE_PATH)
-				else:
-					#self.nowNum += 1
-					continue
+			#try:
+			#拿到一个合约及其源代码
+			(sourceCode, prevFileName) = self.getSourceCode()
+			if not self.preFilter(sourceCode):
+				#前置过滤器
+				continue
+			print(prevFileName)
+			self.filename = prevFileName
+			#将当前合约暂存
+			self.cacheContract(sourceCode)
+			#调整本地编译器版本
+			self.changeSolcVersion(sourceCode)
+			#编译生成当前合约的抽象语法树(以json_ast形式给出)
+			jsonAst = self.compile2Json()
+			#根据合约文件本身、抽象语法树来判断该合约是否符合标准
+			if self.judgeContract(os.path.join(self.cacheContractPath), jsonAst, prevFileName) == True:
+				#符合标准，加１，写入数据文件
+				self.nowNum += 1 
+				#将暂存文件及其JsonAst文件转移到结果保存文件中
+				self.storeResult(prevFileName)
+				#显示进度　
+				print("\r%s当前抽取进度: %.2f%s" % (blue, self.nowNum / self.needs, end))
+				#清空缓存数据
+				rmtree(CACHE_PATH)
+				#重新建立文件夹
+				os.mkdir(CACHE_PATH)
+			else:
+				#self.nowNum += 1
+				continue
+			'''
 			except Exception as e:
 				#self.nowNum += 1
 				print("%s %s %s" % (bad, e, end))
 				continue
+			'''
 		endTime = time.time()
 		print(endTime - startTime)
 		print(contractNum)
@@ -125,6 +134,26 @@ class lockedEtherExtractor:
 		if self.index >= self.maxIndex:
 			print("The data set lacks a sufficient number of contracts that meet the extraction criteria.")
 		return
+
+	def storeInjectInfo(self, _funcSrcList, _etherOutList):
+		try:
+			#组合出字典
+			injectInfo = dict()
+			injectInfo[PAYABLE_FUNC_KEY] = list()
+			injectInfo[ETHER_OUT_KEY] = list()
+			#记录接收外部转账的函数
+			for func in _funcSrcList:
+				sPos, ePos = self.srcToPos(func)
+				injectInfo[PAYABLE_FUNC_KEY].append([sPos, ePos])
+			#记录转出以太币语句的位置
+			for state in _etherOutList:
+				injectInfo[ETHER_OUT_KEY].append(state)
+			#保存信息
+			with open(os.path.join(INJECT_INFO_PATH, self.filename.split(".")[0] + ".json"), "w", encoding = "utf-8") as f:
+				json.dump(injectInfo, f, indent = 1)
+			print("%s %s %s" % (info, self.filename + " target injected information...saved", end))
+		except:
+			print("%s %s %s" % (bad, self.filename + " target injected information...failed", end))
 
 	def getSourceCode(self):
 		'''
@@ -141,22 +170,22 @@ class lockedEtherExtractor:
 				solList.append(i)
 			else:
 				continue
-		self.maxIndex = len(solList)
-		#index = randint(0, len(solList) - 1)
-		index = self.index
+		#self.maxIndex = len(solList)
+		index = randint(0, len(solList) - 1)
+		#index = self.index
 		#print(index, solList[index])
 		try:
 			#拼接绝对路径
 			#sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
-			sourceCode = open(os.path.join(TESTCASE_PATH, "testCase.sol"), "r", encoding = "utf-8").read()
+			sourceCode = open(os.path.join(TESTCASE_PATH, "0xd86b007c6b6214683833aedd9d4a6aa867bbc159.sol"), "r", encoding = "utf-8").read()
 			#[bug fix]清洗合约中的多字节字符，保证编译结果不错误
 			sourceCode = self.cleanMultibyte(sourceCode)
-			self.index += 1
+			#self.index += 1
 			#sourceCode = open(os.path.join(RESULT_PATH, solList[index]), "r", encoding = "utf-8").read()
-			return sourceCode, "testCase.sol" #solList[index]
+			return sourceCode, solList[index] #"testCase.sol" 
 		except:
 			#无法获取源代码，则引发异常
-			self.index += 1
+			#self.index += 1
 			raise Exception("Unable to obtain source code " + solList[index])
 
 	#清洗合约源代码中的多字节字符
@@ -226,15 +255,20 @@ class lockedEtherExtractor:
 	#已经实现
 	def judgeContract(self, _contractPath, _jsonAst, _filename):
 		simpleJudge = judgeAst(_jsonAst)
-		if not simpleJudge.run():
+		flag, funcList = simpleJudge.run()
+		if not flag:
 			#如果不符合标准（简单标准），则返回False
 			return False
-		'''
-		pathJudge  = judgePath(_contractPath, _jsonAst, _filename)
-		if not pathJudge.run():
-			return False
-		'''
-		return True
+		else:
+			#然后再寻找转钱出去的语句
+			pathJudge  = judgePath(_contractPath, _jsonAst, _filename)
+			pathFlag, outEtherInfo = pathJudge.run()
+			if not pathFlag:
+				return False
+			else:
+				#保存结果　
+				self.storeInjectInfo(funcList, outEtherInfo)
+				return True
 
 	def storeResult(self, _filename):
 		try:
@@ -248,7 +282,13 @@ class lockedEtherExtractor:
 		except:
 			raise Exception("Failed to store the result.")
 
+	#传入：657:17:0
+	#传出：657, 674
+	def srcToPos(self, _src):
+		temp = _src.split(":")
+		return int(temp[0]), int(temp[0]) + int(temp[1])
 
+#todo 修复bug
 #单元测试
 if __name__ == "__main__":
 	lee = lockedEtherExtractor(1)
