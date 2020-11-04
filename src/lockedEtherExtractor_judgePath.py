@@ -48,7 +48,16 @@ SUICIDE_FUNC_NAME = "selfdestruct"
 COMMENT_FLAG = 0
 #使用矛盾语句进行无效化
 INVALID_FLAG = 1
+#规定转出金额为0进行无效化
+ZERO_FLAG = 2
 
+'''
+新无效化方法
+transfer/send/call.value语句通过替换转出金额为0来构造bug
+selfdestruct语句通过注释
+探究下
+transfer属于FuntionCall，children[0]就是msg.sender.transfer
+'''
 
 class judgePath:
 	def __init__(self, _contractPath, _json, _filename):
@@ -77,19 +86,29 @@ class judgePath:
 					#找到selfdestruct语句
 					sPos, ePos = self.srcToPos(func["src"])
 					srcList.append([sPos, ePos, COMMENT_FLAG])
-		print(srcList)
 		if not srcList[0]:
 			#没有找到转出以太币的语句
 			return False, list()
 		else:
 			return True,srcList
 
+	#通过给定的ast，返回转账数额的位置
+	def getAmount(self, _ast):
+		for call in self.findASTNode(self.json, "name", "FunctionCall"):
+			if call["children"][0] == _ast:
+				#金额在这里
+				amountAst = call["children"][1]
+				return self.srcToPos(amountAst["src"])
+			else:
+				continue
+		return -1, -1
+
 
 	#根据给定的开始和结束位置，返回包含这一部分的语句
 	def getStatement(self, _startPos, _endPos):
 		statementPattern = re.compile(r"Statement")
-		srcList = list
-		#该findASTNode返回所
+		srcList = list()
+		#该findASTNode返回所有属性值符合statementPattern模式的元素
 		for ast in self.findASTNodeByRegex(self.json, "name", statementPattern):
 			#拿到开始和结束位置
 			sPos, ePos = self.srcToPos(ast["src"])
@@ -115,8 +134,13 @@ class judgePath:
 				if _ast["attributes"]["member_name"] == TRANSFER_FLAG and _ast["attributes"]["referencedDeclaration"] == None:
 					if _ast["children"][0]["attributes"]["type"] == ADDRESS_PAYABLE_FLAG:
 						#找到在memberAccess语句中找到使用.transfer语句
-						startPos, endPos = self.srcToPos(_ast["src"])
-						result.append([startPos, endPos, COMMENT_FLAG])
+						#找到该语句的转账金额
+						#startPos, endPos = self.srcToPos(_ast["src"])
+						#找到转账金额的常量位置
+						startPos, endPos = self.getAmount(_ast)
+						#print(startPos, endPos)
+						if startPos != -1 and endPos != -1:
+							result.append([startPos, endPos, ZERO_FLAG])
 					else:
 						continue
 				else:
@@ -134,8 +158,12 @@ class judgePath:
 						#找到在memberAccess语句中找到使用.send语句
 						startPos, endPos = self.srcToPos(_ast["src"])
 						#然后找到最小的包含语句
-						startPos, endPos = self.getStatement(startPos, endPos)
-						result.append([startPos, endPos, INVALID_FLAG])
+						#startPos, endPos = self.getStatement(startPos, endPos)
+						#找到转账金额的常量位置
+						startPos, endPos = self.getAmount(_ast)
+						#print(startPos, endPos)
+						if startPos != -1 and endPos != -1:
+							result.append([startPos, endPos, ZERO_FLAG])
 					else:
 						continue
 				else:
@@ -155,9 +183,13 @@ class judgePath:
 						if addressMember["attributes"]["type"] == ADDRESS_PAYABLE_FLAG:
 							#找到在memberAccess语句中找到使用.call.value语句
 							startPos, endPos = self.srcToPos(_ast["src"])
-						#然后找到最小的包含语句
-							startPos, endPos = self.getStatement(startPos, endPos)
-							result.append([startPos, endPos, INVALID_FLAG])
+							#然后找到最小的包含语句
+							#startPos, endPos = self.getStatement(startPos, endPos)
+							#找到转账金额的常量位置
+							startPos, endPos = self.getAmount(_ast)
+							#print(startPos, endPos)
+							if startPos != -1 and endPos != -1:
+								result.append([startPos, endPos, ZERO_FLAG])
 						else:
 							continue
 					else:

@@ -16,6 +16,9 @@ INJECTED_CONTRACT_SUFFIX = "_lockedEther.sol"
 INJECTED_INFO_SUFFIX = "_lockedEtherInfo.txt"
 #结果保存路径
 DATASET_PATH = "./dataset/"
+#把转账金额置换为0
+ZERO_FLAG = 2
+ZERO_STR = "0"
 #插入标记字符串
 INJECTED_FLAG = "\t//injected LOCKED ETHER"
 #注释语句字符串
@@ -23,11 +26,13 @@ COMMENT_STR = "//"
 #另一种无效化安全措施的语句
 BALANCE_EQU_0_STR = "\n\trequire(address(this).balance == 0);\n\t"
 #插入语句列表
-INJECTED_STATEMENT_LIST = [COMMENT_STR, BALANCE_EQU_0_STR]
+INJECTED_STATEMENT_LIST = [COMMENT_STR, BALANCE_EQU_0_STR, ZERO_STR]
 #接收以太币函数键值
 PAYABLE_FUNC_KEY = "payableFunc"
 #转出以太币语句键值
 ETHER_OUT_KEY = "etherOutStatement"
+
+
 
 class lockedEtherInjector:
 	def __init__(self, _contractPath, _infoPath, _astPath, _originalContractName):
@@ -61,10 +66,9 @@ class lockedEtherInjector:
 			return str()
 
 	def inject(self):
-		#todo
 		#有两个键值，对应两种插入类型，分开处理
 		#对于接收以太币函数语句，是直接标注
-		#对于转出以太币语句，则是在无效化该语句
+		#对于转出以太币语句，则是在无效化该语句-无效化语句考虑列表的第三个元素决定该使用哪个无效化语句
 		#键－开始替换的位置
 		#值－[结束替换的位置，替换字符串]
 		srcAndItsStr = dict()	#记录注入信息的数据结构
@@ -82,8 +86,17 @@ class lockedEtherInjector:
 		for value in self.info[ETHER_OUT_KEY]:
 			#在语句前端插入
 			#随机选择插入语句
-			injectedState = INJECTED_STATEMENT_LIST[randint(0, 1)]	#左右都是闭区间
+			#injectedState = INJECTED_STATEMENT_LIST[randint(0, 1)]	#左右都是闭区间
+			if value[2] == ZERO_FLAG:
+				#替换
+				srcAndItsStr[value[0]] = [value[1], ZERO_STR]
+			else:
+				#加前缀
+				srcAndItsStr[value[0]] = [value[0], COMMENT_STR]
+			'''
+			injectedState = INJECTED_STATEMENT_LIST[value[2]]
 			srcAndItsStr[value[0]] = [value[0], injectedState]
+			'''
 		#3. 替换语句就行
 		newSourceCode, newInjectInfo = self.insertStatement(srcAndItsStr)
 		#print(newSourceCode)

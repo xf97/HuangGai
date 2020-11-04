@@ -91,41 +91,39 @@ class lockedEtherExtractor:
 		#当符合条件的合约数量不满足需求时，继续抽取
 		while self.nowNum < self.needs:
 			contractNum += 1
-			#try:
-			#拿到一个合约及其源代码
-			(sourceCode, prevFileName) = self.getSourceCode()
-			if not self.preFilter(sourceCode):
-				#前置过滤器
-				continue
-			print(prevFileName)
-			self.filename = prevFileName
-			#将当前合约暂存
-			self.cacheContract(sourceCode)
-			#调整本地编译器版本
-			self.changeSolcVersion(sourceCode)
-			#编译生成当前合约的抽象语法树(以json_ast形式给出)
-			jsonAst = self.compile2Json()
-			#根据合约文件本身、抽象语法树来判断该合约是否符合标准
-			if self.judgeContract(os.path.join(self.cacheContractPath), jsonAst, prevFileName) == True:
-				#符合标准，加１，写入数据文件
-				self.nowNum += 1 
-				#将暂存文件及其JsonAst文件转移到结果保存文件中
-				self.storeResult(prevFileName)
-				#显示进度　
-				print("\r%s当前抽取进度: %.2f%s" % (blue, self.nowNum / self.needs, end))
-				#清空缓存数据
-				rmtree(CACHE_PATH)
-				#重新建立文件夹
-				os.mkdir(CACHE_PATH)
-			else:
-				#self.nowNum += 1
-				continue
-			'''
+			try:
+				#拿到一个合约及其源代码
+				(sourceCode, prevFileName) = self.getSourceCode()
+				if not self.preFilter(sourceCode):
+					#前置过滤器
+					continue
+				print(prevFileName)
+				self.filename = prevFileName
+				#将当前合约暂存
+				self.cacheContract(sourceCode)
+				#调整本地编译器版本
+				self.changeSolcVersion(sourceCode)
+				#编译生成当前合约的抽象语法树(以json_ast形式给出)
+				jsonAst = self.compile2Json()
+				#根据合约文件本身、抽象语法树来判断该合约是否符合标准
+				if self.judgeContract(os.path.join(self.cacheContractPath), jsonAst, prevFileName) == True:
+					#符合标准，加１，写入数据文件
+					self.nowNum += 1 
+					#将暂存文件及其JsonAst文件转移到结果保存文件中
+					self.storeResult(prevFileName)
+					#显示进度　
+					print("\r%s当前抽取进度: %.2f%s" % (blue, self.nowNum / self.needs, end))
+					#清空缓存数据
+					rmtree(CACHE_PATH)
+					#重新建立文件夹
+					os.mkdir(CACHE_PATH)
+				else:
+					#self.nowNum += 1
+					continue
 			except Exception as e:
 				#self.nowNum += 1
 				print("%s %s %s" % (bad, e, end))
 				continue
-			'''
 		endTime = time.time()
 		print(endTime - startTime)
 		print(contractNum)
@@ -160,8 +158,8 @@ class lockedEtherExtractor:
 		该函数从源代码数据存储位置提取
 		合约的名称和源代码
 		'''
-		#fileList = os.listdir(SOURCE_CODE_PATH)
-		fileList = os.listdir(TESTCASE_PATH)
+		fileList = os.listdir(SOURCE_CODE_PATH)
+		#fileList = os.listdir(TESTCASE_PATH)
 		#fileList  = os.listdir(RESULT_PATH)
 		solList = list()
 		#根据文件后缀判断文件类型
@@ -176,13 +174,13 @@ class lockedEtherExtractor:
 		#print(index, solList[index])
 		try:
 			#拼接绝对路径
-			#sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
-			sourceCode = open(os.path.join(TESTCASE_PATH, "0xd86b007c6b6214683833aedd9d4a6aa867bbc159.sol"), "r", encoding = "utf-8").read()
+			sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
+			#sourceCode = open(os.path.join(TESTCASE_PATH, "testCase.sol"), "r", encoding = "utf-8").read()
 			#[bug fix]清洗合约中的多字节字符，保证编译结果不错误
 			sourceCode = self.cleanMultibyte(sourceCode)
 			#self.index += 1
 			#sourceCode = open(os.path.join(RESULT_PATH, solList[index]), "r", encoding = "utf-8").read()
-			return sourceCode, solList[index] #"testCase.sol" 
+			return sourceCode, solList[index]  #"testCase.sol" 
 		except:
 			#无法获取源代码，则引发异常
 			#self.index += 1
@@ -291,5 +289,5 @@ class lockedEtherExtractor:
 #todo 修复bug
 #单元测试
 if __name__ == "__main__":
-	lee = lockedEtherExtractor(1)
+	lee = lockedEtherExtractor(100)
 	lee.extractContracts()

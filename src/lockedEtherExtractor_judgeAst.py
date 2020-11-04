@@ -218,12 +218,13 @@ class judgeAst:
 
 	#*待修改*#
 	#修改完成
+	#修改为只匹配实现了的函数
 	def payableFunc(self, _ast, _contractName):
 		result = list()
 		payableList = self.findASTNode(_ast, "name", "FunctionDefinition")
 		funcList = payableList[:]
 		for item in payableList:
-			if item["attributes"]["stateMutability"] == "payable":
+			if item["attributes"]["stateMutability"] == "payable" and item["attributes"]["implemented"] == True:
 				#如果是payable函数，特殊处理
 				if item["attributes"]["kind"] == "fallback":
 					signature = "fallback"
