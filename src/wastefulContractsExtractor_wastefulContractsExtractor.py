@@ -12,6 +12,7 @@
 1. 可能考虑多态
 2. 最终的函数要有转钱出去的语句，必须是外部可以调用的　
 3. 记录使用的身份验证或者直接把(require/assert或者牵扯到msg.sender/tx.origin)这些语句的位置记录下来
+换个思路－是不是插入语句更稳妥
 '''
 
 '''
@@ -49,17 +50,10 @@ class wastefulContractsExtractor:
 		self.cacheJsonAstPath = "./cache/"	#默认json_ast存储名: json_ast
 		self.cacheJsonAstName = "temp.sol_json.ast"
 		self.defaultSolc = "0.6.0"	#默认使用的solc编译版本
-		self.maxSolc = "0.6.12" #最高被支持的solc版本，合约使用的solc版本高于此版本时，引发异常
+		self.maxSolc = "0.7.1" #最高被支持的solc版本，合约使用的solc版本高于此版本时，引发异常
 		self.minSolc = "0.5.0"	#最低被支持的solc版本
 		self.index = 0
 		self.maxIndex = 100	#数据集合约数量
-		'''
-		#try:
-		compileResult = subprocess.run("ulimit -s 102400", check = True, shell = True)	#临时调整系统栈空间
-		
-		except:
-			print("Change stack size..failed")
-		'''
 		try:
 			os.mkdir(CACHE_PATH)	#建立缓存文件夹
 		except:
@@ -72,6 +66,12 @@ class wastefulContractsExtractor:
 			#如果合约中包含使用0.4版本的solidity，就直接不抽取
 			return False
 		return True
+
+	def inStandardVersion(self, _nowVersion):
+		standardList = ["0.5.0", "0.5.1", "0.5.2", "0.5.3", "0.5.4", "0.5.5", "0.5.6", "0.5.7", "0.5.8", "0.5.9", "0.5.10", "0.5.11", "0.5.12", "0.5.13", "0.5.14", "0.5.15", "0.5.16", "0.5.17" \
+		               "0.6.0", "0.6.1", "0.6.2", "0.6.3", "0.6.4", "0.6.5", "0.6.6", "0.6.7", "0.6.8", "0.6.9", "0.6.10", "0.6.11", "0.6.12"]
+		return _nowVersion in standardList
+
 
 	def cleanComment(self, _code):
 		#使用正则表达式捕捉单行和多行注释
@@ -109,7 +109,7 @@ class wastefulContractsExtractor:
 				#将当前合约暂存
 				self.cacheContract(sourceCode)
 				#调整本地编译器版本
-				self.changeSolcVersion(sourceCode)
+				self.changeSolcVersion(sourceCode)			
 				#编译生成当前合约的抽象语法树(以json_ast形式给出)
 				jsonAst = self.compile2Json()
 				#根据合约文件本身、抽象语法树来判断该合约是否符合标准
@@ -162,11 +162,11 @@ class wastefulContractsExtractor:
 		try:
 			#拼接绝对路径
 			sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
-			#sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, "0x486f1800415c974dfcf12ff57200fa86b04253f5.sol"), "r", encoding = "utf-8").read()
+			#sourceCode = open(os.path.join(TESTCASE_PATH, "assertMIss.sol"), "r", encoding = "utf-8").read()
 			#[bug fix]清洗合约中的多字节字符，保证编译结果不错误
 			sourceCode = self.cleanMultibyte(sourceCode)
 			#sourceCode = open(os.path.join(RESULT_PATH, solList[index]), "r", encoding = "utf-8").read()
-			return sourceCode, solList[index]	#"testCase.sol"
+			return sourceCode, solList[index]   #"assertMIss.sol" 
 		except:
 			#无法获取源代码，则引发异常
 			raise Exception("Unable to obtain source code " + solList[index])
@@ -204,7 +204,8 @@ class wastefulContractsExtractor:
 				self.defaultSolc = solcVersion.group()
 		#否则使用默认声明
 		try:
-			if self.defaultSolc >= self.minSolc and self.defaultSolc <= self.maxSolc:
+			if self.inStandardVersion(self.defaultSolc):
+				#self.defaultSolc >= self.minSolc and self.defaultSolc <= self.maxSolc:
 				#在本机支持的solc版本范围内
 				compileResult = subprocess.run("solc use " + self.defaultSolc, check = True, shell = True)	#切换版本				
 				#print(compileResult.read())
@@ -241,11 +242,6 @@ class wastefulContractsExtractor:
 		if not simpleJudge.run():
 			#如果不符合标准（简单标准），则返回False
 			return False
-		'''
-		pathJudge  = judgePath(_contractPath, _jsonAst, _filename)
-		if not pathJudge.run():
-			return False
-		'''
 		return True
 
 	def storeResult(self, _filename):

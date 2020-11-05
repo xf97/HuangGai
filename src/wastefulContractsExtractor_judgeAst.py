@@ -45,8 +45,6 @@ non-private资源，那么我们仅考虑搜查以下两类资源：
 裁剪原代码
 '''
 
-CALL_FLAG = 1
-
 #缓存路径
 CACHE_PATH = "./cache/"
 #注入所需信息存储路径
@@ -117,6 +115,9 @@ BOOL_FLAG = "bool"
 #require或者assert参数类型
 COMMON_TYPE_STRING = "address"
 
+#[bug fix to improve precision]
+TRANSFER_ALL_MONEY_FLAG = 3
+
 import json
 import os
 from colorPrint import *	#该头文件中定义了色彩显示的信息
@@ -148,21 +149,14 @@ class judgeAst:
 					#不要构造函数
 					continue
 				else:
+					returnValue = func["children"][1] #获取返回值列表
+					if len(returnValue["children"]) != 0:
+						#print(func["attributes"]["name"], len(returnValue["children"]))
+						continue	#不要有返回值的函数
 					funcList.append(func)	#加入的是ast
-		#1.1 增补，修改器值得注意
-		#然后逐个搜索函数，增补函数使用的修改器到目标函数列表中
-		modifierList = list()
-		for func in funcList:
-			#此时的func是ast形式
-			usedModifierIdList = [item["children"][0]["attributes"]["referencedDeclaration"] for item in self.findASTNode(func, "name", "ModifierInvocation")]
-			if not usedModifierIdList:
-				continue
-			else:
-				#根据id找到修改器
-				for _id in usedModifierIdList:
-					modifierList.append(self.findASTNode(self.json, "id", _id)[0])
 		#2. 然后进入到每个函数中，查看其中是否有转出钱的语句
-		srcList = list()	#该函数记录需要被屏蔽或替换的源代码位置
+		srcList = list()	#该列表记录需要被屏蔽或替换的源代码位置
+		targetFuncList = list()
 		for funcAst in funcList:
 			tempSrcList = list()
 			#2.1. 加入transfer语句的位置
@@ -186,57 +180,46 @@ class judgeAst:
 						tempSrcList.append([ePos, ePos, INJECTED_FLAG])
 			#3. 如果该函数能够向外部发送以太币
 			if tempSrcList:
-				#就到了记录需要屏蔽的信息的环节了
-				srcList.extend(tempSrcList)
+				#记录有价值的目标函数
+				targetFuncList.append(funcAst)
 				#找到函数中所有“可能阻止转账”的语句　
 				#require和assert语句是最典型的　
-				srcList.extend(self.getRequireStatement(func))
-				srcList.extend(self.getAssertStatement(func))
+				srcList.extend(self.getRequireStatement(funcAst))
+				srcList.extend(self.getAssertStatement(funcAst))
+				#然后在函数尾部，插入注入语句
+				#一个函数只能有一个代码块吧
+				funcsPos, funcePos = self.srcToPos(funcAst["src"])
+				srcList.append([funcePos - 1, funcePos - 1, TRANSFER_ALL_MONEY_FLAG])
+				while self.sourceCode[funcePos] != "\n":
+					funcePos += 1
+				srcList.append([funcePos, funcePos, INJECTED_FLAG])
 			else:
 				continue
 		if not srcList:
-			#函数内要求有转出语句
+			#至少要有一个函数内要有转出钱的语句
 			return False
+		#然后再增加函数修改器
+		#增补，修改器值得注意
+		#然后逐个搜索函数，增补函数使用的修改器到目标函数列表中
+		modifierList = list()
+		for func in targetFuncList:
+			#此时的func是ast形式
+			usedModifierIdList = [item["children"][0]["attributes"]["referencedDeclaration"] for item in self.findASTNode(func, "name", "ModifierInvocation")]
+			if not usedModifierIdList:
+				continue
+			else:
+				#根据id找到修改器
+				for _id in usedModifierIdList:
+					modifierList.append(self.findASTNode(self.json, "id", _id)[0])
+		print(modifierList)
 		#3. 函数修改器也看一下
 		for funcAst in modifierList:
-			tempSrcList = list()
-			#2.1. 加入transfer语句的位置
-			tempSrcList.extend(self.getStatement_transfer(self.findASTNode(funcAst, "name", "MemberAccess")))
-			#2.2. 加入send语句的位置
-			tempSrcList.extend(self.getStatement_send(self.findASTNode(funcAst, "name", "MemberAccess")))
-			#2.3. 加入call.value语句的位置
-			tempSrcList.extend(self.getStatement_callValue(self.findASTNode(funcAst, "name", "MemberAccess")))
-			#2.4. 加入自毁语句的位置
-			for func in self.findASTNode(funcAst, "name", "FunctionCall"):
-				if func["attributes"]["type"] == TUPLE_FLAG:
-					calledFunc = func["children"][0]	#被调用的函数
-					#处理异常情况
-					if calledFunc["attributes"].get("referencedDeclaration") == None:
-						continue
-					if calledFunc["attributes"]["referencedDeclaration"] < 0 and calledFunc["attributes"]["type"] == SUICIDE_FUNC_TYPE and calledFunc["attributes"]["value"] == SUICIDE_FUNC_NAME:
-						#找到selfdestruct语句
-						sPos, ePos = self.srcToPos(func["src"])
-						while self.sourceCode[ePos] != "\n":
-							ePos += 1
-						tempSrcList.append([ePos, ePos, INJECTED_FLAG])
-			#3. 如果该函数能够向外部发送以太币
-			if tempSrcList:
-				#就到了记录需要屏蔽的信息的环节了
-				srcList.extend(tempSrcList)
-				#找到函数中所有“可能阻止转账”的语句　
-				#require和assert语句是最典型的　
-				srcList.extend(self.getRequireStatement(func))
-				srcList.extend(self.getAssertStatement(func))
-			else:
-				continue
+			srcList.extend(self.getRequireStatement(funcAst))
+			srcList.extend(self.getAssertStatement(funcAst))
 		#最后再增补一下非require和assert的身份验证语句
-		#srcList.extend(self.getAuthStateSrc(funcList))
-		#srcList.extend(self.getAuthStateSrc(modifierList))
+		#造成误判，不使用该语句
 		#去重
 		srcList = self.removeDuplicate(srcList)
-		print(srcList)
-		for item in srcList:
-			print(self.sourceCode[item[0]: item[1]])
 		#４. 存储信息
 		if not srcList:
 			#没有包含自毁语句，返回false
@@ -254,45 +237,6 @@ class judgeAst:
 				continue
 		return result
 
-	'''
-	def getAuthStateSrc(self, _astList):
-		srcList = list()
-		for func in _astList:
-			for ope in self.findASTNode(func, "name", "BinaryOperation"):
-				#首先确定符号
-				if ope["attributes"]["operator"] == EQUAL_FLAG and ope["attributes"]["type"] == BOOL_FLAG:
-					#获取参与比较运算的参数
-					eleList = ope["children"]
-					if len(eleList) != 2:
-						continue
-					else:
-						#如果任一一个元素是msg.sender就记录BinaryOperation的位置
-						for ele in eleList:
-							#这是对msg.sender的
-							if ele["name"] == MEMBER_ACCESS_FLAG and ele["attributes"]["type"] == MSG_SENDER_TYPE and ele["attributes"]["member_name"] == SENDER_FLAG and ele["attributes"]["referencedDeclaration"] == None:
-								#通过属性校验
-								msgEle = ele["children"][0]
-								if msgEle["attributes"]["referencedDeclaration"] < 0 and msgEle["attributes"]["type"] == MSG_FLAG and msgEle["attributes"]["value"] == MSG_FLAG:
-									#找到msg.sender
-									sPos, ePos = self.srcToPos(ope["src"])	#加入的是整个BinaryOperation的src位置
-									srcList.append([sPos, ePos])
-								else:
-									continue
-							#这是对tx.origin
-							elif ele["name"] == MEMBER_ACCESS_FLAG and ele["attributes"]["type"] == MSG_SENDER_TYPE and ele["attributes"]["member_name"] == ORIGIN_FLAG and ele["attributes"]["referencedDeclaration"] == None:
-								#通过属性校验
-								txEle = ele["children"][0]
-								if txEle["attributes"]["referencedDeclaration"] < 0 and txEle["attributes"]["type"] == TX_FLAG and txEle["attributes"]["value"] == TX_FLAG:
-									#找到tx.origin
-									sPos, ePos = self.srcToPos(ope["src"])
-									srcList.append([sPos, ePos, ])
-								else:
-									continue
-							else:
-								continue
-		return srcList
-	'''
-
 	#返回assert语句中的条件值部分
 	def getAssertStatement(self, _ast):
 		funcCall = self.findASTNode(_ast, "name", "FunctionCall")
@@ -309,6 +253,7 @@ class judgeAst:
 					continue
 			else:
 				continue
+		print(srcList, "****")
 		return srcList
 
 	#返回require语句中的条件值部分

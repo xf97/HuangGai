@@ -52,6 +52,11 @@ class integerOverflowExtractor:
 			return False
 		return True
 
+	def inStandardVersion(self, _nowVersion):
+		standardList = ["0.5.0", "0.5.1", "0.5.2", "0.5.3", "0.5.4", "0.5.5", "0.5.6", "0.5.7", "0.5.8", "0.5.9", "0.5.10", "0.5.11", "0.5.12", "0.5.13", "0.5.14", "0.5.15", "0.5.16", "0.5.17" \
+		               "0.6.0", "0.6.1", "0.6.2", "0.6.3", "0.6.4", "0.6.5", "0.6.6", "0.6.7", "0.6.8", "0.6.9", "0.6.10", "0.6.11", "0.6.12", "0.７.0", "0.7.1"]
+		return _nowVersion in standardList
+
 	def cleanComment(self, _code):
 		#使用正则表达式捕捉单行和多行注释
 		singleLinePattern = re.compile(r"(//)(.)+")	#提前编译，以提高速度
@@ -174,7 +179,7 @@ class integerOverflowExtractor:
 				self.defaultSolc = solcVersion.group()
 		#否则使用默认声明
 		try:
-			if self.defaultSolc >= self.minSolc and self.defaultSolc <= self.maxSolc:
+			if self.inStandardVersion(self.defaultSolc):
 				#在本机支持的solc版本范围内
 				compileResult = subprocess.run("solc use " + self.defaultSolc, check = True, shell = True)	#切换版本				
 				#print(compileResult.read())
