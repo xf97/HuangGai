@@ -39,6 +39,8 @@ OR_FLAG = "||"
 PRE_INT_CONST_STR = "int_const"
 #常量标志
 LITERAL_FLAG = "Literal"
+#pure常量标志
+PURE_FLAG = "pure"
 
 
 class judgeAst:
@@ -57,6 +59,8 @@ class judgeAst:
 		#暂且捕捉以下三个: require, assert, if
 		#此处返回完整的ast
 		#[再次精确定义]只要BinaryOperation并且符号是==的，并且children[1]的typeString是uint256的
+		#[bug fix] 不去修改pure函数中的语句，因为address(this).balance会读取区块链的状态而pure函数不能读取状态
+		pureFuncSrcList = self.getPureFuncSrcList(self.json)
 		branchAstList = list()
 		#1.1 assert语句
 		branchAstList.extend(self.getAssertStatement(self.json))
@@ -64,16 +68,43 @@ class judgeAst:
 		branchAstList.extend(self.getRequireStatement(self.json))
 		#1.3 if语句
 		branchAstList.extend(self.getIfStatement(self.json))
-		print(len(branchAstList))
+		#print(len(branchAstList))
 		#2. 过滤不满足要求的条件部分语句
 		#要求参与的操作数其中一个是uint256常数
-		#to do-检查为什么5个被过滤了2个
 		branchAstList = self.filterConditionPart(branchAstList)
 		#print(branchAstList)
+		#3.　记录这些可以被替换的值的位置
 		for item in branchAstList:
 			sPos, ePos = self.srcToPos(item)
-			print(self.sourceCode[sPos:ePos])
-		return True
+			#[bug fix 2020/11/09] 此处不记录在pure函数中的语句
+			if not self.inPureFunc(pureFuncSrcList, sPos, ePos):
+				injectInfo[SRC_KEY].append([sPos, ePos])
+			else:
+				continue
+		#4. 存储信息
+		if not injectInfo[SRC_KEY]:
+			return False
+		else:
+			self.storeInjectInfo(injectInfo)
+			return True
+
+	def inPureFunc(self, _pureFuncSrcList, _startPos, _endPos):
+		for item in _pureFuncSrcList:
+			if item[0] < _startPos and item[1] > _endPos:
+				return True
+			else:
+				continue
+		return False
+
+	def getPureFuncSrcList(self, _ast):
+		srcList = list()
+		for func in self.findASTNode(_ast, "name", "FunctionDefinition"):
+			if func["attributes"]["stateMutability"] == PURE_FLAG:
+				#找到pure函数，记录位置
+				srcList.append(self.srcToPos(func["src"]))
+			else:
+				continue
+		return srcList
 
 	def filterConditionPart(self, _astList):
 		result = list()
@@ -102,7 +133,7 @@ class judgeAst:
 			#检测条件部分是否满足要求
 			if conditionPart["name"] == BINARY_OPERATION_FLAG and conditionPart["attributes"]["type"] == BOOL_FLAG and conditionPart["attributes"]["operator"] == EQU_FLAG and conditionPart["attributes"]["commonType"]["typeString"] == UINT256_FLAG:
 				#满足，记录ast
-				astList.append(ifStatement)
+				astList.append(conditionPart)
 			else:
 				continue
 		return astList
@@ -153,48 +184,7 @@ class judgeAst:
 				continue
 		return srcList
 
-	def getSendStatement(self):
-		sendList = list()
-		for ast in self.findASTNode(self.json, "name", "MemberAccess"):
-			if ast["attributes"]["member_name"] == SEND_FLAG and \
-			   ast["attributes"]["referencedDeclaration"] == None and \
-			   ast["attributes"]["type"] == SEND_TYPE_FLAG:	
-			   #找到了send语句，记录位置
-			   temp = list(self.srcToPos(ast["src"]))
-			   temp.append(SEND_FLAG)
-			   sendList.append(temp)
-			   #sendList.append(SEND_FLAG)
-			else:
-				continue
-		return sendList
 
-	def getCallStatement(self):
-		callList = list()
-		for ast in self.findASTNode(self.json, "name", "MemberAccess"):
-			if ast["attributes"]["member_name"] == CALL_FLAG and \
-			   ast["attributes"]["referencedDeclaration"] == None and \
-			   ast["attributes"]["type"] == CALL_TYPE_FLAG:	
-			   #找到了send语句，记录位置
-			   temp = list(self.srcToPos(ast["src"]))
-			   temp.append(CALL_FLAG)
-			   callList.append(temp)
-			else:
-				continue
-		return callList
-
-	def getDelegatecallStatement(self):
-		delegatecallList = list()
-		for ast in self.findASTNode(self.json, "name", "MemberAccess"):
-			if ast["attributes"]["member_name"] == DELEGATECALL_FLAG and \
-			   ast["attributes"]["referencedDeclaration"] == None and \
-			   ast["attributes"]["type"] == DELEGATECALL_TYPE_FLAG:	
-			   #找到了send语句，记录位置
-			   temp = list(self.srcToPos(ast["src"]))
-			   temp.append(DELEGATECALL_FLAG)
-			   delegatecallList.append(temp)
-			else:
-				continue
-		return delegatecallList
 
 	def cleanComment(self, _code):
 		#使用正则表达式捕捉单行和多行注释
