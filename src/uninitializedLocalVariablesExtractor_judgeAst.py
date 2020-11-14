@@ -29,6 +29,8 @@ SRC_KEY = "srcPos"
 EQU_FLAG = "="
 #映射标志
 MAPPING_FLAG = "mapping"
+#映射的标志符号模式
+MAPPING_PATTERN = r"=(\s)*>"
 
 import json
 import os
@@ -52,11 +54,16 @@ class judgeAst:
 
 	#判断这部分语句有没有等号
 	def containEqu(self, _sPos, _ePos):
+		mappingPattern = re.compile(MAPPING_PATTERN)
 		state = self.sourceCode[_sPos: _ePos]
 		if state.find(EQU_FLAG) == -1:
 			return False
 		else:
-			return True
+			#[bug fix 2020/11/11] 如果包含映射的标志符号，不处理
+			if not mappingPattern.search(state):
+				return True
+			else:
+				return False
 
 
 	def run(self):
