@@ -232,6 +232,9 @@ class unhandledExceptionExtractor:
 		try:
 			#使用cp命令拷贝两份结果
 			desCode = os.path.join(RESULT_PATH, _filename)
+			#若文件存在，则不覆盖　
+			if os.path.exists(os.path.join(desCode)):
+				raise Exception("The result already exists.")
 			desJsonAst = os.path.join(RESULT_PATH, _filename + "_json.ast")
 			#执行拷贝，显示详细信息
 			codeExecuteResult = subprocess.run("cp -v " + self.cacheContractPath + " " + desCode, check = True, shell = True)

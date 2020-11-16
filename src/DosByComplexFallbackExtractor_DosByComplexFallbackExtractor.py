@@ -2,13 +2,16 @@
 #-*- coding: utf-8 -*-
 
 '''
-此文件用于从数据集中抽取可能包含或者注入后可以包含未解决异常的合约
+此文件用于从数据集中抽取可能包含或者注入后可以包含
+被复杂的fallback函数Dos
+的合约
 '''
 
 '''
 抽取标准：
-1. 符合ERC20标准--可能得借助外部工具
-2. 有approve函数
+１．合约中存在fallback函数
+２．fallback函数中存在transfer/call.value语句
+记录整个表达式语句的位置
 '''
 
 import sys
@@ -32,12 +35,12 @@ RESULT_PATH = "./result/"
 #缓存路径
 CACHE_PATH = "./cache/"
 
-class TODExtractor:
+class DosByComplexFallbackExtractor:
 	def __init__(self, _needsNum = 100):
 		self.needs = _needsNum
 		self.nowNum = 0
 		self.defaultSolc = "0.6.0"	#默认使用的solc编译版本
-		self.maxSolc = "0.7.1" #最高被支持的solc版本，合约使用的solc版本高于此版本时，引发异常
+		self.maxSolc = "0.6.12" #最高被支持的solc版本，合约使用的solc版本高于此版本时，引发异常
 		self.minSolc = "0.5.0"	#最低被支持的solc版本
 		self.cacheContractPath = "./cache/temp.sol" 
 		self.cacheJsonAstPath = "./cache/"	#默认json_ast存储名: json_ast
@@ -57,7 +60,7 @@ class TODExtractor:
 
 	def inStandardVersion(self, _nowVersion):
 		standardList = ["0.5.0", "0.5.1", "0.5.2", "0.5.3", "0.5.4", "0.5.5", "0.5.6", "0.5.7", "0.5.8", "0.5.9", "0.5.10", "0.5.11", "0.5.12", "0.5.13", "0.5.14", "0.5.15", "0.5.16", "0.5.17" \
-		               "0.6.0", "0.6.1", "0.6.2", "0.6.3", "0.6.4", "0.6.5", "0.6.6", "0.6.7", "0.6.8", "0.6.9", "0.6.10", "0.6.11", "0.6.12", "0.７.0", "0.7.1"]
+		               "0.6.0", "0.6.1", "0.6.2", "0.6.3", "0.6.4", "0.6.5", "0.6.6", "0.6.7", "0.6.8", "0.6.9", "0.6.10", "0.6.11", "0.6.12"]
 		return _nowVersion in standardList
 
 	def cleanComment(self, _code):
@@ -101,10 +104,10 @@ class TODExtractor:
 				jsonAst = self.compile2Json()
 				#根据合约文件本身、抽象语法树来判断该合约是否符合标准
 				if self.judgeContract(jsonAst, sourceCode, prevFileName) == True:
-					#符合标准，加１，写入数据文件
-					self.nowNum += 1 
 					#将暂存文件及其JsonAst文件转移到结果保存文件中
 					self.storeResult(prevFileName)
+					#符合标准，加１，写入数据文件
+					self.nowNum += 1 
 					#显示进度　
 					print("\r%s当前抽取进度: %.2f%s" % (blue, self.nowNum / self.needs, end))
 					#清空缓存数据
@@ -115,7 +118,7 @@ class TODExtractor:
 					continue
 			except Exception as e:
 				print("%s %s %s" % (bad, e, end))
-				continue	
+				continue
 		print(time.time() - stime)
 		print(contractNum)
 
@@ -126,6 +129,7 @@ class TODExtractor:
 		'''
 		fileList = os.listdir(SOURCE_CODE_PATH)
 		#fileList = os.listdir(TESTCASE_PATH)
+		#fileList = os.listdir(RESULT_PATH)
 		solList = list()
 		#根据文件后缀判断文件类型
 		for i in fileList:
@@ -139,10 +143,12 @@ class TODExtractor:
 		try:
 			#拼接绝对路径
 			sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
+			#sourceCode = open(os.path.join(RESULT_PATH, solList[index]), "r", encoding = "utf-8").read()
 			#sourceCode = open(os.path.join(TESTCASE_PATH, "testCase.sol"), "r", encoding = "utf-8").read()
 			#[bug fix]清洗合约中的多字节字符，保证编译结果不错误
 			sourceCode = self.cleanMultibyte(sourceCode)
-			return sourceCode, solList[index] #"testCase.sol" 
+			#self.index += 1
+			return sourceCode, solList[index]  
 		except:
 			#无法获取源代码，则引发异常
 			#self.index += 1
@@ -217,7 +223,6 @@ class TODExtractor:
 	def judgeContract(self, _jsonAst, _sourceCode, _filename):
 		JA = judgeAst(_jsonAst, _sourceCode, _filename)
 		if not JA.run():
-			#如果不符合抽取标准，则返回False
 			return False
 		return True
 
@@ -237,5 +242,5 @@ class TODExtractor:
 			raise Exception("Failed to store the result.")
 				
 if __name__ == "__main__":
-	te = TODExtractor(100)
-	te.extractContracts()
+	dbcfe = DosByComplexFallbackExtractor(100)
+	dbcfe.extractContracts()
