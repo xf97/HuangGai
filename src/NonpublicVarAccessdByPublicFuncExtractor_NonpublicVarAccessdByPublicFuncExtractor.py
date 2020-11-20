@@ -127,8 +127,8 @@ class NonpublicVarAccessdByPublicFuncExtractor:
 		该函数从源代码数据存储位置提取le index out of range 
 		合约的名称和源代码
 		'''
-		#fileList = os.listdir(SOURCE_CODE_PATH)
-		fileList = os.listdir(TESTCASE_PATH)
+		fileList = os.listdir(SOURCE_CODE_PATH)
+		#fileList = os.listdir(TESTCASE_PATH)
 		#fileList = os.listdir(RESULT_PATH)
 		solList = list()
 		#根据文件后缀判断文件类型
@@ -142,13 +142,13 @@ class NonpublicVarAccessdByPublicFuncExtractor:
 		#print(index, solList[index])
 		try:
 			#拼接绝对路径
-			#sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
+			sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
 			#sourceCode = open(os.path.join(RESULT_PATH, solList[index]), "r", encoding = "utf-8").read()
-			sourceCode = open(os.path.join(TESTCASE_PATH, "testCase.sol"), "r", encoding = "utf-8").read()
+			#sourceCode = open(os.path.join(TESTCASE_PATH, "0xF0c677394C5FE4AA12175738FBe69e3c78997c1D.sol"), "r", encoding = "utf-8").read()
 			#[bug fix]清洗合约中的多字节字符，保证编译结果不错误
 			sourceCode = self.cleanMultibyte(sourceCode)
 			#self.index += 1
-			return sourceCode, "testCase.sol" #solList[index]  
+			return sourceCode, solList[index]  
 		except:
 			#无法获取源代码，则引发异常
 			#self.index += 1
@@ -242,5 +242,5 @@ class NonpublicVarAccessdByPublicFuncExtractor:
 			raise Exception("Failed to store the result.")
 				
 if __name__ == "__main__":
-	nvabpfe = NonpublicVarAccessdByPublicFuncExtractor(1)
+	nvabpfe = NonpublicVarAccessdByPublicFuncExtractor(100)
 	nvabpfe.extractContracts()

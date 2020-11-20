@@ -238,5 +238,5 @@ class forcedToReceiveEthersExtractor:
 			raise Exception("Failed to store the result.")
 				
 if __name__ == "__main__":
-	ftree = forcedToReceiveEthersExtractor(100)
+	ftree = forcedToReceiveEthersExtractor(80)
 	ftree.extractContracts()
