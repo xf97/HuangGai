@@ -126,8 +126,8 @@ class nonStandardNamingExtractor:
 		该函数从源代码数据存储位置提取le index out of range 
 		合约的名称和源代码
 		'''
-		fileList = os.listdir(SOURCE_CODE_PATH)
-		#fileList = os.listdir(TESTCASE_PATH)
+		#fileList = os.listdir(SOURCE_CODE_PATH)
+		fileList = os.listdir(TESTCASE_PATH)
 		#fileList = os.listdir(RESULT_PATH)
 		solList = list()
 		#根据文件后缀判断文件类型
@@ -141,13 +141,13 @@ class nonStandardNamingExtractor:
 		#print(index, solList[index])
 		try:
 			#拼接绝对路径
-			sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
+			#sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
 			#sourceCode = open(os.path.join(RESULT_PATH, solList[index]), "r", encoding = "utf-8").read()
-			#sourceCode = open(os.path.join(TESTCASE_PATH, "0xF0c677394C5FE4AA12175738FBe69e3c78997c1D.sol"), "r", encoding = "utf-8").read()
+			sourceCode = open(os.path.join(TESTCASE_PATH, "complexContract.sol"), "r", encoding = "utf-8").read()
 			#[bug fix]清洗合约中的多字节字符，保证编译结果不错误
 			sourceCode = self.cleanMultibyte(sourceCode)
 			#self.index += 1
-			return sourceCode, solList[index]  
+			return sourceCode, "complexContract.sol" #solList[index]  
 		except:
 			#无法获取源代码，则引发异常
 			#self.index += 1
@@ -220,11 +220,9 @@ class nonStandardNamingExtractor:
 	#待实现
 	#已经实现
 	def judgeContract(self, _jsonAst, _sourceCode, _filename):
-		'''
 		JA = judgeAst(_jsonAst, _sourceCode, _filename)
 		if not JA.run():
 			return False
-		'''
 		return True
 
 	def storeResult(self, _filename):
@@ -243,5 +241,5 @@ class nonStandardNamingExtractor:
 			raise Exception("Failed to store the result.")
 				
 if __name__ == "__main__":
-	nsne = nonStandardNamingExtractor(100)
+	nsne = nonStandardNamingExtractor(1)
 	nsne.extractContracts()
