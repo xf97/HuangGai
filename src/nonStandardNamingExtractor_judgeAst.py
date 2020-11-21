@@ -18,7 +18,7 @@ SRC_KEY = "srcPos"
 #bug记录标志（执行后续标记）
 LABEL_BUG_FLAG = "labelBug"
 #随机数最大值
-MAX_RANDOM = 10
+MAX_RANDOM = 1000
 #随机数最小值
 MIN_RANDOM = 0
 #构造函数标志
@@ -27,6 +27,18 @@ CONSTRUCTOR_FLAG = "constructor"
 FALLBACK_FLAG = "fallback"
 #接收函数标志
 RECEIVER_FLAG = "receive"
+#合约标志
+CONTRACT_FLAG = "contract_"
+#函数名
+FUNCTION_FLAG = "function_"
+#事件标志
+EVENT_FLAG = "event_"
+#变量标志
+VARIABLE_FLAG = "variable_"
+#修改器标志
+MODIFIER_FLAG = "modifier_"
+#常量标志
+CONSTANT_FLAG = "constant_"
 
 '''
 总的想法是捕捉所有的命名，然后准备好对应的非法命名
@@ -50,6 +62,10 @@ class judgeAst:
 		#键是id，值是命名
 		idAndItsName = dict()
 		#没名字的不处理
+		#[bug fix]　要保证注入前同名的在注入后依然同名
+		#该字典的键是非法名，值是使用的随机数
+		nameAndItsRandom = dict()
+		'''
 		#1. 合约和库名
 		for contract in self.findASTNode(self.json, "name", "ContractDefinition"):
 			#拿到名字
@@ -59,7 +75,15 @@ class judgeAst:
 			#拿到起始位置
 			sPos, ePos = self.srcToPos(contract["src"])
 			#根据名字和种类产生非法命名
-			illegalName = contractName.lower() + str(randint(MIN_RANDOM, MAX_RANDOM))
+			illegalName = contractName.lower() 
+			nameKey = CONTRACT_FLAG + illegalName
+			if nameKey in nameAndItsRandom:
+				illegalName += nameAndItsRandom[nameKey]
+			else:
+				#新名字
+				randomStr = str(randint(MIN_RANDOM, MAX_RANDOM))
+				nameAndItsRandom[nameKey] = randomStr
+				illegalName += randomStr
 			contractSourceCode = self.sourceCode[sPos: ePos]
 			#记录
 			#首先是标记
@@ -75,6 +99,7 @@ class judgeAst:
 			injectInfo[SRC_KEY].append([sPos + startOffset, sPos + endOffset, illegalName])
 			#为之后的换名做准备
 			idAndItsName[contract["id"]] = [namePattern, illegalName]
+		'''
 		#2. 函数名
 		for func in self.findASTNode(self.json, "name", "FunctionDefinition"):
 			#过滤一些特殊函数
@@ -91,7 +116,15 @@ class judgeAst:
 			#拿到起始位置
 			sPos, ePos = self.srcToPos(func["src"])
 			#根据名字和种类产生非法命名
-			illegalName = funcName.upper() + str(randint(MIN_RANDOM, MAX_RANDOM))
+			illegalName = funcName.upper()
+			nameKey = FUNCTION_FLAG + illegalName
+			if nameKey in nameAndItsRandom:
+				illegalName += nameAndItsRandom[nameKey]
+			else:
+				#新名字
+				randomStr = str(randint(MIN_RANDOM, MAX_RANDOM))
+				nameAndItsRandom[nameKey] = randomStr
+				illegalName += randomStr
 			funcSourceCode = self.sourceCode[sPos: ePos]
 			#记录
 			#首先是标记
@@ -116,7 +149,15 @@ class judgeAst:
 			#拿到起始位置
 			sPos, ePos = self.srcToPos(func["src"]) 
 			#根据名字和种类产生非法命名
-			illegalName = funcName.upper() + str(randint(MIN_RANDOM, MAX_RANDOM))
+			illegalName = funcName.upper()
+			nameKey = EVENT_FLAG + illegalName
+			if nameKey in nameAndItsRandom:
+				illegalName += nameAndItsRandom[nameKey]
+			else:
+				#新名字
+				randomStr = str(randint(MIN_RANDOM, MAX_RANDOM))
+				nameAndItsRandom[nameKey] = randomStr
+				illegalName += randomStr
 			funcSourceCode = self.sourceCode[sPos: ePos]
 			#记录
 			#首先是标记
@@ -132,9 +173,46 @@ class judgeAst:
 			injectInfo[SRC_KEY].append([sPos + startOffset, sPos + endOffset, illegalName])
 			#为之后的换名做准备
 			idAndItsName[func["id"]] = [namePattern, illegalName]
-		#4. 函数变量命名
+		'''
+		#4. 函数变量和参数命名(非常数)
 		#处理函数参数的文档化缺失问题
 		for func in self.findASTNode(self.json, "name", "VariableDeclaration"):
+			#拿到名字
+			funcName = func["attributes"]["name"]
+			if func["attributes"]["constant"] ==  True:
+				continue
+			if not funcName:
+				continue
+			#拿到起始位置
+			sPos, ePos = self.srcToPos(func["src"]) 
+			#根据名字和种类产生非法命名
+			illegalName = funcName.upper()
+			nameKey = VARIABLE_FLAG + illegalName
+			if nameKey in nameAndItsRandom:
+				illegalName += nameAndItsRandom[nameKey]
+			else:
+				#新名字
+				randomStr = str(randint(MIN_RANDOM, MAX_RANDOM))
+				nameAndItsRandom[nameKey] = randomStr
+				illegalName += randomStr
+			funcSourceCode = self.sourceCode[sPos: ePos]
+			#记录
+			#首先是标记
+			temp = sPos
+			while self.sourceCode[temp] != "\n":
+				temp += 1
+			injectInfo[SRC_KEY].append([temp, temp, LABEL_BUG_FLAG])
+			#解决如何找到变量名准确的源代码位置的问题,　得用正则表达式
+			#第一个匹配的字符串位置就是变量名
+			namePattern  = r"(\b)(" + funcName + r")(\b)"
+			startOffset, endOffset = re.search(namePattern, funcSourceCode).span()
+			#记录位置
+			injectInfo[SRC_KEY].append([sPos + startOffset, sPos + endOffset, illegalName])
+			#为之后的换名做准备
+			idAndItsName[func["id"]] = [namePattern, illegalName]
+		'''
+		#5. 函数修改器命名
+		for func in self.findASTNode(self.json, "name", "ModifierDefinition"):
 			#拿到名字
 			funcName = func["attributes"]["name"]
 			if not funcName:
@@ -142,7 +220,15 @@ class judgeAst:
 			#拿到起始位置
 			sPos, ePos = self.srcToPos(func["src"]) 
 			#根据名字和种类产生非法命名
-			illegalName = funcName.upper() + str(randint(MIN_RANDOM, MAX_RANDOM))
+			illegalName = funcName.upper()
+			nameKey = MODIFIER_FLAG + illegalName
+			if nameKey in nameAndItsRandom:
+				illegalName += nameAndItsRandom[nameKey]
+			else:
+				#新名字
+				randomStr = str(randint(MIN_RANDOM, MAX_RANDOM))
+				nameAndItsRandom[nameKey] = randomStr
+				illegalName += randomStr
 			funcSourceCode = self.sourceCode[sPos: ePos]
 			#记录
 			#首先是标记
@@ -158,10 +244,57 @@ class judgeAst:
 			injectInfo[SRC_KEY].append([sPos + startOffset, sPos + endOffset, illegalName])
 			#为之后的换名做准备
 			idAndItsName[func["id"]] = [namePattern, illegalName]
-		#根据之前的记录，执行换名
+		#6. 对常量型变量的
+		for func in self.findASTNode(self.json, "name", "VariableDeclaration"):
+			#拿到名字
+			funcName = func["attributes"]["name"]
+			if func["attributes"]["constant"] == False:
+				continue
+			if not funcName:
+				continue
+			#拿到起始位置
+			sPos, ePos = self.srcToPos(func["src"]) 
+			#根据名字和种类产生非法命名
+			illegalName = funcName.lower()
+			nameKey = CONSTANT_FLAG + illegalName
+			if nameKey in nameAndItsRandom:
+				illegalName += nameAndItsRandom[nameKey]
+			else:
+				#新名字
+				randomStr = str(randint(MIN_RANDOM, MAX_RANDOM))
+				nameAndItsRandom[nameKey] = randomStr
+				illegalName += randomStr
+			funcSourceCode = self.sourceCode[sPos: ePos]
+			#记录
+			#首先是标记
+			temp = sPos
+			while self.sourceCode[temp] != "\n":
+				temp += 1
+			injectInfo[SRC_KEY].append([temp, temp, LABEL_BUG_FLAG])
+			#解决如何找到变量名准确的源代码位置的问题,　得用正则表达式
+			#第一个匹配的字符串位置就是变量名
+			namePattern  = r"(\b)(" + funcName + r")(\b)"
+			startOffset, endOffset = re.search(namePattern, funcSourceCode).span()
+			#记录位置
+			injectInfo[SRC_KEY].append([sPos + startOffset, sPos + endOffset, illegalName])
+			#为之后的换名做准备
+			idAndItsName[func["id"]] = [namePattern, illegalName]
+		#7. 根据之前的记录，执行换名
 		for key, value in idAndItsName.items():
 			#首先找到所有的引用
 			for ast in self.findASTNodeAttr(self.json, "referencedDeclaration", key):
+				#截取下来语句
+				sPos, ePos = self.srcToPos(ast["src"])
+				state = self.sourceCode[sPos: ePos]
+				#惊了，一句话里面重复调用一个方法
+				for item in re.finditer(value[0], state):
+					startOffset, endOffset = item.span()
+					#startOffset, endOffset = re.search(value[0], state).span()
+					injectInfo[SRC_KEY].append([sPos + startOffset, sPos + endOffset, value[1]])
+		#8. 补充，在内联汇编中的支持
+		for key, value in idAndItsName.items():
+			#首先找到所有的引用
+			for ast in self.findASTNode(self.json, "declaration", key):
 				#截取下来语句
 				sPos, ePos = self.srcToPos(ast["src"])
 				state = self.sourceCode[sPos: ePos]

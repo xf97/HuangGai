@@ -140,15 +140,18 @@ class judgeAst:
 
 	def cleanComment(self, _code):
 		#使用正则表达式捕捉单行和多行注释
-		singleLinePattern = re.compile(r"(//)(.)+")	#提前编译，以提高速度
-		multipleLinePattern = re.compile(r"(/\*)(.)+?(\*/)")
+		singleLinePattern = re.compile("///(.)+")	#提前编译，以提高速度
+		#multipleLinePattern = re.compile(r"\/\*(?:[^\*]|\*+[^\/\*])*\*+\/")
+		multipleLinePattern = re.compile(r"/\*(.|\n)*\*/")
 		#记录注释的下标
 		indexList = list()
-		for item in singleLinePattern.finditer(_code):
+		for item in singleLinePattern.finditer(_sourceCode):
 			indexList.append(item.span())
-		for item in multipleLinePattern.finditer(_code, re.S):
+		for item in multipleLinePattern.finditer(_sourceCode, re.S):
 			#多行注释，要允许多行匹配
+			#print("hahahah")
 			indexList.append(item.span())
+		indexList = sorted(indexList, key = lambda x: x[0])
 		#拼接新结果
 		startIndedx = 0
 		newCode = str()

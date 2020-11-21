@@ -58,7 +58,7 @@ class nonStandardNamingExtractor:
 		return True
 
 	def inStandardVersion(self, _nowVersion):
-		standardList = ["0.5.0", "0.5.1", "0.5.2", "0.5.3", "0.5.4", "0.5.5", "0.5.6", "0.5.7", "0.5.8", "0.5.9", "0.5.10", "0.5.11", "0.5.12", "0.5.13", "0.5.14", "0.5.15", "0.5.16", "0.5.17" \
+		standardList = ["0.5.0", "0.5.1", "0.5.2", "0.5.3", "0.5.4", "0.5.5", "0.5.6", "0.5.7", "0.5.8", "0.5.9", "0.5.10", "0.5.11", "0.5.12", "0.5.13", "0.5.14", "0.5.15", "0.5.16", "0.5.17", \
 		               "0.6.0", "0.6.1", "0.6.2", "0.6.3", "0.6.4", "0.6.5", "0.6.6", "0.6.7", "0.6.8", "0.6.9", "0.6.10", "0.6.11", "0.6.12", "0.7.0", "0.7.1"]
 		return _nowVersion in standardList
 
@@ -91,6 +91,7 @@ class nonStandardNamingExtractor:
 			try:
 				#拿到一个合约及其源代码
 				(sourceCode, prevFileName) = self.getSourceCode()
+				#print(sourceCode)
 				if not self.preFilter(sourceCode):
 					#前置过滤器
 					continue
@@ -126,8 +127,8 @@ class nonStandardNamingExtractor:
 		该函数从源代码数据存储位置提取le index out of range 
 		合约的名称和源代码
 		'''
-		#fileList = os.listdir(SOURCE_CODE_PATH)
-		fileList = os.listdir(TESTCASE_PATH)
+		fileList = os.listdir(SOURCE_CODE_PATH)
+		#fileList = os.listdir(TESTCASE_PATH)
 		#fileList = os.listdir(RESULT_PATH)
 		solList = list()
 		#根据文件后缀判断文件类型
@@ -141,13 +142,15 @@ class nonStandardNamingExtractor:
 		#print(index, solList[index])
 		try:
 			#拼接绝对路径
-			#sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
+			sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
 			#sourceCode = open(os.path.join(RESULT_PATH, solList[index]), "r", encoding = "utf-8").read()
-			sourceCode = open(os.path.join(TESTCASE_PATH, "complexContract.sol"), "r", encoding = "utf-8").read()
+			#sourceCode = open(os.path.join(TESTCASE_PATH, solList[index]), "r", encoding = "utf-8").read()
+			#[bug fix]清洗合约中的注释，防止对参数进行修改后导致文档化参数错误
+			sourceCode = self.cleanComment(sourceCode)
 			#[bug fix]清洗合约中的多字节字符，保证编译结果不错误
 			sourceCode = self.cleanMultibyte(sourceCode)
 			#self.index += 1
-			return sourceCode, "complexContract.sol" #solList[index]  
+			return sourceCode, solList[index]  
 		except:
 			#无法获取源代码，则引发异常
 			#self.index += 1
@@ -162,6 +165,30 @@ class nonStandardNamingExtractor:
 			else:
 				result += "1"
 		return result
+
+	def cleanComment(self, _sourceCode):
+		#使用正则表达式捕捉单行和多行注释
+		singleLinePattern = re.compile(r"///(.)+")	#提前编译，以提高速度
+		#multipleLinePattern = re.compile(r"\/\*(.)+?\*\/")
+		#multipleLinePattern = re.compile(r"/\*(.|\n)*\*/")
+		multipleLinePattern = re.compile(r"\/\*(?:[^\*]|\*+[^\/\*])*\*+\/")
+		#记录注释的下标
+		indexList = list()
+		for item in singleLinePattern.finditer(_sourceCode):
+			indexList.append(item.span())
+		for item in multipleLinePattern.finditer(_sourceCode):
+			#多行注释，要允许多行匹配
+			indexList.append(item.span())
+		indexList = sorted(indexList, key = lambda x: x[0])
+		#拼接新结果
+		startIndedx = 0
+		newCode = str()
+		for item in indexList:
+			newCode += _sourceCode[startIndedx: item[0]]	#不包括item[0]
+			newCode += " " * (item[1] - item[0])
+			startIndedx = item[1] #加一的目的是不覆盖前序的尾巴
+		newCode += _sourceCode[startIndedx:]
+		return newCode
 
 	def changeSolcVersion(self, _sourceCode):
 		#首先明确－如果合约内存在多个solc版本语句，则只不处理该合约
@@ -202,7 +229,7 @@ class nonStandardNamingExtractor:
 
 	def cacheContract(self, _sourceCode):
 		try:
-			with open(self.cacheContractPath, "w+", encoding = "utf-8") as f:
+			with open(self.cacheContractPath, "w", encoding = "utf-8") as f:
 				f.write(_sourceCode)
 			return
 		except:
@@ -241,5 +268,5 @@ class nonStandardNamingExtractor:
 			raise Exception("Failed to store the result.")
 				
 if __name__ == "__main__":
-	nsne = nonStandardNamingExtractor(1)
+	nsne = nonStandardNamingExtractor(100)
 	nsne.extractContracts()
