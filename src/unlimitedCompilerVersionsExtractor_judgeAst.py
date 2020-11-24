@@ -17,6 +17,8 @@ INJECT_INFO_PATH = "./injectInfo/"
 SRC_KEY = "srcPos"
 #无上限标志
 UNLIMITED_FLAG = "^"
+#结尾分号标志
+FENHAO_FLAG = ";"
 
 
 '''
@@ -36,6 +38,8 @@ class judgeAst:
 	def run(self):
 		injectInfo = dict()
 		injectInfo[SRC_KEY] =  list()
+		#组合替换语句
+		injectState = UNLIMITED_FLAG + self.solcVersion + FENHAO_FLAG
 		#1. 捕捉所有的版本标识语句, 如果没有直接false
 		pragmaFlag = False
 		pragmaPattern = re.compile(r"(pragma)(\s)+(solidity)(\s)+")
@@ -43,12 +47,15 @@ class judgeAst:
 			#有相关语句，先置位flag
 			pragmaFlag = True
 			#用正则表达式
+			#[attention] 此处的ePos包含分号
 			sPos, ePos = self.srcToPos(pragma["src"])
 			#语句
 			state = self.sourceCode[sPos: ePos]
 			#拿出不需要的位置
 			_, versionSpos = pragmaPattern.search(state).span()
-			print(sPos + versionSpos)
+			#记录替换位置
+			injectInfo[SRC_KEY].append([sPos + versionSpos, ePos,injectState])
+			#print(self.sourceCode[sPos + versionSpos:ePos])
 		#没有版本指定语句直接再见
 		if not pragmaFlag:
 			return False

@@ -2,16 +2,7 @@
 #-*- coding: utf-8 -*-
 
 '''
-此文件用于从数据集中抽取可能包含或者注入后可以包含
-未限制版本范围　bug
-的合约
-'''
-
-'''
-抽取标准：
-合约中只有一条编译器版本指定语句－－不一定
-然后记录该语句的位置
-在注入bug部分，替换为非法的、适用于该合约的最低版本形式
+该程序用于测试本路径内所有合约能否被编译
 '''
 
 import sys
@@ -22,7 +13,6 @@ import subprocess	#使用subprocess的popen，该popen是同步IO的
 from colorPrint import *	#该头文件中定义了色彩显示的信息
 import json
 from shutil import rmtree
-from judgeAst import judgeAst	#用于判断合约是否符合抽取标准
 import time
 
 #源代码数据存储位置
@@ -35,7 +25,7 @@ RESULT_PATH = "./result/"
 #缓存路径
 CACHE_PATH = "./cache/"
 
-class unlimitedCompilerVersionsExtractor:
+class canItBeCompiled:
 	def __init__(self, _needsNum = 100):
 		self.needs = _needsNum
 		self.nowNum = 0
@@ -45,6 +35,8 @@ class unlimitedCompilerVersionsExtractor:
 		self.cacheContractPath = "./cache/temp.sol" 
 		self.cacheJsonAstPath = "./cache/"	#默认json_ast存储名: json_ast
 		self.cacheJsonAstName = "temp.sol_json.ast"
+		self.index = 0
+		self.maxIndex = 100
 		try:
 			os.mkdir(CACHE_PATH)	#建立缓存文件夹
 		except:
@@ -86,8 +78,9 @@ class unlimitedCompilerVersionsExtractor:
 	def extractContracts(self):
 		stime = time.time()
 		contractNum = 0
+		successNum = 0
 		#当符合条件的合约数量不满足需求时，继续抽取
-		while self.nowNum < self.needs:
+		while self.nowNum < self.needs and self.index < self.maxIndex:
 			contractNum += 1
 			try:
 				#拿到一个合约及其源代码
@@ -103,56 +96,44 @@ class unlimitedCompilerVersionsExtractor:
 				self.changeSolcVersion(sourceCode)
 				#编译生成当前合约的抽象语法树(以json_ast形式给出)
 				jsonAst = self.compile2Json()
+				successNum += 1
+				#清空缓存数据
+				rmtree(CACHE_PATH)
+				#重新建立文件夹
+				os.mkdir(CACHE_PATH)
+				'''
 				#根据合约文件本身、抽象语法树来判断该合约是否符合标准
 				if self.judgeContract(jsonAst, sourceCode, prevFileName, self.defaultSolc) == True:
 					#将暂存文件及其JsonAst文件转移到结果保存文件中
-					self.storeResult(prevFileName)
+					#self.storeResult(prevFileName)
 					#符合标准，加１，写入数据文件
 					self.nowNum += 1 
 					#显示进度　
 					print("\r%s当前抽取进度: %.2f%s" % (blue, self.nowNum / self.needs, end))
-					#清空缓存数据
-					rmtree(CACHE_PATH)
-					#重新建立文件夹
-					os.mkdir(CACHE_PATH)
+
 				else:
 					continue
+				'''
 			except Exception as e:
 				print("%s %s %s" % (bad, e, end))
 				continue
 		print(time.time() - stime)
 		print(contractNum)
+		print(successNum)
 
 	def getSourceCode(self):
-		'''
-		该函数从源代码数据存储位置提取le index out of range 
-		合约的名称和源代码
-		'''
-		fileList = os.listdir(SOURCE_CODE_PATH)
-		#fileList = os.listdir(TESTCASE_PATH)
-		#fileList = os.listdir(RESULT_PATH)
-		solList = list()
-		#根据文件后缀判断文件类型
-		for i in fileList:
-			if i.split(".")[1] == "sol":
-				solList.append(i)
-			else:
-				continue
-		index = randint(0, len(solList) - 1)
-		#index = self.index
-		#print(index, solList[index])
+		solList = [file for file in os.listdir() if ".sol" in file]
+		index = self.index 
+		self.index += 1
+		self.maxIndex = len(solList)
 		try:
 			#拼接绝对路径
-			sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
-			#sourceCode = open(os.path.join(RESULT_PATH, solList[index]), "r", encoding = "utf-8").read()
-			#sourceCode = open(os.path.join(TESTCASE_PATH, "testCase.sol"), "r", encoding = "utf-8").read()
+			sourceCode = open(os.path.join(".", solList[index]), "r", encoding = "utf-8").read()
 			#[bug fix]清洗合约中的多字节字符，保证编译结果不错误
 			sourceCode = self.cleanMultibyte(sourceCode)
-			#self.index += 1
 			return sourceCode, solList[index]  
 		except:
 			#无法获取源代码，则引发异常
-			#self.index += 1
 			raise Exception("Unable to obtain source code " + solList[index])
 
 	#清洗合约源代码中的多字节字符
@@ -168,8 +149,6 @@ class unlimitedCompilerVersionsExtractor:
 	def cleanComment(self, _sourceCode):
 		#使用正则表达式捕捉单行和多行注释
 		singleLinePattern = re.compile(r"///(.)+")	#提前编译，以提高速度
-		#multipleLinePattern = re.compile(r"\/\*(.)+?\*\/")
-		#multipleLinePattern = re.compile(r"/\*(.|\n)*\*/")
 		multipleLinePattern = re.compile(r"\/\*(?:[^\*]|\*+[^\/\*])*\*+\/")
 		#记录注释的下标
 		indexList = list()
@@ -267,5 +246,5 @@ class unlimitedCompilerVersionsExtractor:
 			raise Exception("Failed to store the result.")
 				
 if __name__ == "__main__":
-	ucve = unlimitedCompilerVersionsExtractor(100)
-	ucve.extractContracts()
+	cibc = canItBeCompiled(50)
+	cibc.extractContracts()
