@@ -242,5 +242,7 @@ class DosByComplexFallbackExtractor:
 			raise Exception("Failed to store the result.")
 				
 if __name__ == "__main__":
-	dbcfe = DosByComplexFallbackExtractor(100)
+	#从命令行参数处接收需求数量
+	userNeed = sys.argv[1]
+	dbcfe = DosByComplexFallbackExtractor(int(userNeed))
 	dbcfe.extractContracts()

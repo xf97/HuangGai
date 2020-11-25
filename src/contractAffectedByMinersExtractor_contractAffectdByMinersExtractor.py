@@ -82,6 +82,7 @@ class contractAffectdByMinersExtractor:
 	def extractContracts(self):
 		stime = time.time()
 		contractNum = 0
+		print(sys.version)
 		#当符合条件的合约数量不满足需求时，继续抽取
 		while self.nowNum < self.needs:
 			contractNum += 1
@@ -144,7 +145,7 @@ class contractAffectdByMinersExtractor:
 			#[bug fix]清洗合约中的多字节字符，保证编译结果不错误
 			sourceCode = self.cleanMultibyte(sourceCode)
 			return sourceCode, solList[index] #"testCase.sol" #"overFlow.sol"
-		except:
+		except Exception as e:
 			#无法获取源代码，则引发异常
 			#self.index += 1
 			raise Exception("Unable to obtain source code " + solList[index])
@@ -183,8 +184,7 @@ class contractAffectdByMinersExtractor:
 		try:
 			if self.inStandardVersion(self.defaultSolc):
 				#在本机支持的solc版本范围内
-				compileResult = subprocess.run("solc use " + self.defaultSolc, check = True, shell = True)	#切换版本				
-				#print(compileResult.read())
+				subprocess.run("solc use " + self.defaultSolc, check = True, shell = True)	#切换版本			
 			else:
 				#如果超出本机支持的solc范围，则引发异常
 				#print("Use unsupported solc version.")
@@ -200,7 +200,8 @@ class contractAffectdByMinersExtractor:
 			with open(self.cacheContractPath, "w+", encoding = "utf-8") as f:
 				f.write(_sourceCode)
 			return
-		except:
+		except Exception as e:
+			print(e)
 			raise Exception("Failed to cache contract.")
 
 	def compile2Json(self):
@@ -239,5 +240,7 @@ class contractAffectdByMinersExtractor:
 
 #单元测试
 if __name__ == "__main__":
-	cabme = contractAffectdByMinersExtractor(100)
+	#从命令行参数处接收需求数量
+	userNeed = sys.argv[1]
+	cabme = contractAffectdByMinersExtractor(int(userNeed))
 	cabme.extractContracts()

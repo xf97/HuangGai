@@ -244,5 +244,7 @@ class unhandledExceptionExtractor:
 			raise Exception("Failed to store the result.")
 				
 if __name__ == "__main__":
-	uee = unhandledExceptionExtractor(100)
+	#从命令行参数处接收需求数量
+	userNeed = sys.argv[1]
+	uee = unhandledExceptionExtractor(int(userNeed))
 	uee.extractContracts()

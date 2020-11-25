@@ -264,5 +264,7 @@ class reentrancyExtractor:
 
 #单元测试
 if __name__ == "__main__":
-	ree = reentrancyExtractor(50)
+	#从命令行参数处接收需求数量
+	userNeed = sys.argv[1]
+	ree = reentrancyExtractor(int(userNeed))
 	ree.extractContracts()

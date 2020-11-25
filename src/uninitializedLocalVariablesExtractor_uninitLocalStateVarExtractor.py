@@ -259,5 +259,7 @@ class uninitLocalStateVarExtractor:
 
 #单元测试
 if __name__ == "__main__":
-	ulsve = uninitLocalStateVarExtractor(100)
+	#从命令行参数处接收需求数量
+	userNeed = sys.argv[1]
+	ulsve = uninitLocalStateVarExtractor(int(userNeed))
 	ulsve.extractContracts()

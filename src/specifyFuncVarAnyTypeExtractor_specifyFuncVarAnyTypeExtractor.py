@@ -238,5 +238,7 @@ class specifyFuncVarAnyTypeExtractor:
 
 #单元测试
 if __name__ == "__main__":
-	sfvate = specifyFuncVarAnyTypeExtractor(10)
+	#从命令行参数处接收需求数量
+	userNeed = sys.argv[1]
+	sfvate = specifyFuncVarAnyTypeExtractor(int(userNeed))
 	sfvate.extractContracts()

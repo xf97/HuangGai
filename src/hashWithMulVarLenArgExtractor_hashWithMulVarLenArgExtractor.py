@@ -242,5 +242,7 @@ class hashWithMulVarLenArgExtractor:
 
 #单元测试
 if __name__ == "__main__":
-	hwmvlae = hashWithMulVarLenArgExtractor(50)
+	#从命令行参数处接收需求数量
+	userNeed = sys.argv[1]
+	hwmvlae = hashWithMulVarLenArgExtractor(int(userNeed))
 	hwmvlae.extractContracts()

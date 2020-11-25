@@ -267,5 +267,7 @@ class unlimitedCompilerVersionsExtractor:
 			raise Exception("Failed to store the result.")
 				
 if __name__ == "__main__":
-	ucve = unlimitedCompilerVersionsExtractor(100)
+	#从命令行参数处接收需求数量
+	userNeed = sys.argv[1]
+	ucve = unlimitedCompilerVersionsExtractor(int(userNeed))
 	ucve.extractContracts()

@@ -238,5 +238,7 @@ class forcedToReceiveEthersExtractor:
 			raise Exception("Failed to store the result.")
 				
 if __name__ == "__main__":
-	ftree = forcedToReceiveEthersExtractor(80)
+	#从命令行参数处接收需求数量
+	userNeed = sys.argv[1]
+	ftree = forcedToReceiveEthersExtractor(int(userNeed))
 	ftree.extractContracts()

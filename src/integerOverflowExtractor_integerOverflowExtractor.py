@@ -237,5 +237,7 @@ class integerOverflowExtractor:
 
 #单元测试
 if __name__ == "__main__":
-	ioe = integerOverflowExtractor(100)
+	#从命令行参数处接收需求数量
+	userNeed = sys.argv[1]
+	ioe = integerOverflowExtractor(int(userNeed))
 	ioe.extractContracts()
