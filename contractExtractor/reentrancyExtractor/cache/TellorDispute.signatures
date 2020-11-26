@@ -1,7 +1,0 @@
-ca9a4ea5: beginDispute(TellorStorage.TellorStorageStruct storage,uint256,uint256,uint256)
-694bf49f: proposeFork(TellorStorage.TellorStorageStruct storage,address)
-def6fac7: tallyVotes(TellorStorage.TellorStorageStruct storage,uint256)
-97f5f972: unlockDisputeFee(TellorStorage.TellorStorageStruct storage,uint256)
-d7b651c1: updateMinDisputeFee(TellorStorage.TellorStorageStruct storage)
-22048ecf: updateTellor(TellorStorage.TellorStorageStruct storage,uint256)
-2da0706e: vote(TellorStorage.TellorStorageStruct storage,uint256,bool)

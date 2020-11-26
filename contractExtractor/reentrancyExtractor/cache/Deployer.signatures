@@ -1,8 +1,0 @@
-3e4b9f7a: computeAddress(bytes,bytes32)
-620289c3: computeAddressFor(bytes,bytes32,address)
-4af63f02: deploy(bytes,bytes32)
-d1925ed4: deployAndCall(bytes,bytes32,bytes)
-8f32d59b: isOwner()
-8da5cb5b: owner()
-715018a6: renounceOwnership()
-f2fde38b: transferOwnership(address)

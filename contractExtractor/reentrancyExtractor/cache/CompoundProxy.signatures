@@ -1,6 +1,0 @@
-70480275: addAdmin(address)
-109b88df: addcToken(address)
-62d91855: delAdmin(address)
-e00a5bba: delcToken(address)
-24d7806c: isAdmin(address)
-41c0e1b5: kill()

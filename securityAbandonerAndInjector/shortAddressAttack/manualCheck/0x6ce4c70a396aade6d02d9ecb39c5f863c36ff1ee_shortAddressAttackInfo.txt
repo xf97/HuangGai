@@ -1,3 +1,0 @@
-line_number: 902
-line_number: 1066
-line_number: 1105

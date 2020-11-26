@@ -1,1 +1,0 @@
-This part of the program grabs the contract source code from etherscan.io, then stores the source code in the sourceCode folder, and stores the contract and its address in the data folder.

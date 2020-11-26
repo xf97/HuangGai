@@ -1,4 +1,0 @@
-86605d96: changeRootnodeOwner(address)
-89b6f027: isAvailable(bytes32)
-76d64974: register(address,address,string,bytes)
-c456b205: resolveName(address)

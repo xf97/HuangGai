@@ -1,7 +1,0 @@
-2a9dcb06: accessLiquidity(address[],uint256[])
-47e7ef24: deposit(address,uint256)
-ed86172c: isTknAllowed(address)
-522d3571: liquidityBalance(address,address)
-0c3b37ac: returnLiquidity(address[])
-bd984ab6: tknToCTkn(address)
-f3fef3a3: withdraw(address,uint256)

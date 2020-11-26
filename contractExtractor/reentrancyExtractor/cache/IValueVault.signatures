@@ -1,8 +1,0 @@
-70a08231: balanceOf(address)
-8de1a3c7: burnByBank(address,address,uint256)
-c39fdb28: depositAvailable()
-31e19cfa: getStrategyCount()
-b8d47bf8: harvestAllStrategies(uint256)
-205b19fd: harvestStrategy(address,uint256)
-d1723540: mintByBank(address,address,uint256)
-d574ea3d: strategies(uint256)

@@ -1,3 +1,0 @@
-line_number: 576
-line_number: 591
-line_number: 677

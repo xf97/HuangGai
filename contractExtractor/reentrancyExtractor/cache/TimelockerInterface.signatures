@@ -1,3 +1,0 @@
-9d003e04: getDefaultTimelockExpiration(bytes4)
-336e73d0: getDefaultTimelockInterval(bytes4)
-ec2cd043: getTimelock(bytes4,bytes)

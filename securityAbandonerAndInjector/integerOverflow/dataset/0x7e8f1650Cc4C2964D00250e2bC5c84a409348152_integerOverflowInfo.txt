@@ -1,3 +1,0 @@
-line_number: 789
-line_number: 927
-line_number: 1045

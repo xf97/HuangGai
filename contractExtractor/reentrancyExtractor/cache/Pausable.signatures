@@ -1,7 +1,0 @@
-79ba5097: acceptOwnership()
-91b4ded9: lastPauseTime()
-1627540c: nominateNewOwner(address)
-53a47bb7: nominatedOwner()
-8da5cb5b: owner()
-5c975abb: paused()
-16c38b3c: setPaused(bool)

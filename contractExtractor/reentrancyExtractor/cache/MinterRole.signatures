@@ -1,7 +1,0 @@
-983b2d56: addMinter(address)
-aa271e1a: isMinter(address)
-8f32d59b: isOwner()
-8da5cb5b: owner()
-98650275: renounceMinter()
-715018a6: renounceOwnership()
-f2fde38b: transferOwnership(address)

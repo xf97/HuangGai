@@ -1,4 +1,0 @@
-37ef5a21: getColInfo(string)
-cb46dc3a: getMcdAddresses()
-94708776: getVaultById(uint256)
-fe7c9c92: getVaults(address)

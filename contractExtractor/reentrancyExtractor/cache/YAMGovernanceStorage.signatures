@@ -1,5 +1,0 @@
-e7a324dc: DELEGATION_TYPEHASH()
-20606b70: DOMAIN_TYPEHASH()
-f1127ed8: checkpoints(address,uint32)
-7ecebe00: nonces(address)
-6fcfff45: numCheckpoints(address)

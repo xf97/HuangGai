@@ -1,5 +1,0 @@
-5310dd31: adjustTraderProfitForFees(address,address,uint256,uint256)
-c4d66de8: initialize(address)
-45a684bb: recordClaim(address,address,uint256[])
-2e57cab7: recordFrozenFundChange(address,address,address,uint256,int256)
-12922c94: recordTrade(address,address,address,address,uint256,int256,int256,uint256,uint256,uint256,uint256)

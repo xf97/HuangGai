@@ -1,4 +1,0 @@
-70480275: addAdmin(address)
-62d91855: delAdmin(address)
-24d7806c: isAdmin(address)
-41c0e1b5: kill()

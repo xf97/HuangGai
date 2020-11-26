@@ -1,5 +1,0 @@
-b5ddb9c7: appendVestingEntry(address,uint256)
-70a08231: balanceOf(address)
-34e4a77c: getAvailableToVest(address)
-204b676a: numVestingEntries(address)
-458efde3: vest()

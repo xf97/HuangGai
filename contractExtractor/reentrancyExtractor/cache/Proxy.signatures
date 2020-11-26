@@ -1,7 +1,0 @@
-5c60da1b: implementation()
-8f32d59b: isOwner()
-8da5cb5b: owner()
-4555d5c9: proxyType()
-715018a6: renounceOwnership()
-f2fde38b: transferOwnership(address)
-025b22bc: updateImplementation(address)

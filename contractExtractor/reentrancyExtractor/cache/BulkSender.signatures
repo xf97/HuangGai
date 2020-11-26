@@ -1,6 +1,0 @@
-daea85c5: approve(address)
-2929abe6: distribute(address[],uint256[])
-6f9170f6: isWhiteListed(address)
-8da5cb5b: owner()
-29092d0e: remove(address)
-f2fde38b: transferOwnership(address)

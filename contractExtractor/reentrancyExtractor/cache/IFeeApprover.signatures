@@ -1,8 +1,0 @@
-301a5801: calculateAmountsAfterFee(address,address,uint256)
-b2e09624: check(address,address,uint256)
-3b4e71ad: feePercentX100()
-1e6a311d: setFeeMultiplier(uint256)
-37a66d85: setPaused()
-c5cb5be6: setTokenUniswapPair(address)
-6c9b8578: setdecoreTokenAddress(address)
-fff6cae9: sync()

@@ -1,8 +1,0 @@
-e0bab4c4: DAI()
-ad5c4648: WETH()
-2efff745: daiValue(address,uint256)
-2667e965: ethValue(address,uint256)
-23323374: perDAI(address)
-128f060a: perETH(address)
-071039e8: swapAmountFromETH(address,uint256)
-2681f7e4: uniswap()

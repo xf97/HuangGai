@@ -1,4 +1,0 @@
-fc2525ab: get(address,string)
-76977a3a: getPrice(address,string)
-38636e9a: put(bytes,bytes)
-482a6193: source(bytes,bytes)

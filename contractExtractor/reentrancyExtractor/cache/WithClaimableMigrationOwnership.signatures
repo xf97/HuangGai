@@ -1,5 +1,0 @@
-7b93af4c: claimMigrationOwnership()
-021abb93: isMigrationOwner()
-2c43bdd5: migrationOwner()
-209df1e2: renounceMigrationOwnership()
-9f587d1c: transferMigrationOwnership(address)

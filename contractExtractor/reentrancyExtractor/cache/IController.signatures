@@ -1,8 +1,0 @@
-e16c7d98: getContract(bytes32)
-8da5cb5b: owner()
-8456cb59: pause()
-5c975abb: paused()
-d737c2b0: setContractInfo(bytes32,address,bytes20)
-f2fde38b: transferOwnership(address)
-3f4ba83a: unpause()
-eb5dd94f: updateController(bytes32,address)

@@ -1,4 +1,0 @@
-a92f9719: addSmartPool(address)
-b30906d4: entries(uint256)
-e4ec552b: inRegistry(address)
-e64b4f23: removeSmartPool(uint256)

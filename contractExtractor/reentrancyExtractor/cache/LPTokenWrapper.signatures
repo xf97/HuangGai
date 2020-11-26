@@ -1,6 +1,0 @@
-70a08231: balanceOf(address)
-4390d2a8: devFund()
-a694fc3a: stake(uint256)
-72f702f3: stakingToken()
-18160ddd: totalSupply()
-2e1a7d4d: withdraw(uint256)

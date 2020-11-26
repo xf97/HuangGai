@@ -1,6 +1,0 @@
-9dc29fac: burn(address,uint256)
-dbd06c85: currencyKey()
-867904b4: issue(address,uint256)
-b014c3a3: transferAndSettle(address,uint256)
-e73cced3: transferFromAndSettle(address,address,uint256)
-ffff51d6: transferableSynths(address)

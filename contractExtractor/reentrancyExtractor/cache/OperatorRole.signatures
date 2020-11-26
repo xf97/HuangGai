@@ -1,7 +1,0 @@
-9870d7fe: addOperator(address)
-6d70f7ae: isOperator(address)
-8f32d59b: isOwner()
-8da5cb5b: owner()
-2ab6f8db: renounceOperator()
-715018a6: renounceOwnership()
-f2fde38b: transferOwnership(address)

@@ -1,6 +1,0 @@
-f8b2cb4f: getBalance(address)
-1f9d1c92: getLastWithdrawal(address)
-c7e284b8: getTimeLeft()
-7b04a2d0: onApprovalReceived(address,uint256,bytes)
-88a7ca5c: onTransferReceived(address,address,uint256,bytes)
-2e1a7d4d: withdraw(uint256)

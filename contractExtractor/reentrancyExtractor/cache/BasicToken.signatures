@@ -1,5 +1,0 @@
-70a08231: balanceOf(address)
-8da5cb5b: owner()
-18160ddd: totalSupply()
-a9059cbb: transfer(address,uint256)
-f2fde38b: transferOwnership(address)

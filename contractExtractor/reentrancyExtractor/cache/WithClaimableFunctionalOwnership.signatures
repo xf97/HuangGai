@@ -1,5 +1,0 @@
-1dc669f4: claimFunctionalOwnership()
-bed1807d: functionalOwner()
-3a88ab8e: isFunctionalOwner()
-3b781309: renounceFunctionalOwnership()
-9b9a7e68: transferFunctionalOwnership(address)

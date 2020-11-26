@@ -1,4 +1,0 @@
-3b3b57de: addr(bytes32)
-691f3431: name(bytes32)
-d5fa2b00: setAddr(bytes32,address)
-77372213: setName(bytes32,string)

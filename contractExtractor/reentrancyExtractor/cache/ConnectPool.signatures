@@ -1,8 +1,0 @@
-dd2380e8: accessLiquidity(address,uint256,uint256,uint256)
-466b4354: accessMultiLiquidity(address[],uint256[],uint256[],uint256[])
-eb15f781: connectorID()
-ce88b439: deposit(address,uint256,uint256,uint256)
-06fdde03: name()
-c5040a43: returnLiquidity(address,uint256,uint256)
-4d1273cf: returnMultiLiquidity(address[],uint256[],uint256[])
-4532d776: withdraw(address,uint256,uint256,uint256)

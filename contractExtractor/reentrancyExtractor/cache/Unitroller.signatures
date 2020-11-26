@@ -1,8 +1,0 @@
-e9c714f2: _acceptAdmin()
-c1e80334: _acceptImplementation()
-b71d1a0c: _setPendingAdmin(address)
-e992a041: _setPendingImplementation(address)
-f851a440: admin()
-bb82aa5e: comptrollerImplementation()
-26782247: pendingAdmin()
-dcfbc0c7: pendingComptrollerImplementation()

@@ -1,5 +1,0 @@
-70480275: addAdmin(address)
-62d91855: delAdmin(address)
-24d7806c: isAdmin(address)
-41c0e1b5: kill()
-c4e2c1e6: withdrawTo(address,uint256,address)

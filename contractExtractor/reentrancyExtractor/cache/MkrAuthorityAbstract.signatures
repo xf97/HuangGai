@@ -1,6 +1,0 @@
-b7009613: canCall(address,address,bytes4)
-9c52a7f1: deny(address)
-65fae35e: rely(address)
-ebf0c717: root()
-003ba1ed: setRoot(address)
-bf353dbb: wards(address)

@@ -1,5 +1,0 @@
-809a9e55: getExpectedRate(address,address,uint256)
-418436bc: getExpectedRateAfterFee(address,address,uint256,uint256,bytes)
-cb3c28c7: trade(address,uint256,address,address,uint256,uint256,address)
-29589f61: tradeWithHint(address,uint256,address,address,uint256,uint256,address,bytes)
-ae591d54: tradeWithHintAndFee(address,uint256,address,address,uint256,uint256,address,uint256,bytes)
