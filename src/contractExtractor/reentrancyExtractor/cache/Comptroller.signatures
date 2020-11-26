@@ -1,0 +1,5 @@
+929fe9a1: checkMembership(address,address)
+c2998238: enterMarkets(address[])
+ede4edd0: exitMarket(address)
+5ec88c79: getAccountLiquidity(address)
+abfceffc: getAssetsIn(address)

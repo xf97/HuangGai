@@ -1,0 +1,6 @@
+9e45e0d0: darknodeRegistry()
+8f32d59b: isOwner()
+8da5cb5b: owner()
+715018a6: renounceOwnership()
+563bf264: slash(address,address,address)
+f2fde38b: transferOwnership(address)

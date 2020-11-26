@@ -1,0 +1,6 @@
+e9af0292: claimComp(address)
+109d0af8: comp()
+a7f0e231: compInitialIndex()
+dca8a9e4: getBalance(address,address[])
+118e31b7: getBorrowBalance(address,address)
+0308afdf: getSuppyBalance(address,address)

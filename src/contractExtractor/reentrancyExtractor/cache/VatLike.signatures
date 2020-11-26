@@ -1,0 +1,8 @@
+4538c4eb: can(address,address)
+6c25b346: dai(address)
+76088703: frob(bytes32,address,address,address,int256,int256)
+214414d5: gem(bytes32,address)
+a3b22fc4: hope(address)
+d9638d36: ilks(bytes32)
+bb35783b: move(address,address,uint256)
+2424be5c: urns(bytes32,address)

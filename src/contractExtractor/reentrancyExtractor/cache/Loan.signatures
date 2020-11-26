@@ -1,0 +1,7 @@
+b352d4af: addCollateral(address,bytes32,address,uint256)
+85a13f38: addDebt(address,bytes32,address,uint256)
+a90cf0af: closeLoan(address,bytes32)
+81c44b5c: getLoan(address,bytes32)
+b02c808d: openLoan(address,address,uint256,address,uint256)
+ac5f8d51: removeCollateral(address,bytes32,address,uint256)
+e8ca0ca3: removeDebt(address,bytes32,address,uint256)

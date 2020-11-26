@@ -1,0 +1,5 @@
+313ce567: decimals()
+7284e416: description()
+9a6fc8f5: getRoundData(uint80)
+feaf968c: latestRoundData()
+54fd4d50: version()

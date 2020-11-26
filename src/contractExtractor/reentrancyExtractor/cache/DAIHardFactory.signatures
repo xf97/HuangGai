@@ -1,0 +1,8 @@
+e12f1746: createdTrades(uint256)
+2ce8b913: daiContract()
+c0907099: devFeeAddress()
+ce57be06: getBuyerDeposit(uint256)
+0fd40c2e: getDevFee(uint256)
+6ff26483: getExtraFees(uint256)
+0b3504e6: getNumTrades()
+46eb584c: openDAIHardTrade(address,bool,uint256[5],string,string,string)

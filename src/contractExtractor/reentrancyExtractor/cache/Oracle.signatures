@@ -1,0 +1,8 @@
+f8c439dc: ETH_EUR()
+093ae918: ETH_EURCENT()
+54a4adc2: EUR_WEI()
+c0463711: lastUpdate()
+a48e77f6: rateControl()
+4707d000: rescueToken(address,address)
+34fcf437: setRate(uint256)
+c8c2ed54: tokenAssignmentControl()

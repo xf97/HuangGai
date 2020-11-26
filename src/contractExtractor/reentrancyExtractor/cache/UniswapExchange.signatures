@@ -1,0 +1,3 @@
+59e94862: getEthToTokenOutputPrice(uint256)
+2640f62c: getTokenToEthOutputPrice(uint256)
+b040d545: tokenToTokenSwapOutput(uint256,uint256,uint256,uint256,address)

@@ -1,0 +1,6 @@
+4515cef3: add_liquidity(uint256[3],uint256)
+029b2f34: add_liquidity(uint256[4],uint256)
+3df02124: exchange(int128,int128,uint256,uint256)
+bb7b8b80: get_virtual_price()
+7d49d875: remove_liquidity(uint256,uint256[4])
+18a7bd76: remove_liquidity_imbalance(uint256[4],uint256)

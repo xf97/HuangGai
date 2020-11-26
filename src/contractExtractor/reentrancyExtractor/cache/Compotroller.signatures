@@ -1,0 +1,6 @@
+e9af0292: claimComp(address)
+cc7ebdc4: compAccrued(address)
+8c57804e: compBorrowState(address)
+ca0af043: compBorrowerIndex(address,address)
+b21be7fd: compSupplierIndex(address,address)
+6b79c38d: compSupplyState(address)

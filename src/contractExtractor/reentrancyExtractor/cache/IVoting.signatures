@@ -1,0 +1,5 @@
+5a55c1f0: getVote(uint256)
+4b12311c: getVoterState(uint256,address)
+fc0c546a: token()
+bcf93dd6: voteTime()
+de4f6347: votesLength()

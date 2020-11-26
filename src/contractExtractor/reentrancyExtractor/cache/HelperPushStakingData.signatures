@@ -1,0 +1,5 @@
+f851a440: admin()
+25971dff: becomeAdmin()
+6c8381f8: candidate()
+1a8526f2: pushStakingData(address,address[],uint256[],uint256[])
+07880b7f: setCandidate(address)

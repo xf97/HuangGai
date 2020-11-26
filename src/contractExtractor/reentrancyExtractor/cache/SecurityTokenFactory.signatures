@@ -1,0 +1,4 @@
+78a89567: getTokenCount()
+a0dc609d: newSecurityToken(string,string,uint8,address,address[],uint256[])
+c85e07b9: stamp()
+4f64b2be: tokens(uint256)

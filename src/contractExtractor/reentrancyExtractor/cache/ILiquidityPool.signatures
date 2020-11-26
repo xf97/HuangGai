@@ -1,0 +1,4 @@
+47e7ef24: deposit(address,uint256)
+4b93c875: isEther(address)
+52180208: take(address,uint256)
+f3fef3a3: withdraw(address,uint256)

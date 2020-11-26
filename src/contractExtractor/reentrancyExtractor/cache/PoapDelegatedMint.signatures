@@ -1,0 +1,5 @@
+02cce70b: mintToken(uint256,address,bytes)
+06fdde03: name()
+8da5cb5b: owner()
+ac13e2cf: processed(bytes)
+1cc7d743: validSigner()

@@ -1,0 +1,3 @@
+ec9e13aa: addInvestment(address,address,uint256,uint256)
+cac7495c: getInvestment(address,address)
+98d53428: removeInvestment(address,address,uint256)

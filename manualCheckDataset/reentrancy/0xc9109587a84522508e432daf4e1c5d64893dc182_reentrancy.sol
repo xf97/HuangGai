@@ -276,7 +276,7 @@ contract ERC20 is IERC20 {
      * @dev Supports selling tokens to the contract. It uses msg.sender.call.value() mrthod to be compatible with EIP-1884.
      * In addition to CEI, Mutex (noReentrancy modifier is also used to mitigate cross-function re-entrancy attack (along with same-function re-entrancy).
      */
-    function sell(uint256 tokens) external notPaused returns(bool success)
+    function sell(uint256 tokens) external notPaused noReentrancy returns(bool success)
     {
         require(tokens > 0, "No token to sell");                                /// Selling zero token is not allowed
         require(balances[msg.sender] >= tokens, "Not enough token");            /// Checks the seller's balance

@@ -1,0 +1,5 @@
+f5f62a69: flushToWallet(address,bool,uint256)
+6701586a: getMVDFunctionalitiesManagerAddress()
+ba83c16f: getStateHolderAddress()
+21df0da7: getToken()
+dbba0f01: transfer(address,uint256,address)

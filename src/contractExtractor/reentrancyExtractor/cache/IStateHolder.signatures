@@ -1,0 +1,4 @@
+16cf503e: clear(string)
+9535ce12: getBool(string)
+b8b2bdad: setBool(string,bool)
+825de8af: setUint256(string,uint256)

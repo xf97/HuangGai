@@ -1,0 +1,5 @@
+4e71e0c8: claimOwnership()
+8f32d59b: isOwner()
+8da5cb5b: owner()
+715018a6: renounceOwnership()
+f2fde38b: transferOwnership(address)

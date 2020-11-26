@@ -1,0 +1,7 @@
+7e5465ba: approve(address,address)
+e0b22c4c: drainToken(address)
+f712a6f8: ethToToken(uint256,uint256,address)
+41c0e1b5: kill()
+33bf9127: setEOA(address)
+57895ca2: setManagerContract(address)
+9e074552: tokenToEth(uint256,uint256,uint256,address)

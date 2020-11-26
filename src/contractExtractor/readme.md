@@ -1,0 +1,1 @@
+According to our predefined extraction criteria, this part of the program extracts contracts from the contractSpider/sourceCode folder until the number of extracted contracts reaches the user's needs (or the default value-100).

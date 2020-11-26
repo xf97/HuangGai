@@ -1,0 +1,6 @@
+70a08231: balanceOf(address)
+b02bf4b9: earn(address,uint256)
+9ec5a894: rewards()
+a622ee7c: vaults(address)
+75724589: want(address)
+f3fef3a3: withdraw(address,uint256)

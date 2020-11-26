@@ -1,0 +1,6 @@
+dd62ed3e: allowance(address,address)
+095ea7b3: approve(address,uint256)
+bd6d894d: exchangeRateCurrent()
+6e519d10: getMetaTransactionMessageHash(bytes4,bytes,uint256,bytes32)
+0053981b: modifyAllowanceViaMetaTransaction(address,address,uint256,uint256,bytes32,bytes)
+23b872dd: transferFrom(address,address,uint256)

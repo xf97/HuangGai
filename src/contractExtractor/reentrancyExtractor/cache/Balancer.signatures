@@ -1,0 +1,6 @@
+b02f0b73: exitPool(uint256,uint256[])
+46ab38f1: exitswapPoolAmountIn(address,uint256,uint256)
+4f69c0d4: joinPool(uint256,uint256[])
+5db34277: joinswapExternAmountIn(address,uint256,uint256)
+8201aa3f: swapExactAmountIn(address,uint256,address,uint256,uint256)
+7c5e9ea4: swapExactAmountOut(address,uint256,address,uint256,uint256)

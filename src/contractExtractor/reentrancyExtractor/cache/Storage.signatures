@@ -1,0 +1,6 @@
+f77c4791: controller()
+5aa6e675: governance()
+b429afeb: isController(address)
+dee1f0e4: isGovernance(address)
+92eefe9b: setController(address)
+ab033ea9: setGovernance(address)
