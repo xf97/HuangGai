@@ -36,7 +36,7 @@ class canItBeCompiled:
 		self.cacheJsonAstPath = "./cache/"	#默认json_ast存储名: json_ast
 		self.cacheJsonAstName = "temp.sol_json.ast"
 		self.index = 0
-		self.maxIndex = 100
+		self.maxIndex = _needsNum #100
 		try:
 			os.mkdir(CACHE_PATH)	#建立缓存文件夹
 		except:
@@ -117,12 +117,13 @@ class canItBeCompiled:
 			except Exception as e:
 				print("%s %s %s" % (bad, e, end))
 				continue
-		print(time.time() - stime)
-		print(contractNum)
-		print(successNum)
+		print("Compiling consumes time: ", time.time() - stime)
+		print("Contract num: ", contractNum)
+		print("Successful contract num: ", successNum)
 
 	def getSourceCode(self):
-		solList = [file for file in os.listdir() if ".sol" in file]
+		#solList = [file for file in os.listdir() if ".sol" in file]
+		solList = [file for file in os.listdir() if file.endswith(".sol")]
 		index = self.index 
 		try:
 			#拼接绝对路径
