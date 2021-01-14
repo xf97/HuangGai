@@ -4,11 +4,11 @@
 
 *HuangGai* is an Ethereum smart contract bug injection framework, it can inject 20 types of bugs into Solidity smart contract. *HuangGai* is compatible with multiple versions of Solidity (Solidity 0.5.x, 0.6.x, 0.7.x).
 
-Users can use *HuangGai* to generate the large-scale and vulnerable contract datasets without preparing contracts in advance (*HuangGai* integrates a contract crawler engine, of course, you can also use your contracts).
+Users can use *HuangGai* to generate the large-scale vulnerable contract datasets without preparing contracts in advance (*HuangGai* integrates a contract crawler engine, of course, you can also use your contracts).
 
 One of the goals of *HuangGai* is to inject bugs into the contract while keeping the original content of the contract as much as possible, so as to ensure the authenticity of the injected contracts (i.e.,  contracts that have been injected bugs by *HuangGai*).
 
-For more information on Bugs, we have a [paper](https://github.com/xf97/HuangGai/blob/master/OurPaper.pdf).
+For more information on *HuangGai*, we have a [paper](https://github.com/xf97/HuangGai/blob/master/OurPaper.pdf).
 
 *HuangGai* can inject the following 20 types of bugs into the contracts (the names and definitions of the bugs are from our *[Jiuzhou](https://github.com/xf97/JiuZhou)* classification framework):
 
@@ -58,10 +58,10 @@ And you're done! The collected real contracts are stored in the folder `src/cont
 
 **Note 3**: You can also use your contracts (.sol files) by copying them to folder `src/contractSpider/contractCodeGetter/sourceCode`.
 
-**Note 4**: You can also use the real contract dataset we collect, which is `sourceCodeDateSet.zip`. After decompressing the `sourceCodeDateSet.zip`, you can get 66,205 real contracts.
+**Note 4**: You can also use the *real contract* dataset we collect, which is `sourceCodeDateSet.zip`. After decompressing the `sourceCodeDateSet.zip` (forgive me for my typo (data -> date).), you can get 66,205 *real contracts* and then copy these contracts to folder `src/contractSpider/contractCodeGetter/sourceCode`.
 
 ### Stage 2
-Make sure that folder a contains the real contracts, and then you can inject bugs into the contracts in the following two steps:
+Make sure that folder `src/contractSpider/contractCodeGetter/sourceCode` contains the *real contracts*, and then you can inject bugs into the contracts in the following two steps:
 #### Step 1: Specify your needs
 Now you should open the file `/src/userNeeds.json` and specify your needs by modifying the content of file `/src/userNeeds.json`. File `/src/userNeeds.json` requires you to specify the number of contracts containing each type of bugs and the maximum injection time.
 
