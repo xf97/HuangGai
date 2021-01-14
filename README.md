@@ -114,11 +114,14 @@ At present, we have only tested *HuangGai* on Ubuntu (18.04).
 
 ## Datasets we provide
 Through *HuangGai*, we generate and release the following 3 datasets:
+1. **[Dataset 1](https://github.com/xf97/HuangGai/tree/master/manualCheckDataset)**: This dataset consists of 964 buggy contracts, covering 20 types of bugs, and 3 researchers who familiar with smart contract bugs check the injected bugs in these buggy contracts to ensure that all injected bugs can be activated (i.e., the injected bugs can be exploited by external attackers). As far as we know, **dataset 1** is currently the largest (number of contracts) buggy contract dataset with bug labels.
+2. **[Dataset 2](https://github.com/xf97/HuangGai/tree/master/injectedContractDataSet)**: This dataset consists of 4,744 buggy contracts, covering 20 types of bugs. Users can use the contracts in **dataset 1** and **2** as the benchmark to evaluate the performance of analysis tools, to obtain the true performance of the analysis tools.
+3. **[Dataset 3](https://github.com/xf97/HuangGai/blob/master/sourceCodeDateSet.zip)**: This dataset consists of 66,205 real contracts. Users can analyze the contracts in this dataset to know the current overview of Ethereum smart contracts.
 
-## Open-source code used in *HuangGai*
 
 
 ## License
+This project is issued, reproduced or used under the permission of **MIT**. Please indicate the source when using.
 
 
 
