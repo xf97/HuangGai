@@ -44,7 +44,7 @@ We hope that this bug injection framework, like *Huang Gai*, is superficially a 
 ### Stage 1
 First, you need to collect *real contracts* (i.e., smart contracts deployed on Ethereum) before injecting bugs into contracts. *HuangGai* integrates a contract spider (we call this spider *ContractSpider*) developed based on [Python scrapy framework](https://github.com/scrapy/scrapy), which can collect tens of thousands of real contracts in several hours.
 
-Enter the following instructions in the terminal (eg., ubuntu os):
+Enter the following commands in the terminal (eg., ubuntu os):
 ```
 cd src/contractSpider/contractCodeGetter/data/
 python3 autoCrawl.py
@@ -71,10 +71,41 @@ Specifically, the content structure of file `/src/userNeeds.json` is as follows:
 ```
 
 #### Step 2: Start injecting
+Enter the following commands in the terminal to start the injection (eg., ubuntu os):
+```
+cd src/
+python3 main.py
+```
+And you're done! The injection result will be printed in the terminal.
 
 ## How to install
+*HuangGai* requires Python 3.6+.
+
+1. Clone source coode
+```
+git clone https://github.com/xf97/HuangGai
+```
+
+2. Install dependencies
+*HuangGai* needs to use *solc* (multiple versions) and *Slither*, so please use the following commands to install dependencies:
+```
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+
+
+## Supported operating systems
+At present, we have only tested *HuangGai* on Ubuntu (18.04).
 
 ## Datasets we provide
 Through *HuangGai*, we generate and release the following 3 datasets:
+
+## Open-source code used in *HuangGai*
+
+
+## License
+
+
 
 
