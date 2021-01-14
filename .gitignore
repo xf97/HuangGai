@@ -14,3 +14,4 @@ contractExtractor/securityAbandonerAndInjector/integerOverflow/dataset/*.txt
 contractExtractor/securityAbandonerAndInjector/integerOverflow/manualCheck/*.solcontractExtractor/securityAbandonerAndInjector/integerOverflow/manualCheck/*.txt*.sol
 *.json
 *.ast
+sourceCodeDate.zip

@@ -56,8 +56,25 @@ And you're done! The collected real contracts are stored in the folder `src/cont
 
 **Note 2**: To reduce the load of the crawled URL, the default crawl interval of *ContractSpider* is 5 seconds per contract. You can reduce or increase the interval by modifying the variable *DOWNLOAD_DELAY* (in seconds) in file `/src/contractSpider/contractCodeGetter/contractCodeGetter/spiders/setting.py`.
 
-**Note 3**: You can also use your contracts by copying them to folder `src/contractSpider/contractCodeGetter/sourceCode`.
+**Note 3**: You can also use your contracts (.sol files) by copying them to folder `src/contractSpider/contractCodeGetter/sourceCode`.
+
+**Note 4**: You can also use the real contract dataset we collect, which is `sourceCodeDateSet.zip`. After decompressing the `sourceCodeDateSet.zip`, you can get 66,205 real contracts.
 
 ### Stage 2
+Make sure that folder a contains the real contracts, and then you can inject bugs into the contracts in the following two steps:
+#### Step 1: Specify your needs
+Now you should open the file `/src/userNeeds.json` and specify your needs by modifying the content of file `/src/userNeeds.json`. File `/src/userNeeds.json` requires you to specify the number of contracts containing each type of bugs and the maximum injection time.
+
+Specifically, the content structure of file `/src/userNeeds.json` is as follows:
+```
+[bug type]: [the number of contracts you need to contain this type of bug, the time limit for injecting this type of bug (in minutes)]
+```
+
+#### Step 2: Start injecting
+
+## How to install
+
+## Datasets we provide
+Through *HuangGai*, we generate and release the following 3 datasets:
 
 
