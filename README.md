@@ -1,5 +1,7 @@
 # HuangGai(黄盖)
 ![logo](logo.png)
+
+
 *HuangGai* is an Ethereum smart contract bug injection framework, it can inject 20 types of bugs into Solidity smart contract. *HuangGai* is compatible with multiple versions of Solidity (Solidity 0.5.x, 0.6.x, 0.7.x).
 
 Users can use *HuangGai* to generate the large-scale and vulnerable contract datasets without preparing contracts in advance (*HuangGai* integrates a contract crawler engine, of course, you can also use your contracts).
@@ -28,3 +30,6 @@ Users can use *HuangGai* to generate the large-scale and vulnerable contract dat
 | 18 | Non-public variables are accessed by *public*/*external* |
 | 19 | Nonstandard naming |
 | 20 | Unlimited compiler versions |
+
+## Why do we name this framework *HuangGai*?
+*Huang Gai* was a famous general of *Wu* state during the *Three Kingdoms period*. His most well-known achievement was: in the battle of *Chibi* in the 13th year of Jian'an (208 AD), *Huang Gai* went to *Cao Cao*'s camp to pretend to surrender (the **bitter meat tactics**) and took the opportunity to attack *Cao Cao*'s army with fire.
