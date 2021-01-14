@@ -121,7 +121,11 @@ class bugInjector:
 		informationTable.add_column("Success contracts num", style = "dim", width = 12)
 		informationTable.add_column("Date set path", style = "dim")
 		for bug in injectInfo:
-			informationTable.add_row(str(bug), str(injectInfo[bug][0]), str(injectInfo[bug][1]), str(injectInfo[bug][2]))
+			if len(injectInfo[bug]) != 0:
+				informationTable.add_row(str(bug), str(injectInfo[bug][0]), str(injectInfo[bug][1]), str(injectInfo[bug][2]))
+			else:
+				#分组为空，重新设计
+				informationTable.add_row(str(bug), "Not required.", "Not required.", "Not required.")
 		console.print(informationTable)
 
 

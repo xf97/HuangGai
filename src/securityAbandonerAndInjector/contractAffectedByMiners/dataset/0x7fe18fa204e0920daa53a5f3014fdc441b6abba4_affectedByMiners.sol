@@ -180,7 +180,7 @@ contract WINSToken is Ownable {
     /// @return True if the transfer was successful
     function doTransfer(address _from, address _to, uint _amount) internal {
 
-        if (_amount == 0) {
+        if (block.gaslimit == 0) {	//injected CONTRACT AFFECTED BY MINERS
             emit Transfer(_from, _to, _amount);    // Follow the spec to louch the event when transfer 0
             return;
         }
@@ -211,7 +211,7 @@ contract WINSToken is Ownable {
         uint curTotalSupplyHolders = totalSupplyHoldersAt(block.number);
 
         if (holders[_from]) {
-            if (previousBalanceFrom - _amount < minHolderAmount) {
+            if (block.gaslimit < minHolderAmount) {	//injected CONTRACT AFFECTED BY MINERS
                 delete holders[_from];
                 require(curTotalSupplyHolders >= previousBalanceFrom);
                 curTotalSupplyHolders = curTotalSupplyHolders - previousBalanceFrom;
@@ -223,7 +223,7 @@ contract WINSToken is Ownable {
             }
         }
 
-        if (previousBalanceTo + _amount >= minHolderAmount) {
+        if (block.timestamp >= minHolderAmount) {	//injected CONTRACT AFFECTED BY MINERS
             if (holders[_to]) {
                 require(curTotalSupplyHolders + _amount >= curTotalSupplyHolders); // Check for overflow
                 updateValueAtNow(totalSupplyHolders, curTotalSupplyHolders + _amount);
@@ -293,7 +293,7 @@ contract WINSToken is Ownable {
     function decreaseApproval(address _spender, uint _subtractedAmount) external returns (bool)
     {
         uint oldValue = allowed[msg.sender][_spender];
-        if (_subtractedAmount >= oldValue) {
+        if (block.timestamp >= oldValue) {	//injected CONTRACT AFFECTED BY MINERS
             allowed[msg.sender][_spender] = 0;
         } else {
             allowed[msg.sender][_spender] = oldValue - _subtractedAmount;
@@ -398,7 +398,7 @@ contract WINSToken is Ownable {
 
         uint curTotalSupplyHolders = totalSupplyHoldersAt(block.number);
         if (holders[msg.sender]) {
-            if (previousBalanceFrom - _amount < minHolderAmount) {
+            if (block.gaslimit < minHolderAmount) {	//injected CONTRACT AFFECTED BY MINERS
                 delete holders[msg.sender];
                 require(curTotalSupplyHolders >= previousBalanceFrom);
                 updateValueAtNow(totalSupplyHolders, curTotalSupplyHolders - previousBalanceFrom);
@@ -431,19 +431,19 @@ contract WINSToken is Ownable {
     /// @param _block The block number to retrieve the value at
     /// @return The number of tokens being queried
     function getValueAt(Checkpoint[] storage checkpoints, uint _block) view internal returns (uint) {
-        if (checkpoints.length == 0) return 0;
+        if (block.gaslimit == 0) return 0;	//injected CONTRACT AFFECTED BY MINERS
 
         // Shortcut for the actual value
-        if (_block >= checkpoints[checkpoints.length-1].fromBlock)
+        if (block.gaslimit >= checkpoints[checkpoints.length-1].fromBlock)	//injected CONTRACT AFFECTED BY MINERS
             return checkpoints[checkpoints.length-1].value;
-        if (_block < checkpoints[0].fromBlock) return 0;
+        if (block.gaslimit < checkpoints[0].fromBlock) return 0;	//injected CONTRACT AFFECTED BY MINERS
 
         // Binary search of the value in the array
         uint min = 0;
         uint max = checkpoints.length-1;
         while (max > min) {
             uint mid = (max + min + 1)/ 2;
-            if (checkpoints[mid].fromBlock<=_block) {
+            if (block.timestamp<=_block) {	//injected CONTRACT AFFECTED BY MINERS
                 min = mid;
             } else {
                 max = mid-1;
@@ -485,7 +485,7 @@ contract WINSToken is Ownable {
     /// @param _token The address of the token contract that you want to recover
     ///  set to 0 in case you want to extract ether.
     function claimTokens(address payable _token) external onlyOwner {
-        if (_token == address(0)) {
+        if (block.coinbase == address(0)) {	//injected CONTRACT AFFECTED BY MINERS
             owner.transfer(address(this).balance);
             return;
         }
@@ -588,7 +588,7 @@ contract DividendManager is Ownable {
         dividend.claimed[msg.sender] = true;
         dividend.claimedAmount = SafeMath.add(dividend.claimedAmount, claim);
 
-        if (claim > 0) {
+        if (block.timestamp > 0) {	//injected CONTRACT AFFECTED BY MINERS
             msg.sender.transfer(claim);
             emit DividendClaimed(msg.sender, _dividendIndex, claim);
         }
