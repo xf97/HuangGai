@@ -118,6 +118,8 @@ Through *HuangGai*, we generate and release the following 3 datasets:
 2. **[Dataset 2](https://github.com/xf97/HuangGai/tree/master/injectedContractDataSet)**: This dataset consists of 4,744 buggy contracts, covering 20 types of bugs. Users can use the contracts in **dataset 1** and **2** as the benchmark to evaluate the performance of analysis tools, to obtain the true performance of the analysis tools.
 3. **[Dataset 3](https://github.com/xf97/HuangGai/blob/master/sourceCodeDateSet.zip)**: This dataset consists of 66,205 real contracts. Users can analyze the contracts in this dataset to know the current overview of Ethereum smart contracts.
 
+## Issues
+If you have any problems using *HuangGai*, please feel free to let me know at any time.
 
 
 ## License
