@@ -87,13 +87,27 @@ git clone https://github.com/xf97/HuangGai
 ```
 
 2. Install dependencies
-*HuangGai* needs to use *solc* (multiple versions) and *Slither*, so please use the following commands to install dependencies:
+
+*HuangGai* needs to use [Slither](https://github.com/crytic/slither) and [Scrapy](https://github.com/scrapy/scrapy), so please use the following commands to install dependencies:
 ```
+cd HuangGai/
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
+3. Install multiple *solc* versions
 
+We use [solc-select](https://github.com/crytic/solc-select) to install multiple versions of solc:
+```
+cd ..
+git clone https://github.com/crytic/solc-select.git
+./solc-select/scripts/install.sh
+```
+
+This will install `solc` into `~/.solc-select/`, so you have to add it to the **PATH** variable. Add this line, replacing **USERNAME** with your username, to your `.bashrc` or equivalent:
+```
+export PATH=/home/USERNAME/.solc-select:$PATH
+```
 
 ## Supported operating systems
 At present, we have only tested *HuangGai* on Ubuntu (18.04).
