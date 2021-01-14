@@ -56,5 +56,8 @@ And you're done! The collected real contracts are stored in the folder `src/cont
 
 **Note 2**: To reduce the load of the crawled URL, the default crawl interval of *ContractSpider* is 5 seconds per contract. You can reduce or increase the interval by modifying the variable *DOWNLOAD_DELAY* (in seconds) in file `/src/contractSpider/contractCodeGetter/contractCodeGetter/spiders/setting.py`.
 
-**Note 3**: 
+**Note 3**: You can also use your contracts by copying them to folder `src/contractSpider/contractCodeGetter/sourceCode`.
+
+### Stage 2
+
 
