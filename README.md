@@ -92,7 +92,9 @@ git clone https://github.com/xf97/HuangGai
 ```
 cd HuangGai/
 pip install --upgrade pip
-pip install -r requirements.txt
+pip install rich
+pip install graphvi
+pip install pydot
 ```
 
 3. Install multiple *solc* versions
