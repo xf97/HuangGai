@@ -40,6 +40,16 @@ For more information on *HuangGai*, we have a [paper](https://github.com/xf97/Hu
 
 We hope that this bug injection framework, like *Huang Gai*, is superficially a surrender of the enemy (generating a large number of vulnerable contracts), but actually the bug injection framework is helping us win (helping to evaluate the smart contract analysis tools and further promote the progress of the analysis tools).
 
+## Quick start
+We provide docker image of *HuangGai*. In this docker image, we have installed *HuangGai* and all the dependencies *HuangGai* needs to run, and collected 66,205 *real contracts* in this image. You just need to pull the docker image and modify ithe *userNeeds.json* (by *vim*), and you're done.
+
+Make sure that docker is installed and the network is good. Enter the following instructions in the terminal (eg., ubuntu os):
+```
+sudo docker pull xf15850673022/huanggai:latest
+sudo docker run -it xf15850673022/huanggai:latest
+root@d3eef7f13492:~/HuangGai# ln -s /usr/bin/python3 /usr/bin/python
+```
+
 ## How to use
 ### Stage 1
 First, you need to collect *real contracts* (i.e., smart contracts deployed on Ethereum) before injecting bugs into contracts. *HuangGai* integrates a contract spider (we call this spider *ContractSpider*) developed based on [Python scrapy framework](https://github.com/scrapy/scrapy), which can collect tens of thousands of real contracts in several hours.
@@ -69,6 +79,8 @@ Specifically, the content structure of file `/src/userNeeds.json` is as follows:
 ```
 [bug type]: [the number of contracts you need to contain this type of bug, the time limit for injecting this type of bug (in minutes)]
 ```
+
+**Note 1**: Injecting *re-entrancy* and *specify function variable as any type* bugs will take a lot of time. If you need to inject these two types of bugs into the contracts, please specify a longer timeout value.
 
 #### Step 2: Start injecting
 Enter the following commands in the terminal to start the injection (eg., ubuntu os):
