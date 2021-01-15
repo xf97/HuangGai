@@ -45,8 +45,8 @@ We provide docker image of *HuangGai*. In this docker image, we have installed *
 
 Make sure that docker is installed and the network is good. Enter the following instructions in the terminal (eg., ubuntu os):
 ```
-sudo docker pull xf15850673022/huanggai:latest
-sudo docker run -it xf15850673022/huanggai:latest
+sudo docker pull xf15850673022/huanggai:1.0
+sudo docker run -it xf15850673022/huanggai:1.0
 root@d3eef7f13492:~/HuangGai# ln -s /usr/bin/python3 /usr/bin/python
 ```
 
@@ -80,7 +80,7 @@ Specifically, the content structure of file `/src/userNeeds.json` is as follows:
 [bug type]: [the number of contracts you need to contain this type of bug, the time limit for injecting this type of bug (in minutes)]
 ```
 
-**Note 1**: Injecting *re-entrancy* and *specify function variable as any type* bugs will take a lot of time. If you need to inject these two types of bugs into the contracts, please specify a longer timeout value.
+**Note 5**: Injecting *re-entrancy* and *specify function variable as any type* bugs will take a lot of time. If you need to inject these two types of bugs into the contracts, please specify a longer timeout value.
 
 #### Step 2: Start injecting
 Enter the following commands in the terminal to start the injection (eg., ubuntu os):
