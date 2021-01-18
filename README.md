@@ -41,7 +41,7 @@ For more information on *HuangGai*, we have a [paper](https://github.com/xf97/Hu
 We hope that this bug injection framework, like *Huang Gai*, is superficially a surrender of the enemy (generating a large number of vulnerable contracts), but actually the bug injection framework is helping us win (helping to evaluate the smart contract analysis tools and further promote the progress of the analysis tools).
 
 ## Quick start
-We provide docker image of *HuangGai*. In this docker image, we have installed *HuangGai* and all the dependencies *HuangGai* needs to run, and collected 66,205 *real contracts* in this image. You just need to pull the docker image and modify ithe *userNeeds.json* (by *vim*), and you're done.
+We provide a docker image of *HuangGai*. In this docker image, we have installed *HuangGai* and all the dependencies *HuangGai* needs to run, and collected 66,205 *real contracts* in this image. You just need to pull the docker image and modify ithe *userNeeds.json* (by *vim*), and you're done.
 
 Make sure that docker is installed and the network is good. Enter the following instructions in the terminal (eg., ubuntu os):
 ```
@@ -107,6 +107,8 @@ pip install --upgrade pip
 pip install rich
 pip install graphvi
 pip install pydot
+pip install slither-analyzer
+pip install scrapy
 ```
 
 3. Install multiple *solc* versions
