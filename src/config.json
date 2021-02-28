@@ -1,0 +1,202 @@
+{
+  "contractAffectedByMiners": {
+    "Extractor" : [
+      "contractExtractor/contractAffectedByMinersExtractor",
+      "python contractAffectdByMinersExtractor.py"
+    ],
+    "Injector": [
+      "securityAbandonerAndInjector/contractAffectedByMiners",
+      "python main.py"
+    ]
+  },
+  "DosByComplexFallback": {
+    "Extractor" : [
+      "contractExtractor/DosByComplexFallbackExtractor",
+      "python DosByComplexFallbackExtractor.py"
+    ],
+    "Injector": [
+      "securityAbandonerAndInjector/DosByComplexFallback",
+      "python main.py"
+    ]
+  },
+  "forcedToReceiveEthers": {
+    "Extractor" : [
+      "contractExtractor/forcedToReceiveEthersExtractor",
+      "python forcedToReceiveEthersExtractor.py"
+    ],
+    "Injector": [
+      "securityAbandonerAndInjector/forcedToReceiveEthers",
+      "python main.py"
+    ]
+  },
+  "hashWithMulVarLenArg": {
+    "Extractor" : [
+      "contractExtractor/hashWithMulVarLenArgExtractor",
+      "python hashWithMulVarLenArgExtractor.py"
+    ],
+    "Injector": [
+      "securityAbandonerAndInjector/hashWithMulVarLenArg",
+      "python main.py"
+    ]
+  },
+  "integerOverflow": {
+    "Extractor" : [
+      "contractExtractor/integerOverflowExtractor",
+      "python integerOverflowExtractor.py"
+    ],
+    "Injector": [
+      "securityAbandonerAndInjector/integerOverflow",
+      "python main.py"
+    ]
+  },
+  "lockedEther": {
+    "Extractor" : [
+      "contractExtractor/lockedEtherExtractor",
+      "python lockedEtherExtractor.py"
+    ],
+    "Injector": [
+      "securityAbandonerAndInjector/lockedEther",
+      "python main.py"
+    ]
+  },
+  "NonpublicVarAccessdByPublicFunc": {
+    "Extractor" : [
+      "contractExtractor/NonpublicVarAccessdByPublicFuncExtractor",
+      "python NonpublicVarAccessdByPublicFuncExtractor.py"
+    ],
+    "Injector": [
+      "securityAbandonerAndInjector/NonpublicVarAccessdByPublicFunc",
+      "python main.py"
+    ]
+  },
+  "nonStandarNaming": {
+    "Extractor" : [
+      "contractExtractor/nonStandardNamingExtractor",
+      "python nonStandardNamingExtractor.py"
+    ],
+    "Injector": [
+      "securityAbandonerAndInjector/nonStandarNaming",
+      "python main.py"
+    ]
+  },
+  "preSentEther": {
+    "Extractor" : [
+      "contractExtractor/preSentEtherExtractor",
+      "python preSentEtherExtractor.py"
+    ],
+    "Injector": [
+      "securityAbandonerAndInjector/preSentEther",
+      "python main.py"
+    ]
+  },
+  "publicFuncToExternal": {
+    "Extractor" : [
+      "contractExtractor/publicFuncToExternalExtractor",
+      "python publicFuncToExternalExtractor.py"
+    ],
+    "Injector": [
+      "securityAbandonerAndInjector/publicFuncToExternal",
+      "python main.py"
+    ]
+  },
+  "reentrancy": {
+    "Extractor" : [
+      "contractExtractor/reentrancyExtractor",
+      "python reentrancyExtractor.py"
+    ],
+    "Injector": [
+      "securityAbandonerAndInjector/reentrancy",
+      "python main.py"
+    ]
+  },
+  "shortAddressAttack": {
+    "Extractor" : [
+      "contractExtractor/shortAddressAttackExtractor",
+      "python shortAddressExtractor.py"
+    ],
+    "Injector": [
+      "securityAbandonerAndInjector/shortAddressAttack",
+      "python main.py"
+    ]
+  },
+  "specifyFuncVarAnyType": {
+    "Extractor" : [
+      "contractExtractor/specifyFuncVarAnyTypeExtractor",
+      "python specifyFuncVarAnyTypeExtractor.py"
+    ],
+    "Injector": [
+      "securityAbandonerAndInjector/specifyFuncVarAnyType",
+      "python main.py"
+    ]
+  },
+  "suicideContract": {
+    "Extractor" : [
+      "contractExtractor/suicideContractExtractor",
+      "python suicideContractExtractor.py"
+    ],
+    "Injector": [
+      "securityAbandonerAndInjector/suicideContract",
+      "python main.py"
+    ]
+  },
+  "transactionOrderDependancy": {
+    "Extractor" : [
+      "contractExtractor/transactionOrderDependancyExtractor",
+      "python TODExtractor.py"
+    ],
+    "Injector": [
+      "securityAbandonerAndInjector/transactionOrderDependancy",
+      "python main.py"
+    ]
+  },
+  "txOriginForAuthentication": {
+    "Extractor" : [
+      "contractExtractor/txOriginForAuthenticationExtractor",
+      "python txOriginForAuthenticationExtractor.py"
+    ],
+    "Injector": [
+      "securityAbandonerAndInjector/txOriginForAuthentication",
+      "python main.py"
+    ]
+  },
+  "unhandledException": {
+    "Extractor" : [
+      "contractExtractor/unhandledExceptionExtractor",
+      "python unhandledExceptionExtractor.py"
+    ],
+    "Injector": [
+      "securityAbandonerAndInjector/unhandledException",
+      "python main.py"
+    ]
+  },
+  "uninitializedLocalVariables": {
+    "Extractor" : [
+      "contractExtractor/uninitializedLocalVariablesExtractor",
+      "python uninitLocalStateVarExtractor.py"
+    ],
+    "Injector": [
+      "securityAbandonerAndInjector/uninitializedLocalVariables",
+      "python main.py"
+    ]
+  },
+  "unlimitedCompilerVersions": {
+    "Extractor" : [
+      "contractExtractor/unlimitedCompilerVersionsExtractor",
+      "python unlimitedCompilerVersionsExtractor.py"
+    ],
+    "Injector": [
+      "securityAbandonerAndInjector/unlimitedCompilerVersions",
+      "python main.py"
+    ]
+  },
+  "wastefulContracts": {
+    "Extractor" : [
+      "contractExtractor/wastefulContractsExtractor",
+      "python wastefulContractsExtractor.py"
+    ],
+    "Injector": [
+      "securityAbandonerAndInjector/wastefulContracts",
+      "python main.py"
+    ]
+  }
+}
