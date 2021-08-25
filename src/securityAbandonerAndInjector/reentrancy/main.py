@@ -7,6 +7,8 @@ CACHE_PATH = "./cache/"
 CACHE_CONTRACT_PATH = "./cache/temp.sol"
 #缓存路径信息文件
 CACHE_PATHINFO_PATH = "./cache/temp_sol.json"
+#缓存屏蔽信息文件
+CACHE_SHIELD_INFO_PATH = "./cache/tempShield_sol.json"
 #中间合约路径
 IR_CONTRACT_PATH = "./tempStorage/temp.sol"
 #中间路径信息
@@ -17,6 +19,8 @@ PATH_INFO_PATH = "../../contractExtractor/reentrancyExtractor/pathInfo"
 CONTRACT_PATH = "../../contractExtractor/reentrancyExtractor/result"
 #sol文件后缀
 SOL_SUFFIX = ".sol"
+#json文件后缀
+JSON_SUFFIX = ".json"
 #屏蔽完成后文件保存路径
 TEMP_STORAGE_PATH = "./tempStorage/"
 
@@ -31,6 +35,7 @@ class reentrancy:
 		self.pathInfo = _infoPath	#所有文件的路径信息情况
 		self.targetInfoFile = self.targetPathInfo(self.pathInfo)
 		self.targetContract = self.targetContractList(self.targetInfoFile, _contractPath)	#路径保存信息
+		self.targetShieldFile = self.targetShieldInfo(self.targetContract, _contractPath)
 		self.nowNum = 0
 		try:
 			os.mkdir(CACHE_PATH)	#建立缓存文件夹
@@ -42,6 +47,14 @@ class reentrancy:
 		except:
 			#print("The IR folder already exists.")
 			pass
+
+	def targetShieldInfo(self, _fileList, _contractPath):
+		result = list()
+		for filename in _fileList:
+			infoFileName = os.path.splitext(os.path.split(filename)[1])[0] + JSON_SUFFIX
+			result.append(os.path.join(_contractPath, infoFileName))
+		return result
+
 
 	def targetContractList(self, _fileList, _contractPath):
 		result = list()
@@ -66,15 +79,26 @@ class reentrancy:
 				continue
 		return str()
 
-	def cacheFile(self, _contract, _pathInfo):
+	def cacheFile(self, _contract, _pathInfo, _shieldPathInfo):
 		try:
 			with open(CACHE_CONTRACT_PATH, "w+", encoding = "utf-8") as f:
 				f.write(open(_contract).read())
 			with open(CACHE_PATHINFO_PATH, "w+",  encoding = "utf-8") as f:
 				f.write(open(_pathInfo).read())
+			with open(CACHE_SHIELD_INFO_PATH, "w+",  encoding = "utf-8") as f:
+				f.write(open(_pathInfo).read())
 			return
 		except:
 			raise Exception("Failed to cache contract.")
+
+	def getShieldInfoFile(self, _contractName, _infoFileList):
+		contractAddr = os.path.splitext(os.path.split(_contractName)[1])[0]
+		for file in _infoFileList:
+			if contractAddr in file:
+				return file
+			else:
+				continue
+		return str()
 
 	def run(self):
 		stime = time.time()
@@ -83,16 +107,17 @@ class reentrancy:
 		for contractFile in self.targetContract:
 			contractNum += 1
 			try:
-			#contractFile = os.path.join(CONTRACT_PATH, "0x9bdf81e6066d32764b7e75a1b5577237e06d9364.sol")
+				#contractFile = os.path.join(CONTRACT_PATH, "0x9bdf81e6066d32764b7e75a1b5577237e06d9364.sol")
 				pathInfoFile = self.getInfoFile(contractFile, self.targetInfoFile)
+				shieldInfoFile = self.getShieldInfoFile(contractFile, self.targetShieldFile)
 				print("\r\t   Injecting contract: ", os.path.split(contractFile)[1], end = "")
-				self.cacheFile(contractFile, pathInfoFile)
+				self.cacheFile(contractFile, pathInfoFile, shieldInfoFile)
 				#2. 屏蔽目标语句
 				RA = reentrancyAbandoner(CACHE_CONTRACT_PATH, CACHE_PATHINFO_PATH)
 				RA.shield()
 				RA.output()	
 				#3. 根据目标路径，插入语句 
-				RI = reentrancyInjector(IR_CONTRACT_PATH, IR_PATHINFO_PATH, self.getOriginalContractName(contractFile))
+				RI = reentrancyInjector(IR_CONTRACT_PATH, IR_PATHINFO_PATH, shieldInfoFile, self.getOriginalContractName(contractFile))
 				RI.inject()
 				RI.output()
 				#4. 输出进度
