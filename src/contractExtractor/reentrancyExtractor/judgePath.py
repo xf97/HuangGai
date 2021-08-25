@@ -153,8 +153,7 @@ class judgePath:
 
 	def run(self):
 		#第一步，应该是生成合约所有函数的CFG
-		#因为slither的此功能故障，因此暂时失效此功能
-		#self.getAllFuncCFG()
+		self.getAllFuncCFG()
 		#第二步，产生函数间的调用图（可能跨合约）
 		self.getAllFuncCallGraph()
 		#第三步，根据合约的CFG和函数调用图，尝试组合出所有路径
