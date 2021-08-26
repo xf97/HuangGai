@@ -100,7 +100,7 @@ class reentrancyInjector:
 		#print(infoDict, type(infoDict))
 		#injectInfo = dict()
 		injectInfo = self.initDict()
-		print(injectInfo)
+		#print(injectInfo)
 		#使用正则表达式，截取接收地址
 		addressPattern = re.compile(r"(\[)((\w)|(\.))+(\])")	#用于匹配接收转账的地址
 		for key in infoDict:
