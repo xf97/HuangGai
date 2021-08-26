@@ -18,6 +18,7 @@ SOURCE_CODE_PATH = "../../contractSpider/contractCodeGetter/sourceCode"
 SOURCE_CODE_PREFIX_PATH = "../../contractSpider/contractCodeGetter/sourceCode"
 #测试时源代码存储位置
 TESTCASE_PATH = "./testCase/"
+TESTCASE_PREFIX_PATH = ""
 #结果存储位置
 RESULT_PATH = "./result/"
 
@@ -165,6 +166,7 @@ class reentrancyExtractor:
 		try:
 			#拼接绝对路径
 			sourceCode = open(os.path.join(SOURCE_CODE_PREFIX_PATH, solList[index]), "r", encoding = "utf-8").read()
+			#sourceCode = open(os.path.join(TESTCASE_PATH, solList[index]), "r", encoding = "utf-8").read()
 			#[bug fix]清洗合约中的多字节字符，保证编译结果不错误
 			sourceCode = self.cleanMultibyte(sourceCode)
 			self.index += 1
@@ -173,7 +175,7 @@ class reentrancyExtractor:
 		except:
 			#无法获取源代码，则引发异常
 			self.index += 1
-			raise Exception("Unable to obtain source code " + solList[index])
+			#raise Exception("Unable to obtain source code " + solList[index])
 
 	#清洗合约源代码中的多字节字符
 	def cleanMultibyte(self, _sourceCode):
@@ -251,19 +253,21 @@ class reentrancyExtractor:
 		return True
 
 	def storeResult(self, _filename):
-		try:
-			#使用cp命令拷贝两份结果
-			desCode = os.path.join(RESULT_PATH, _filename)
-			#若文件存在，则不覆盖　
-			if os.path.exists(os.path.join(desCode)):
-				raise Exception("The result already exists.")
-			desJsonAst = os.path.join(RESULT_PATH, _filename + "_json.ast")
-			#执行拷贝，显示详细信息
-			codeExecuteResult = subprocess.run("cp " + self.cacheContractPath + " " + desCode, check = True, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-			astExecuteResult = subprocess.run("cp " + self.cacheJsonAstPath + self.cacheJsonAstName + " " + desJsonAst, check = True, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-			return
+		#try:
+		#使用cp命令拷贝两份结果
+		desCode = os.path.join(RESULT_PATH, _filename)
+		#若文件存在，则不覆盖　
+		if os.path.exists(os.path.join(desCode)):
+			raise Exception("The result already exists.")
+		desJsonAst = os.path.join(RESULT_PATH, _filename + "_json.ast")
+		#执行拷贝，显示详细信息
+		codeExecuteResult = subprocess.run("cp " + self.cacheContractPath + " " + desCode, check = True, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+		astExecuteResult = subprocess.run("cp " + self.cacheJsonAstPath + self.cacheJsonAstName + " " + desJsonAst, check = True, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+		return
+		'''
 		except:
 			raise Exception("Failed to store the result.")
+		'''
 
 
 #单元测试
