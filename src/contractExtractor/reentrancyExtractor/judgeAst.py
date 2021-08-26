@@ -150,6 +150,45 @@ class judgeAst:
 				result.append(_list[index])
 		_list = result[:]
 
+	#返回assert语句中的条件值部分
+	def getAssertStatement(self, _ast):
+		funcCall = self.findASTNode(_ast, "name", "FunctionCall")
+		srcList = list()	#assert语句中BinaryOperation的源代码位置
+		for call in funcCall:
+			if call["attributes"]["type"] == TUPLE_FLAG:
+				children0 = call["children"][0]	#children[0]是运算符
+				children1 = call["children"][1]	#children[1]是第一个参数－也只有一个
+				if children0["attributes"]["type"] == REQUIRE_FUNC_TYPE_FLAG and \
+				   children0["attributes"]["value"] == ASSERT_FLAG:
+				   	sPos, ePos = self.srcToPos(children1["src"])
+				   	srcList.append([sPos, ePos, BOOL_TRUE_FLAG])
+				else:
+					continue
+			else:
+				continue
+		#print(srcList, "****")
+		return srcList
+
+	#返回require语句中的条件值部分
+	def getRequireStatement(self, _ast):
+		funcCall = self.findASTNode(_ast, "name", "FunctionCall")
+		srcList = list()
+		for call in funcCall:
+			if call["attributes"]["type"] == TUPLE_FLAG:
+				children0 = call["children"][0]
+				children1 = call["children"][1]
+				if (children0["attributes"]["type"] == REQUIRE_FUNC_TYPE_FLAG or \
+					children0["attributes"]["type"] == REQUIRE_FUNC_STRING_TYPE_FLAG) and \
+				   children0["attributes"]["value"] == REQUIRE_FLAG:
+				   	sPos, ePos = self.srcToPos(children1["src"])
+				   	srcList.append([sPos, ePos, BOOL_TRUE_FLAG])
+				else:
+					continue
+			else:
+				continue
+		return srcList
+
+
 
 
 	def getAContractSig(self, _contractName):
