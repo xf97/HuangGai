@@ -31,9 +31,25 @@ import json
 CACHE_PATH = "./cache/"
 #终端输出记录文件
 TERMINAL_FILE = "log.txt"
+#注入所需信息存储路径
+INJECT_INFO_PATH = "./result/"
+#元组标志
+TUPLE_FLAG = "tuple()"
+#require和assert函数类型标志
+REQUIRE_FUNC_TYPE_FLAG = "function (bool) pure"
+#require的另一种形式 的定义
+REQUIRE_FUNC_STRING_TYPE_FLAG = "function (bool,string memory) pure"
+#require标志
+REQUIRE_FLAG = "require"
+#assert标志
+ASSERT_FLAG = "assert"
+#替换为真值flag
+BOOL_TRUE_FLAG = 0
 
+#图文件前缀
+DOT_PREFIX = "temp.sol."
 #图文件后缀
-DOT_SUFFIX = ".dot"
+DOT_SUFFIX = ".call-graph.dot"
 #有向边标志　
 EDGE_FLAG = " -> "
 #payable函数标志
@@ -105,6 +121,7 @@ class judgePath:
 		self.targetContractName = self.getMainContract()
 		self.json = _json
 		self.receiveEthPath = list()
+		self.funcCallGraph = list()
 		self.sendEthPath = list()
 		if not os.path.exists(PATH_INFO_PATH):
 			os.mkdir(PATH_INFO_PATH)	#若文件夹不存在，则建立路径信息保存文件夹
@@ -151,6 +168,119 @@ class judgePath:
 			#print("%s %s %s" % (bad, self.filename + " target path information...failed", end))
 			pass
 
+	#返回assert语句中的条件值部分
+	def getAssertStatement(self, _ast):
+		funcCall = self.findASTNode(_ast, "name", "FunctionCall")
+		srcList = list()	#assert语句中BinaryOperation的源代码位置
+		for call in funcCall:
+			if call["attributes"]["type"] == TUPLE_FLAG:
+				children0 = call["children"][0]	#children[0]是运算符
+				children1 = call["children"][1]	#children[1]是第一个参数－也只有一个
+				if children0["attributes"]["type"] == REQUIRE_FUNC_TYPE_FLAG and \
+				   children0["attributes"]["value"] == ASSERT_FLAG:
+				   	sPos, ePos = self.srcToPos(children1["src"])
+				   	srcList.append([sPos, ePos, BOOL_TRUE_FLAG])
+				else:
+					continue
+			else:
+				continue
+		#print(srcList, "****")
+		return srcList
+
+	#返回require语句中的条件值部分
+	def getRequireStatement(self, _ast):
+		funcCall = self.findASTNode(_ast, "name", "FunctionCall")
+		srcList = list()
+		for call in funcCall:
+			if call["attributes"]["type"] == TUPLE_FLAG:
+				children0 = call["children"][0]
+				children1 = call["children"][1]
+				if (children0["attributes"]["type"] == REQUIRE_FUNC_TYPE_FLAG or \
+					children0["attributes"]["type"] == REQUIRE_FUNC_STRING_TYPE_FLAG) and \
+				   children0["attributes"]["value"] == REQUIRE_FLAG:
+				   	sPos, ePos = self.srcToPos(children1["src"])
+				   	srcList.append([sPos, ePos, BOOL_TRUE_FLAG])
+				else:
+					continue
+			else:
+				continue
+		return srcList
+
+	def shieldTerminate(self, _statementInfo):
+		funcList = list()
+		contractAndFuncList = list()
+		for path in [i[0] for i in _statementInfo]:
+			for func in path:
+				contractAndFuncList.append(func)
+		#print(contractAndFuncList)
+		#根据合约和函数名获得funcList
+		for func in contractAndFuncList:
+			(contract, function) = tuple(func.split("."))
+			contractAst = self.getContractAst(contract)
+			for func in self.findASTNode(contractAst, "name",  "FunctionDefinition"):
+				if func["attributes"]["name"] == function:
+					#找到一个目标函数
+					funcList.append(func)
+				else:
+					continue
+		#寻找函数中可能影响转账的语句
+		srcList = list()	#该列表记录需要被屏蔽或替换的源代码位置
+		for funcAst in funcList:
+			srcList.extend(self.getRequireStatement(funcAst))
+			srcList.extend(self.getAssertStatement(funcAst))
+		#寻找函数修改其中的语句
+		#然后再增加函数修改器
+		#增补，修改器值得注意
+		#然后逐个搜索函数，增补函数使用的修改器到目标函数列表中
+		modifierList = list()
+		for func in funcList:
+			#此时的func是ast形式
+			usedModifierIdList = [item["children"][0]["attributes"]["referencedDeclaration"] for item in self.findASTNode(func, "name", "ModifierInvocation")]
+			if not usedModifierIdList:
+				continue
+			else:
+				#根据id找到修改器
+				for _id in usedModifierIdList:
+					modifierList.append(self.findASTNode(self.json, "id", _id)[0])
+		#print(modifierList)
+		#3. 函数修改器也看一下
+		for funcAst in modifierList:
+			srcList.extend(self.getRequireStatement(funcAst))
+			srcList.extend(self.getAssertStatement(funcAst))
+		#最后再增补一下非require和assert的身份验证语句
+		#造成误判，不使用该语句
+		#去重
+		srcList = self.removeDuplicate(srcList)
+		#存储信息
+		#无论有没有都写入
+		#if srcList:
+		self.storeInjectInfo(srcList)
+
+	def storeInjectInfo(self, _srcList):
+		try:
+			resultDict = dict()
+			resultDict["srcList"] = _srcList
+			#保存信息
+			with open(os.path.join(INJECT_INFO_PATH, self.filename.split(".")[0] + ".json"), "w", encoding = "utf-8") as f:
+				json.dump(resultDict, f, indent = 1)
+			#print("%s %s %s" % (info, self.filename + " target injected information...saved", end))
+		except:
+			#print("%s %s %s" % (bad, self.filename + " target injected information...failed", end))
+			pass
+			#raise Exception()
+
+	def removeDuplicate(self, _list):
+		result = list()
+		for item in _list:
+			if item not in result:
+				result.append(item)
+			else:
+				continue
+		return result
+
+
+
+
 	def run(self):
 		#第一步，应该是生成合约所有函数的CFG
 		self.getAllFuncCFG()
@@ -176,6 +306,9 @@ class judgePath:
 		else:
 			#如果符合抽取标准，则保存路径信息 
 			self.storePathInfo(statementInfo)
+			#print(statementInfo)
+			#记录路径中所有可能终止执行的语句
+			self.shieldTerminate(statementInfo)
 			#print("%s %s %s" % (info, "Meet the extraction criteria.", end))
 			return True
 		'''
@@ -211,6 +344,15 @@ class judgePath:
 			if i not in newResult:
 				newResult.append(i)
 		return newResult
+
+	def getContractAst(self, _name):
+		contractList = self.findASTNode(self.json, "name", "ContractDefinition")
+		for contract in contractList:
+			if contract["attributes"]["name"] == _name:
+				return contract
+			else:
+				continue
+		return contractList[0]
 
 	def findEtherOutStatement(self, _path):
 		'''
@@ -476,11 +618,10 @@ class judgePath:
 			pass
 
 	def getCallGraphDot(self):
-		dotFileName = self.targetContractName + DOT_SUFFIX
+		dotFileName = CACHE_PATH + DOT_PREFIX + self.targetContractName + DOT_SUFFIX
 		try:
 			f =  io.open(dotFileName)
 			edgeList =  list()
-			self.funcCallGraph = list()
 			#逐行遍历dot文件，找到所有有向边
 			for line in f.readlines():
 				if line.find(EDGE_FLAG) != -1:
@@ -670,7 +811,7 @@ class judgePath:
 		return result
 
 	def contractNameToNum(self,_callGraph):
-		dotFileName = self.targetContractName + DOT_SUFFIX
+		dotFileName = CACHE_PATH + DOT_PREFIX + self.targetContractName + DOT_SUFFIX
 		#try:
 		result = list()
 		f = io.open(dotFileName)
