@@ -38,6 +38,9 @@ One of the goals of *HuangGai* is to inject bugs into the contract while keeping
 
 We hope that this bug injection framework, like *Huang Gai*, is superficially a surrender of the enemy (generating a large number of vulnerable contracts), but actually the bug injection framework is helping us win (helping to evaluate the smart contract analysis tools and further promote the progress of the analysis tools).
 
+## The dataset used in our experiments
+Due to the github space limitation, we have to upload this dataset to Baidu NetDisk. You can find the dataset by accessing this url (https://pan.baidu.com/s/1yHusq3-_KtFY_s462biJjg), and the extraction code is t8bd.
+
 ## Quick start
 We provide a docker image of *HuangGai*. In this docker image, we have installed *HuangGai* and all the dependencies *HuangGai* needs to run, and collected 66,205 *real contracts* in this image. You just need to pull the docker image and modify ithe *userNeeds.json* (by *vim*), and you're done.
 
