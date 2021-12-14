@@ -44,6 +44,7 @@ non-private资源，那么我们仅考虑搜查以下两类资源：
 CALL_FLAG = 1
 PAYABLE_FLAG = 2
 MAPPING_FLAG = 3
+EVER_TRUE_FLAG = 4	#永真表达式标志
 
 #缓存路径
 CACHE_PATH = "./cache/"
@@ -149,6 +150,21 @@ class judgeAst:
 			else:
 				result.append(_list[index])
 		_list = result[:]
+
+	#返回if语句的条件值部分
+	def getIfStatement(self, _ast):
+		ifStatements = self.findASTNode(_ast, "name", "IfStatement")
+		srcList = list()	#目标语句
+		#拿出条件值部分
+		for ifStatement in ifStatements:
+			if ifStatement["children"][0]["attributes"]["type"] == "bool" and ifStatement["children"][0]["name"] == "BinaryOperation":
+				#找到
+				sPos, ePos = self.srcToPos(ifStatement["children"][0]["src"])
+				srcList.append([sPos, ePos, EVER_TRUE_FLAG])
+			else:
+				continue
+		return srcList	#2021/12/14 code here
+
 
 	#返回assert语句中的条件值部分
 	def getAssertStatement(self, _ast):
