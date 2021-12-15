@@ -5,6 +5,7 @@ import json
 import re
 import copy
 import os
+import random
 
 #转出语句
 CALL_VALUE_STATEMENT = ".call.value(1)(\"\");	//injected REENTRANCY\n"
@@ -27,6 +28,9 @@ SRC_LIST_KEY = "srcList"
 BOOL_TRUE_STR = "true"
 #替换为真值flag
 BOOL_TRUE_FLAG = 0
+#永真表达式集合文件
+EVERTRUEEXPRESSIONS_JSON_FILE_PATH = "./ever_true.json"
+EVERTRUEEXPRESSIONS_KEY = "exertrueExpressions"
 
 #记录结构体
 class statementInfo:
@@ -63,6 +67,16 @@ class reentrancyInjector:
 			raise Exception("Failed to get source code when injecting.")
 			return str()
 
+	def getEverTrueExpressions(self):
+		#该函数随机返回一个永真表达式字符串
+		everTrueStr = str()
+		#打开文件
+		with open(EVERTRUEEXPRESSIONS_JSON_FILE_PATH, "r", encoding = "utf-8") as f:
+			temp = json.loads(f.read())	#
+			expList = temp[EVERTRUEEXPRESSIONS_KEY]	#返回的这是一个列表了
+			everTrueStr = random.choice(expList)
+		return everTrueStr	#done
+
 	def initDict(self):
 		srcAndItsStr = dict()
 		#print(self.shieldInfo)
@@ -70,7 +84,7 @@ class reentrancyInjector:
 			#print(item)
 			if item[2] == BOOL_TRUE_FLAG:
 				#布尔真值，执行替换
-				srcAndItsStr[item[0]] = [item[1], BOOL_TRUE_STR]
+				srcAndItsStr[item[0]] = [item[1], self.getEverTrueExpressions()]
 		return srcAndItsStr
 
 	def inject(self):
@@ -97,6 +111,7 @@ class reentrancyInjector:
 			infoDict[deductIndex] = item
 		#2. 根据不同路径，构造匹配语句并记录插入位置
 		#[bug fix] 添加屏蔽路径上require和assert语句
+		#[bug fix] 使路径上的if语句的条件表达式部分永真
 		#print(infoDict, type(infoDict))
 		#injectInfo = dict()
 		injectInfo = self.initDict()
