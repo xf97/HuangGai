@@ -206,6 +206,20 @@ class judgePath:
 				continue
 		return srcList
 
+	#返回if语句的条件值部分
+	def getIfStatement(self, _ast):
+		ifStatements = self.findASTNode(_ast, "name", "IfStatement")
+		srcList = list()	#目标语句
+		#拿出条件值部分
+		for ifStatement in ifStatements:
+			if ifStatement["children"][0]["attributes"]["type"] == "bool" and ifStatement["children"][0]["name"] == "BinaryOperation":
+				#找到
+				sPos, ePos = self.srcToPos(ifStatement["children"][0]["src"])
+				srcList.append([sPos, ePos, EVER_TRUE_FLAG])
+			else:
+				continue
+		return srcList	#2021/12/14 code here
+
 	def shieldTerminate(self, _statementInfo):
 		funcList = list()
 		contractAndFuncList = list()
@@ -226,8 +240,11 @@ class judgePath:
 		#寻找函数中可能影响转账的语句
 		srcList = list()	#该列表记录需要被屏蔽或替换的源代码位置
 		for funcAst in funcList:
+			'''
 			srcList.extend(self.getRequireStatement(funcAst))
 			srcList.extend(self.getAssertStatement(funcAst))
+			'''
+			srcList.extend(self.getIfStatement(funcAst))	#funcAst是目标函数的完整ast，因此可以传入
 		#寻找函数修改其中的语句
 		#然后再增加函数修改器
 		#增补，修改器值得注意
@@ -245,8 +262,9 @@ class judgePath:
 		#print(modifierList)
 		#3. 函数修改器也看一下
 		for funcAst in modifierList:
-			srcList.extend(self.getRequireStatement(funcAst))
-			srcList.extend(self.getAssertStatement(funcAst))
+			#srcList.extend(self.getRequireStatement(funcAst))
+			#srcList.extend(self.getAssertStatement(funcAst))
+			srcList.extend(self.getIfStatement(funcAst))
 		#最后再增补一下非require和assert的身份验证语句
 		#造成误判，不使用该语句
 		#去重
